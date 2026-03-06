@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/navbar/navbar_button.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
+import 'package:wisebuget/features/navbar/presentation/widgets/navbar_button.dart';
 
 class Navbar extends StatelessWidget {
   final int activeIndex;

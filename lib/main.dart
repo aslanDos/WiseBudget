@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_constants.dart';
+import 'package:wisebuget/core/di/dependency_injection.dart' as di;
+import 'package:wisebuget/core/logger/logger_setup.dart';
 import 'package:wisebuget/core/router/router.dart';
 import 'package:wisebuget/core/theme/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  setupLogging();
+  await di.init();
   runApp(const WiseBudget());
 }
 

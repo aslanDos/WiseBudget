@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/router/home_router.dart';
-import 'package:wisebuget/core/router/onboarding_router.dart';
 import 'package:wisebuget/core/router/routes.dart';
 
 final GlobalKey<NavigatorState> globalNavigatorKey =

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
-import 'package:wisebuget/core/shared/widgets/navbar/navbar.dart';
-import 'package:wisebuget/core/shared/widgets/navbar/new_transaction_button.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_tab.dart';
 import 'package:wisebuget/features/home/presentation/pages/home_tab.dart';
 import 'package:wisebuget/features/analytics/presentation/pages/analytics_tab.dart';
+import 'package:wisebuget/features/navbar/presentation/navbar.dart';
+import 'package:wisebuget/features/navbar/presentation/widgets/new_transaction_button.dart';
 import 'package:wisebuget/features/settings/presentation/pages/settings_tab.dart';
 
 class HomePage extends StatefulWidget {
