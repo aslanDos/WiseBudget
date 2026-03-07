@@ -16,8 +16,8 @@ class NewTransactionButton extends StatelessWidget {
         child: Icon(
           AppIcons.add,
           fill: 0.0,
-          color: navbarTheme.transactionButtonForegroundColor,
-          weight: 600.0,
+          color: navbarTheme.backgroundColor,
+          weight: 900.0,
         ),
       ),
     );

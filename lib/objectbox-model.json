@@ -1,0 +1,61 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:382033324989994512",
+      "lastPropertyId": "6:1244932568722291277",
+      "name": "AccountModel",
+      "properties": [
+        {
+          "id": "1:5762687634356238683",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6642607828898678055",
+          "name": "uuid",
+          "indexId": "1:8962986254979889701",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:1136003196780488071",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:3594987435910699938",
+          "name": "currency",
+          "type": 9
+        },
+        {
+          "id": "5:7263988078248117948",
+          "name": "sortOrder",
+          "indexId": "2:3721445483240570850",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "6:1244932568722291277",
+          "name": "iconCode",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:382033324989994512",
+  "lastIndexId": "2:3721445483240570850",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
