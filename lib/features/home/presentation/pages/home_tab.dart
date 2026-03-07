@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/icons/app_icons.dart';
 
 class HomeTab extends StatelessWidget {
   final ScrollController? scrollController;
@@ -6,6 +7,13 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Center(child: Text('Home Tab')));
+    return Scaffold(
+      appBar: AppBar(
+        leading: Icon(AppIcons.settings),
+        centerTitle: true,
+        title: Text('Home'),
+      ),
+      body: Container(child: Center(child: Text('Home Tab'))),
+    );
   }
 }

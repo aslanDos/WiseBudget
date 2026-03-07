@@ -5,7 +5,7 @@ import 'package:wisebuget/features/home/presentation/pages/home_tab.dart';
 import 'package:wisebuget/features/analytics/presentation/pages/analytics_tab.dart';
 import 'package:wisebuget/features/navbar/presentation/navbar.dart';
 import 'package:wisebuget/features/navbar/presentation/widgets/new_transaction_button.dart';
-import 'package:wisebuget/features/settings/presentation/pages/settings_tab.dart';
+import 'package:wisebuget/features/tools/presentation/page/tools_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -59,29 +59,29 @@ class _HomePageState extends State<HomePage>
               HomeTab(scrollController: _homeTabScrollController),
               const AccountTab(),
               const AnalyticsTab(),
-              const SettingsTab(),
+              const ToolsTab(),
             ],
           ),
         ),
         Positioned(
-          bottom: 16.0,
+          bottom: 4.0,
           left: 0.0,
           right: 0.0,
           child: SafeArea(
             child: Frame(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Navbar(
-                    onTap: (i) => _navigateTo(i),
-                    activeIndex: _currentIndex,
-                  ),
-                  NewTransactionButton(),
-                ],
+              child: Navbar(
+                onTap: (i) => _navigateTo(i),
+                activeIndex: _currentIndex,
               ),
             ),
           ),
         ),
+        if (_currentIndex == 0)
+          Positioned(
+            bottom: 64.0,
+            right: 16.0,
+            child: SafeArea(child: NewTransactionButton()),
+          ),
       ],
     );
   }

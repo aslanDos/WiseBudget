@@ -13,6 +13,7 @@ class AppIcons {
   static const IconData arrowDownRight = LucideIcons.arrowDownRight;
   static const IconData arrowUpDown = LucideIcons.arrowUpDown;
   static const IconData check = LucideIcons.check;
+  static const IconData briefCase = LucideIcons.briefcaseBusiness;
   static const IconData wallet = LucideIcons.wallet;
   static const IconData settings = LucideIcons.settings;
   static const IconData pencil = LucideIcons.pencil;
@@ -20,4 +21,8 @@ class AppIcons {
   static const IconData trash = LucideIcons.trash2;
   static const IconData calendar = LucideIcons.calendarDays;
   static const IconData empty = LucideIcons.octagonMinus;
+  static const IconData crown = LucideIcons.crown;
+  static const IconData grid = LucideIcons.layoutGrid;
+  static const IconData bell = LucideIcons.bell;
+  static const IconData messageSquare = LucideIcons.messageSquare;
 }
