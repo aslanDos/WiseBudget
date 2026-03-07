@@ -1,4 +1,4 @@
-import 'package:wisebuget/features/account/data/datasource/account_local_datasource.dart';
+import 'package:wisebuget/features/account/data/data_source/account_local_datasource.dart';
 import 'package:wisebuget/features/account/data/model/account_model.dart';
 import 'package:wisebuget/objectbox.g.dart';
 
@@ -9,8 +9,7 @@ class AccountLocalDataSourceImpl implements AccountLocalDataSource {
 
   @override
   Future<List<AccountModel>> getAccounts() async {
-    final query = _box.query()
-      ..order(AccountModel_.sortOrder);
+    final query = _box.query()..order(AccountModel_.sortOrder);
     return query.build().find();
   }
 

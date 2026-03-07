@@ -17,4 +17,7 @@ abstract class AccountRepository {
 
   /// Delete account by uuid
   Future<Either<Failure, void>> deleteAccount(String uuid);
+
+  /// Seed default account if no accounts exist
+  Future<Either<Failure, void>> seedDefaultAccount();
 }

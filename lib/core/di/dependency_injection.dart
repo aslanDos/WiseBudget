@@ -2,8 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisebuget/core/database/objectbox.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
-import 'package:wisebuget/features/account/data/datasource/account_local_datasource.dart';
-import 'package:wisebuget/features/account/data/datasource/account_local_datasource_impl.dart';
+import 'package:wisebuget/features/account/data/data_source/account_local_datasource.dart';
+import 'package:wisebuget/features/account/data/data_source/account_local_datasource_impl.dart';
 import 'package:wisebuget/features/account/data/repository/account_repository_impl.dart';
 import 'package:wisebuget/features/account/domain/repository/account_repository.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
@@ -43,12 +43,16 @@ void _initAccountFeature() {
   sl.registerLazySingleton(() => CreateAccount(sl()));
   sl.registerLazySingleton(() => UpdateAccount(sl()));
   sl.registerLazySingleton(() => DeleteAccount(sl()));
+  sl.registerLazySingleton(() => SeedDefaultAccount(sl()));
 
   // Cubit
-  sl.registerFactory(() => AccountCubit(
-        getAccounts: sl(),
-        createAccount: sl(),
-        updateAccount: sl(),
-        deleteAccount: sl(),
-      ));
+  sl.registerFactory(
+    () => AccountCubit(
+      getAccounts: sl(),
+      createAccount: sl(),
+      updateAccount: sl(),
+      deleteAccount: sl(),
+      seedDefaultAccount: sl(),
+    ),
+  );
 }

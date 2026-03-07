@@ -1,9 +1,13 @@
 import 'package:dartz/dartz.dart';
+import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/errors/failures.dart';
-import 'package:wisebuget/features/account/data/datasource/account_local_datasource.dart';
+import 'package:wisebuget/features/account/data/data_source/account_local_datasource.dart';
 import 'package:wisebuget/features/account/data/model/account_model.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/domain/repository/account_repository.dart';
+
+final _log = Logger('AccountRepository');
 
 class AccountRepositoryImpl implements AccountRepository {
   final AccountLocalDataSource localDataSource;
@@ -35,7 +39,9 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, AccountEntity>> createAccount(AccountEntity account) async {
+  Future<Either<Failure, AccountEntity>> createAccount(
+    AccountEntity account,
+  ) async {
     try {
       final model = AccountModel.fromEntity(account);
       final created = await localDataSource.createAccount(model);
@@ -46,7 +52,9 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, AccountEntity>> updateAccount(AccountEntity account) async {
+  Future<Either<Failure, AccountEntity>> updateAccount(
+    AccountEntity account,
+  ) async {
     try {
       final model = AccountModel.fromEntity(account);
       final updated = await localDataSource.updateAccount(model);
@@ -63,6 +71,34 @@ class AccountRepositoryImpl implements AccountRepository {
       return const Right(null);
     } catch (e) {
       return Left(DatabaseFailure('Failed to delete account: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> seedDefaultAccount() async {
+    try {
+      final accounts = await localDataSource.getAccounts();
+      if (accounts.isNotEmpty) {
+        _log.fine('Accounts already exist, skipping seed');
+        return const Right(null);
+      }
+
+      _log.info('No accounts found, creating default account');
+
+      final defaultAccount = AccountModel(
+        uuid: const Uuid().v4(),
+        name: 'Cash',
+        currency: 'KZT',
+        sortOrder: 0,
+        iconCode: 'wallet',
+      );
+
+      await localDataSource.createAccount(defaultAccount);
+      _log.info('Default account created successfully');
+      return const Right(null);
+    } catch (e) {
+      _log.severe('Failed to seed default account', e);
+      return Left(DatabaseFailure('Failed to seed default account: $e'));
     }
   }
 }
