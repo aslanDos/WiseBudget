@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 
 class ToolItem {
@@ -7,6 +8,7 @@ class ToolItem {
   final String subtitle;
   final Color iconColor;
   final Color backgroundColor;
+  final String? route;
 
   const ToolItem({
     required this.icon,
@@ -14,10 +16,11 @@ class ToolItem {
     required this.subtitle,
     required this.iconColor,
     required this.backgroundColor,
+    this.route,
   });
 
-  static const List<ToolItem> items = [
-    ToolItem(
+  static final List<ToolItem> items = [
+    const ToolItem(
       icon: AppIcons.crown,
       title: 'Premium',
       subtitle: 'Unlock all features',
@@ -28,17 +31,18 @@ class ToolItem {
       icon: AppIcons.grid,
       title: 'Categories',
       subtitle: 'Manage categories',
-      iconColor: Color(0xFF6366F1),
-      backgroundColor: Color(0xFFEEF2FF),
+      iconColor: const Color(0xFF6366F1),
+      backgroundColor: const Color(0xFFEEF2FF),
+      route: AppRoutes.manageCategories,
     ),
-    ToolItem(
+    const ToolItem(
       icon: AppIcons.bell,
       title: 'Notifications',
       subtitle: 'Manage alerts',
       iconColor: Color(0xFFEF4444),
       backgroundColor: Color(0xFFFEE2E2),
     ),
-    ToolItem(
+    const ToolItem(
       icon: AppIcons.messageSquare,
       title: 'Feedback',
       subtitle: 'Share your thoughts',

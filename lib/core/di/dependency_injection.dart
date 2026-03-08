@@ -8,6 +8,12 @@ import 'package:wisebuget/features/account/data/repository/account_repository_im
 import 'package:wisebuget/features/account/domain/repository/account_repository.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
+import 'package:wisebuget/features/category/data/data_source/category_local_datasource_impl.dart';
+import 'package:wisebuget/features/category/data/repository/category_repository_impl.dart';
+import 'package:wisebuget/features/category/domain/repository/category_repository.dart';
+import 'package:wisebuget/features/category/domain/usecases/category_usecases.dart';
+import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -22,8 +28,9 @@ Future<void> init() async {
   // Preferences
   sl.registerSingleton(LocalPreferences(prefs: sl()));
 
-  // Account Feature
+  // Features
   _initAccountFeature();
+  _initCategoryFeature();
 }
 
 void _initAccountFeature() {
@@ -53,6 +60,37 @@ void _initAccountFeature() {
       updateAccount: sl(),
       deleteAccount: sl(),
       seedDefaultAccount: sl(),
+    ),
+  );
+}
+
+void _initCategoryFeature() {
+  // Data sources
+  sl.registerLazySingleton<CategoryLocalDataSource>(
+    () => CategoryLocalDataSourceImpl(sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(localDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetCategories(sl()));
+  sl.registerLazySingleton(() => GetCategoryById(sl()));
+  sl.registerLazySingleton(() => CreateCategory(sl()));
+  sl.registerLazySingleton(() => UpdateCategory(sl()));
+  sl.registerLazySingleton(() => DeleteCategory(sl()));
+  sl.registerLazySingleton(() => SeedDefaultCategories(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => CategoryCubit(
+      getCategories: sl(),
+      createCategory: sl(),
+      updateCategory: sl(),
+      deleteCategory: sl(),
+      seedDefaultCategories: sl(),
     ),
   );
 }

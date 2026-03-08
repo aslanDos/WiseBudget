@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:382033324989994512",
-      "lastPropertyId": "6:1244932568722291277",
+      "lastPropertyId": "8:2150691393952799244",
       "name": "AccountModel",
       "properties": [
         {
@@ -42,13 +42,71 @@
           "id": "6:1244932568722291277",
           "name": "iconCode",
           "type": 9
+        },
+        {
+          "id": "7:6134489207178538838",
+          "name": "createdDate",
+          "type": 10
+        },
+        {
+          "id": "8:2150691393952799244",
+          "name": "balance",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:9214700060690020303",
+      "lastPropertyId": "7:2927885393013914745",
+      "name": "CategoryModel",
+      "properties": [
+        {
+          "id": "1:5042176435344498329",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4964907963736203626",
+          "name": "uuid",
+          "indexId": "3:2131731661318091830",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:2950322200862300025",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:5183834337721085102",
+          "name": "sortOrder",
+          "indexId": "4:3028586126921687772",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "5:4652026289613823089",
+          "name": "iconCode",
+          "type": 9
+        },
+        {
+          "id": "6:3128269495404495968",
+          "name": "createdDate",
+          "type": 10
+        },
+        {
+          "id": "7:2927885393013914745",
+          "name": "type",
+          "type": 9
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "1:382033324989994512",
-  "lastIndexId": "2:3721445483240570850",
+  "lastEntityId": "2:9214700060690020303",
+  "lastIndexId": "4:3028586126921687772",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

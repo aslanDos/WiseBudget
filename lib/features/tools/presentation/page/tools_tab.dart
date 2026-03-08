@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/features/tools/data/tool_item.dart';
@@ -32,7 +33,11 @@ class ToolsTab extends StatelessWidget {
               subtitle: item.subtitle,
               iconColor: item.iconColor,
               backgroundColor: item.backgroundColor,
-              onTap: () {},
+              onTap: () {
+                if (item.route != null) {
+                  context.push(item.route!);
+                }
+              },
             );
           },
         ),

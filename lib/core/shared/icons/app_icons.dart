@@ -4,6 +4,41 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class AppIcons {
   AppIcons._();
 
+  /// Icon code to IconData mapping
+  static const Map<String, IconData> _iconMap = {
+    'chevronBottom': chevronBottom,
+    'circle': circle,
+    'chart': chart,
+    'add': add,
+    'close': close,
+    'arrowUpLeft': arrowUpleft,
+    'arrowDownRight': arrowDownRight,
+    'arrowUpDown': arrowUpDown,
+    'check': check,
+    'briefCase': briefCase,
+    'wallet': wallet,
+    'settings': settings,
+    'pencil': pencil,
+    'gripVertical': gripVertical,
+    'trash': trash,
+    'calendar': calendar,
+    'empty': empty,
+    'crown': crown,
+    'grid': grid,
+    'bell': bell,
+    'messageSquare': messageSquare,
+    // Category icons
+    'utensils': utensils,
+    'car': car,
+    'shoppingBag': shoppingBag,
+    'gamepad': gamepad,
+    'receipt': receipt,
+    'gift': gift,
+  };
+
+  /// Resolves icon code to IconData, returns [empty] if not found
+  static IconData fromCode(String code) => _iconMap[code] ?? empty;
+
   static const IconData chevronBottom = LucideIcons.chevronDown;
   static const IconData circle = LucideIcons.circle;
   static const IconData chart = LucideIcons.chartNoAxesCombined;
@@ -25,4 +60,12 @@ class AppIcons {
   static const IconData grid = LucideIcons.layoutGrid;
   static const IconData bell = LucideIcons.bell;
   static const IconData messageSquare = LucideIcons.messageSquare;
+
+  // Category icons
+  static const IconData utensils = LucideIcons.utensils;
+  static const IconData car = LucideIcons.car;
+  static const IconData shoppingBag = LucideIcons.shoppingBag;
+  static const IconData gamepad = LucideIcons.gamepad2;
+  static const IconData receipt = LucideIcons.receipt;
+  static const IconData gift = LucideIcons.gift;
 }

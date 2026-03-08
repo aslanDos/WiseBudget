@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/account/data/model/account_model.dart';
+import 'features/category/data/model/category_model.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -22,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 382033324989994512),
     name: 'AccountModel',
-    lastPropertyId: const obx_int.IdUid(6, 1244932568722291277),
+    lastPropertyId: const obx_int.IdUid(8, 2150691393952799244),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -60,6 +61,72 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(6, 1244932568722291277),
         name: 'iconCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 6134489207178538838),
+        name: 'createdDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 2150691393952799244),
+        name: 'balance',
+        type: 8,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(2, 9214700060690020303),
+    name: 'CategoryModel',
+    lastPropertyId: const obx_int.IdUid(7, 2927885393013914745),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5042176435344498329),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4964907963736203626),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(3, 2131731661318091830),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2950322200862300025),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5183834337721085102),
+        name: 'sortOrder',
+        type: 6,
+        flags: 8,
+        indexId: const obx_int.IdUid(4, 3028586126921687772),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 4652026289613823089),
+        name: 'iconCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 3128269495404495968),
+        name: 'createdDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 2927885393013914745),
+        name: 'type',
         type: 9,
         flags: 0,
       ),
@@ -112,8 +179,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(1, 382033324989994512),
-    lastIndexId: const obx_int.IdUid(2, 3721445483240570850),
+    lastEntityId: const obx_int.IdUid(2, 9214700060690020303),
+    lastIndexId: const obx_int.IdUid(4, 3028586126921687772),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -139,13 +206,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final currencyOffset = fbb.writeString(object.currency);
         final iconCodeOffset = fbb.writeString(object.iconCode);
-        fbb.startTable(7);
+        fbb.startTable(9);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addOffset(2, nameOffset);
         fbb.addOffset(3, currencyOffset);
         fbb.addInt64(4, object.sortOrder);
         fbb.addOffset(5, iconCodeOffset);
+        fbb.addInt64(6, object.createdDate.millisecondsSinceEpoch);
+        fbb.addFloat64(7, object.balance);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -167,6 +236,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final currencyParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 10, '');
+        final balanceParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
         final sortOrderParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -176,13 +251,85 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final iconCodeParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 14, '');
+        final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
+        );
         final object = AccountModel(
           id: idParam,
           uuid: uuidParam,
           name: nameParam,
           currency: currencyParam,
+          balance: balanceParam,
           sortOrder: sortOrderParam,
           iconCode: iconCodeParam,
+          createdDate: createdDateParam,
+        );
+
+        return object;
+      },
+    ),
+    CategoryModel: obx_int.EntityDefinition<CategoryModel>(
+      model: _entities[1],
+      toOneRelations: (CategoryModel object) => [],
+      toManyRelations: (CategoryModel object) => {},
+      getId: (CategoryModel object) => object.id,
+      setId: (CategoryModel object, int id) {
+        object.id = id;
+      },
+      objectToFB: (CategoryModel object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final nameOffset = fbb.writeString(object.name);
+        final iconCodeOffset = fbb.writeString(object.iconCode);
+        final typeOffset = fbb.writeString(object.type);
+        fbb.startTable(8);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addOffset(2, nameOffset);
+        fbb.addInt64(3, object.sortOrder);
+        fbb.addOffset(4, iconCodeOffset);
+        fbb.addInt64(5, object.createdDate.millisecondsSinceEpoch);
+        fbb.addOffset(6, typeOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final sortOrderParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final iconCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
+        final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
+        );
+        final object = CategoryModel(
+          id: idParam,
+          uuid: uuidParam,
+          name: nameParam,
+          sortOrder: sortOrderParam,
+          iconCode: iconCodeParam,
+          type: typeParam,
+          createdDate: createdDateParam,
         );
 
         return object;
@@ -223,5 +370,53 @@ class AccountModel_ {
   /// See [AccountModel.iconCode].
   static final iconCode = obx.QueryStringProperty<AccountModel>(
     _entities[0].properties[5],
+  );
+
+  /// See [AccountModel.createdDate].
+  static final createdDate = obx.QueryDateProperty<AccountModel>(
+    _entities[0].properties[6],
+  );
+
+  /// See [AccountModel.balance].
+  static final balance = obx.QueryDoubleProperty<AccountModel>(
+    _entities[0].properties[7],
+  );
+}
+
+/// [CategoryModel] entity fields to define ObjectBox queries.
+class CategoryModel_ {
+  /// See [CategoryModel.id].
+  static final id = obx.QueryIntegerProperty<CategoryModel>(
+    _entities[1].properties[0],
+  );
+
+  /// See [CategoryModel.uuid].
+  static final uuid = obx.QueryStringProperty<CategoryModel>(
+    _entities[1].properties[1],
+  );
+
+  /// See [CategoryModel.name].
+  static final name = obx.QueryStringProperty<CategoryModel>(
+    _entities[1].properties[2],
+  );
+
+  /// See [CategoryModel.sortOrder].
+  static final sortOrder = obx.QueryIntegerProperty<CategoryModel>(
+    _entities[1].properties[3],
+  );
+
+  /// See [CategoryModel.iconCode].
+  static final iconCode = obx.QueryStringProperty<CategoryModel>(
+    _entities[1].properties[4],
+  );
+
+  /// See [CategoryModel.createdDate].
+  static final createdDate = obx.QueryDateProperty<CategoryModel>(
+    _entities[1].properties[5],
+  );
+
+  /// See [CategoryModel.type].
+  static final type = obx.QueryStringProperty<CategoryModel>(
+    _entities[1].properties[6],
   );
 }

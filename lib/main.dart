@@ -6,6 +6,7 @@ import 'package:wisebuget/core/logger/logger_setup.dart';
 import 'package:wisebuget/core/router/router.dart';
 import 'package:wisebuget/core/theme/app_theme.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 
 final _log = Logger('Main');
 
@@ -33,6 +34,7 @@ class _WiseBudgetState extends State<WiseBudget> {
   Future<void> _seedDefaultData() async {
     _log.info('Seeding default data');
     await di.sl<AccountCubit>().seedDefaultAccount();
+    await di.sl<CategoryCubit>().seedDefaultCategories();
   }
 
   @override
