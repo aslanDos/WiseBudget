@@ -25,10 +25,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return BlocProvider(
       create: (_) => sl<CategoryCubit>()..loadCategories(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Categories'),
-          centerTitle: true,
-        ),
+        appBar: AppBar(title: const Text('Categories'), centerTitle: true),
         body: Column(
           children: [
             Frame(
@@ -49,10 +46,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final categories = state.categories
-                      .where((c) => c.type == _selectedType)
-                      .toList()
-                    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+                  final categories =
+                      state.categories
+                          .where((c) => c.type == _selectedType)
+                          .toList()
+                        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
                   if (categories.isEmpty) {
                     return Center(
@@ -67,7 +65,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           const SizedBox(height: 16.0),
                           Text(
                             'No ${_selectedType.value} categories',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
                                   color: Theme.of(context).colorScheme.outline,
                                 ),
                           ),
@@ -166,7 +165,10 @@ class _CategoriesList extends StatelessWidget {
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
-            final elevation = Tween<double>(begin: 0, end: 4).animate(animation);
+            final elevation = Tween<double>(
+              begin: 0,
+              end: 4,
+            ).animate(animation);
             return Material(
               elevation: elevation.value,
               borderRadius: BorderRadius.circular(12.0),

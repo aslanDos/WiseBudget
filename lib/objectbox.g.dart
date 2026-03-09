@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/account/data/model/account_model.dart';
 import 'features/category/data/model/category_model.dart';
+import 'features/transaction/data/model/transaction_model.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -134,6 +135,80 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(3, 4887377587349221783),
+    name: 'TransactionModel',
+    lastPropertyId: const obx_int.IdUid(10, 1046574712184831675),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8265815489559655068),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 240131740609387706),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(5, 3219095287413770953),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 765549453558749912),
+        name: 'amount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 2022185303494821467),
+        name: 'currency',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3397911784444922825),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 6473185591998799718),
+        name: 'categoryUuid',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(6, 1342639113838923788),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 7653500323661685717),
+        name: 'accountUuid',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(7, 4503638087803091419),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 2423795632474298415),
+        name: 'note',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 8872363332800351242),
+        name: 'date',
+        type: 10,
+        flags: 8,
+        indexId: const obx_int.IdUid(8, 995482463966676039),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 1046574712184831675),
+        name: 'createdDate',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -179,8 +254,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(2, 9214700060690020303),
-    lastIndexId: const obx_int.IdUid(4, 3028586126921687772),
+    lastEntityId: const obx_int.IdUid(3, 4887377587349221783),
+    lastIndexId: const obx_int.IdUid(8, 995482463966676039),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -335,6 +410,92 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    TransactionModel: obx_int.EntityDefinition<TransactionModel>(
+      model: _entities[2],
+      toOneRelations: (TransactionModel object) => [],
+      toManyRelations: (TransactionModel object) => {},
+      getId: (TransactionModel object) => object.id,
+      setId: (TransactionModel object, int id) {
+        object.id = id;
+      },
+      objectToFB: (TransactionModel object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final currencyOffset = fbb.writeString(object.currency);
+        final typeOffset = fbb.writeString(object.type);
+        final categoryUuidOffset = fbb.writeString(object.categoryUuid);
+        final accountUuidOffset = fbb.writeString(object.accountUuid);
+        final noteOffset = object.note == null
+            ? null
+            : fbb.writeString(object.note!);
+        fbb.startTable(11);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addFloat64(2, object.amount);
+        fbb.addOffset(3, currencyOffset);
+        fbb.addOffset(4, typeOffset);
+        fbb.addOffset(5, categoryUuidOffset);
+        fbb.addOffset(6, accountUuidOffset);
+        fbb.addOffset(7, noteOffset);
+        fbb.addInt64(8, object.date.millisecondsSinceEpoch);
+        fbb.addInt64(9, object.createdDate.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final amountParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final currencyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final categoryUuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final accountUuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
+        final noteParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 18);
+        final dateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
+        );
+        final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0),
+        );
+        final object = TransactionModel(
+          id: idParam,
+          uuid: uuidParam,
+          amount: amountParam,
+          currency: currencyParam,
+          type: typeParam,
+          categoryUuid: categoryUuidParam,
+          accountUuid: accountUuidParam,
+          note: noteParam,
+          date: dateParam,
+          createdDate: createdDateParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -418,5 +579,58 @@ class CategoryModel_ {
   /// See [CategoryModel.type].
   static final type = obx.QueryStringProperty<CategoryModel>(
     _entities[1].properties[6],
+  );
+}
+
+/// [TransactionModel] entity fields to define ObjectBox queries.
+class TransactionModel_ {
+  /// See [TransactionModel.id].
+  static final id = obx.QueryIntegerProperty<TransactionModel>(
+    _entities[2].properties[0],
+  );
+
+  /// See [TransactionModel.uuid].
+  static final uuid = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[1],
+  );
+
+  /// See [TransactionModel.amount].
+  static final amount = obx.QueryDoubleProperty<TransactionModel>(
+    _entities[2].properties[2],
+  );
+
+  /// See [TransactionModel.currency].
+  static final currency = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[3],
+  );
+
+  /// See [TransactionModel.type].
+  static final type = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[4],
+  );
+
+  /// See [TransactionModel.categoryUuid].
+  static final categoryUuid = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[5],
+  );
+
+  /// See [TransactionModel.accountUuid].
+  static final accountUuid = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[6],
+  );
+
+  /// See [TransactionModel.note].
+  static final note = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[7],
+  );
+
+  /// See [TransactionModel.date].
+  static final date = obx.QueryDateProperty<TransactionModel>(
+    _entities[2].properties[8],
+  );
+
+  /// See [TransactionModel.createdDate].
+  static final createdDate = obx.QueryDateProperty<TransactionModel>(
+    _entities[2].properties[9],
   );
 }

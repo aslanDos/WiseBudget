@@ -103,10 +103,77 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:4887377587349221783",
+      "lastPropertyId": "10:1046574712184831675",
+      "name": "TransactionModel",
+      "properties": [
+        {
+          "id": "1:8265815489559655068",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:240131740609387706",
+          "name": "uuid",
+          "indexId": "5:3219095287413770953",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:765549453558749912",
+          "name": "amount",
+          "type": 8
+        },
+        {
+          "id": "4:2022185303494821467",
+          "name": "currency",
+          "type": 9
+        },
+        {
+          "id": "5:3397911784444922825",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "6:6473185591998799718",
+          "name": "categoryUuid",
+          "indexId": "6:1342639113838923788",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "7:7653500323661685717",
+          "name": "accountUuid",
+          "indexId": "7:4503638087803091419",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "8:2423795632474298415",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "9:8872363332800351242",
+          "name": "date",
+          "indexId": "8:995482463966676039",
+          "type": 10,
+          "flags": 8
+        },
+        {
+          "id": "10:1046574712184831675",
+          "name": "createdDate",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:9214700060690020303",
-  "lastIndexId": "4:3028586126921687772",
+  "lastEntityId": "3:4887377587349221783",
+  "lastIndexId": "8:995482463966676039",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

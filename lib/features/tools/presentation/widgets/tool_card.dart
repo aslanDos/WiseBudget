@@ -24,7 +24,7 @@ class ToolCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
-      color: AppColors.subtext0,
+      color: Colors.white.withValues(alpha: 0.7),
       borderRadius: BorderRadius.circular(16.0),
       child: InkWell(
         overlayColor: WidgetStateProperty.all(Colors.transparent),

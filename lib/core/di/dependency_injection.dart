@@ -14,6 +14,12 @@ import 'package:wisebuget/features/category/data/repository/category_repository_
 import 'package:wisebuget/features/category/domain/repository/category_repository.dart';
 import 'package:wisebuget/features/category/domain/usecases/category_usecases.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
+import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource.dart';
+import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource_impl.dart';
+import 'package:wisebuget/features/transaction/data/repository/transaction_repository_impl.dart';
+import 'package:wisebuget/features/transaction/domain/repository/transaction_repository.dart';
+import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -31,6 +37,7 @@ Future<void> init() async {
   // Features
   _initAccountFeature();
   _initCategoryFeature();
+  _initTransactionFeature();
 }
 
 void _initAccountFeature() {
@@ -91,6 +98,39 @@ void _initCategoryFeature() {
       updateCategory: sl(),
       deleteCategory: sl(),
       seedDefaultCategories: sl(),
+    ),
+  );
+}
+
+void _initTransactionFeature() {
+  // Data sources
+  sl.registerLazySingleton<TransactionLocalDataSource>(
+    () => TransactionLocalDataSourceImpl(sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<TransactionRepository>(
+    () => TransactionRepositoryImpl(localDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetTransactions(sl()));
+  sl.registerLazySingleton(() => GetTransactionById(sl()));
+  sl.registerLazySingleton(() => GetTransactionsByAccount(sl()));
+  sl.registerLazySingleton(() => GetTransactionsByCategory(sl()));
+  sl.registerLazySingleton(() => CreateTransaction(sl()));
+  sl.registerLazySingleton(() => UpdateTransaction(sl()));
+  sl.registerLazySingleton(() => DeleteTransaction(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => TransactionCubit(
+      getTransactions: sl(),
+      getTransactionsByAccount: sl(),
+      getTransactionsByCategory: sl(),
+      createTransaction: sl(),
+      updateTransaction: sl(),
+      deleteTransaction: sl(),
     ),
   );
 }
