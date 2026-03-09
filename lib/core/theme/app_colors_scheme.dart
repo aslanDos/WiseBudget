@@ -5,32 +5,32 @@ class AppColorsScheme {
   static const ColorScheme light = ColorScheme(
     brightness: Brightness.light,
 
-    primary: AppColors.blue,
-    onPrimary: AppColors.base,
+    primary: AppColors.black,
+    onPrimary: AppColors.white,
 
-    secondary: AppColors.mauve,
-    onSecondary: AppColors.base,
+    secondary: AppColors.gray,
+    onSecondary: AppColors.white,
 
     error: AppColors.red,
-    onError: Colors.white,
+    onError: AppColors.white,
 
-    surface: AppColors.text,
-    onSurface: AppColors.mantle,
+    surface: AppColors.white,
+    onSurface: AppColors.textDark,
   );
 
   static const ColorScheme dark = ColorScheme(
     brightness: Brightness.dark,
 
-    primary: AppColors.blue,
-    onPrimary: AppColors.base,
+    primary: AppColors.white,
+    onPrimary: AppColors.black,
 
-    secondary: AppColors.mauve,
-    onSecondary: AppColors.base,
+    secondary: AppColors.mediumGray,
+    onSecondary: AppColors.white,
 
     error: AppColors.red,
-    onError: AppColors.base,
+    onError: AppColors.white,
 
-    surface: AppColors.mantle,
-    onSurface: AppColors.text,
+    surface: AppColors.black,
+    onSurface: AppColors.textLight,
   );
 }

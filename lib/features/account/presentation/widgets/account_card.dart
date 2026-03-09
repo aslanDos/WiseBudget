@@ -21,9 +21,7 @@ class AccountCard extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
@@ -36,7 +34,7 @@ class AccountCard extends StatelessWidget {
                 width: 56.0,
                 height: 56.0,
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
+                  color: colorScheme.secondary.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Icon(
@@ -69,10 +67,7 @@ class AccountCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.outline,
-              ),
+              Icon(Icons.chevron_right, color: colorScheme.outline),
             ],
           ),
         ),

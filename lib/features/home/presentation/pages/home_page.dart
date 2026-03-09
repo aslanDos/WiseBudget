@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pie_menu/pie_menu.dart';
+import 'package:wisebuget/core/router/routes.dart';
+import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_tab.dart';
 import 'package:wisebuget/features/home/presentation/pages/home_tab.dart';
@@ -49,7 +53,8 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return PieCanvas(
+      child: Stack(
       children: [
         Scaffold(
           body: TabBarView(
@@ -80,9 +85,14 @@ class _HomePageState extends State<HomePage>
           Positioned(
             bottom: 64.0,
             right: 16.0,
-            child: SafeArea(child: NewTransactionButton()),
+            child: SafeArea(
+              child: NewTransactionButton(
+                onActionTap: (type) => _onNewTransaction(type),
+              ),
+            ),
           ),
       ],
+      ),
     );
   }
 
@@ -90,5 +100,9 @@ class _HomePageState extends State<HomePage>
     if (index == _tabController.index) {}
 
     _tabController.animateTo(index);
+  }
+
+  void _onNewTransaction(TransactionType type) {
+    context.push(AppRoutes.transactionForm, extra: type);
   }
 }

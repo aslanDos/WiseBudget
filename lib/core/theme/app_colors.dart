@@ -2,18 +2,24 @@ import 'dart:ui';
 
 class AppColors {
   AppColors._();
-  // Base
-  static const base = Color(0xFF1E1E2E);
-  static const mantle = Color(0xFF181825);
-  static const crust = Color(0xFF11111B);
-  // Text
-  static const text = Color(0xFFCDD6F4);
-  static const subtext1 = Color(0xFFBAC2DE);
-  static const subtext0 = Color(0xFFA6ADC8);
-  // Accent
-  static const blue = Color(0xFF89B4FA);
-  static const mauve = Color(0xFF8839EF);
-  static const green = Color(0xFFA6E3A1);
-  static const red = Color(0xFFF38BA8);
-  static const yellow = Color(0xFFF9E2AF);
+
+  // ===== Light theme =====
+  static const white = Color(0xFFFFFFFF);
+  static const lightGray = Color(0xFFF5F5F5);
+  static const gray = Color(0xFF9E9E9E);
+
+  // ===== Dark theme =====
+  static const black = Color(0xFF000000);
+  static const darkGray = Color(0xFF1A1A1A);
+  static const mediumGray = Color(0xFF2A2A2A);
+
+  // ===== Text =====
+  static const textDark = Color(0xFF121212);
+  static const textLight = Color(0xFFEDEDED);
+
+  // ===== Accent =====
+  static const accent = Color(0xFF444444);
+
+  // ===== Error =====
+  static const red = Color(0xFFB00020);
 }

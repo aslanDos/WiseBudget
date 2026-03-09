@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/theme/app_colors.dart';
+import 'package:wisebuget/core/theme/extensions/build_context_x.dart';
 
 class ToolCard extends StatelessWidget {
   final IconData icon;
@@ -21,10 +21,8 @@ class ToolCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Material(
-      color: Colors.white.withValues(alpha: 0.7),
+      color: context.c.secondary.withValues(alpha: 0.4),
       borderRadius: BorderRadius.circular(16.0),
       child: InkWell(
         overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -56,9 +54,9 @@ class ToolCard extends StatelessWidget {
               const SizedBox(height: 4.0),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: context.c.onSurface),
               ),
             ],
           ),
