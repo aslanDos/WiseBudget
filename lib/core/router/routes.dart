@@ -8,4 +8,6 @@ class AppRoutes {
   static const String categoryList = '/categories';
   static const String categoryForm = '/category-form';
   static const String manageCategories = '/manage-categories';
+  static const String accountDetail = '/account-detail';
+  static const String accountForm = '/account-form';
 }
