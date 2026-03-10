@@ -22,9 +22,9 @@ class AccountDetailPage extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<AccountCubit>()),
-        BlocProvider(
-          create: (_) => sl<TransactionCubit>()
+        BlocProvider.value(value: sl<AccountCubit>()),
+        BlocProvider.value(
+          value: sl<TransactionCubit>()
             ..loadTransactionsByAccount(account.uuid),
         ),
       ],

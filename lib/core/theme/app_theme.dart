@@ -45,8 +45,8 @@ class AppTheme {
       ),
       extensions: [
         NavbarTheme(
-          backgroundColor: scheme.secondary,
-          activeIconColor: scheme.primary,
+          backgroundColor: scheme.primary,
+          activeIconColor: scheme.onPrimary,
           inactiveIconOpacity: 0.5,
           transactionButtonBackgroundColor: scheme.primary,
           transactionButtonForegroundColor: scheme.onPrimary,

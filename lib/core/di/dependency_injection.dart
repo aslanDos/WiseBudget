@@ -59,8 +59,8 @@ void _initAccountFeature() {
   sl.registerLazySingleton(() => DeleteAccount(sl()));
   sl.registerLazySingleton(() => SeedDefaultAccount(sl()));
 
-  // Cubit
-  sl.registerFactory(
+  // Cubit (singleton so all screens share the same state)
+  sl.registerLazySingleton(
     () => AccountCubit(
       getAccounts: sl(),
       createAccount: sl(),
@@ -122,8 +122,8 @@ void _initTransactionFeature() {
   sl.registerLazySingleton(() => UpdateTransaction(sl()));
   sl.registerLazySingleton(() => DeleteTransaction(sl()));
 
-  // Cubit
-  sl.registerFactory(
+  // Cubit (singleton so all screens share the same state)
+  sl.registerLazySingleton(
     () => TransactionCubit(
       getTransactions: sl(),
       getTransactionsByAccount: sl(),
@@ -131,6 +131,7 @@ void _initTransactionFeature() {
       createTransaction: sl(),
       updateTransaction: sl(),
       deleteTransaction: sl(),
+      accountCubit: sl(),
     ),
   );
 }

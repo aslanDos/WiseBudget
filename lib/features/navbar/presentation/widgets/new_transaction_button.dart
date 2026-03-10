@@ -17,9 +17,9 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
   double _buttonRotationTurns = 0.0;
 
   static const _buttonOrder = [
-    TransactionType.expense,
-    TransactionType.income,
     TransactionType.transfer,
+    TransactionType.income,
+    TransactionType.expense,
   ];
 
   @override
@@ -42,9 +42,10 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
           backgroundColor: colorScheme.primaryContainer,
           iconColor: colorScheme.onPrimaryContainer,
         ),
-        customAngle: 130.0,
+        customAngle: 135.0,
         customAngleDiff: 45.0,
-        radius: 100.0,
+        radius: 80.0,
+        spacing: 6.0,
         customAngleAnchor: PieAnchor.center,
         leftClickShowsMenu: true,
         rightClickShowsMenu: true,
@@ -71,20 +72,23 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
           .toList(),
       child: Tooltip(
         message: 'New Transaction',
-        child: Material(
-          color: navbarTheme.transactionButtonBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: AnimatedRotation(
-              turns: _buttonRotationTurns,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              child: Icon(
-                AppIcons.add,
-                color: navbarTheme.transactionButtonForegroundColor,
+        child: SizedBox(
+          width: 64.0,
+          height: 64.0,
+          child: Material(
+            color: navbarTheme.transactionButtonBackgroundColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.0),
+            ),
+            child: Center(
+              child: AnimatedRotation(
+                turns: _buttonRotationTurns,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: Icon(
+                  AppIcons.add,
+                  color: navbarTheme.transactionButtonForegroundColor,
+                ),
               ),
             ),
           ),

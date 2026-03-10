@@ -22,7 +22,7 @@ class ToolCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.c.secondary.withValues(alpha: 0.4),
+      color: context.c.secondary.withValues(alpha: 0.3),
       borderRadius: BorderRadius.circular(16.0),
       child: InkWell(
         overlayColor: WidgetStateProperty.all(Colors.transparent),

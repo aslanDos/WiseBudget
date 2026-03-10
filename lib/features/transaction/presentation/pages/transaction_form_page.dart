@@ -68,8 +68,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<TransactionCubit>()),
-        BlocProvider(create: (_) => sl<AccountCubit>()..loadAccounts()),
+        BlocProvider.value(value: sl<TransactionCubit>()),
+        BlocProvider.value(value: sl<AccountCubit>()..loadAccounts()),
         BlocProvider(create: (_) => sl<CategoryCubit>()..loadCategories()),
       ],
       child: Scaffold(

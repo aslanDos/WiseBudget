@@ -23,12 +23,12 @@ class Navbar extends StatelessWidget {
           BoxShadow(
             color: const Color(0x05000000),
             blurRadius: 16.0,
-            offset: const Offset(0, 0),
+            offset: const Offset(0, 2),
           ),
           BoxShadow(
             color: const Color(0x10000000),
             blurRadius: 4.0,
-            offset: const Offset(0, 0),
+            offset: const Offset(0, 2),
           ),
         ],
       ),

@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/theme/extensions/build_context_x.dart';
+import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
+import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
+import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 import 'package:wisebuget/features/home/presentation/widgets/collapsible_calendar.dart';
+import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 
 class HomeTab extends StatefulWidget {
   final ScrollController? scrollController;
@@ -15,24 +26,31 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Home')),
-      body: Column(
-        children: [
-          // Calendar
-          SafeArea(
-            bottom: false,
-            child: CollapsibleCalendar(
-              selectedDate: _selectedDate,
-              onDateSelected: (date) {
-                setState(() => _selectedDate = date);
-              },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: sl<TransactionCubit>()..loadTransactions()),
+        BlocProvider(create: (_) => sl<CategoryCubit>()..loadCategories()),
+        BlocProvider.value(value: sl<AccountCubit>()..loadAccounts()),
+      ],
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Home')),
+        body: Column(
+          children: [
+            // Calendar
+            SafeArea(
+              bottom: false,
+              child: CollapsibleCalendar(
+                selectedDate: _selectedDate,
+                onDateSelected: (date) {
+                  setState(() => _selectedDate = date);
+                },
+              ),
             ),
-          ),
 
-          // Transactions for selected date
-          Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
-        ],
+            // Transactions for selected date
+            Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
+          ],
+        ),
       ),
     );
   }
@@ -45,10 +63,66 @@ class _TransactionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<TransactionCubit, TransactionState>(
+      builder: (context, transactionState) {
+        if (transactionState.status == TransactionStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (transactionState.status == TransactionStatus.failure) {
+          return Center(
+            child: Text(
+              transactionState.errorMessage ?? 'Failed to load transactions',
+            ),
+          );
+        }
+
+        // Filter transactions for the selected date
+        final transactions = transactionState.transactions.where((t) {
+          return t.date.year == selectedDate.year &&
+              t.date.month == selectedDate.month &&
+              t.date.day == selectedDate.day;
+        }).toList();
+
+        if (transactions.isEmpty) {
+          return _EmptyState(selectedDate: selectedDate);
+        }
+
+        return BlocBuilder<CategoryCubit, CategoryState>(
+          builder: (context, categoryState) {
+            return BlocBuilder<AccountCubit, AccountState>(
+              builder: (context, accountState) {
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: transactions.length,
+                  itemBuilder: (context, index) {
+                    final transaction = transactions[index];
+                    return _TransactionTile(
+                      transaction: transaction,
+                      categoryState: categoryState,
+                      accountState: accountState,
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final DateTime selectedDate;
+
+  const _EmptyState({required this.selectedDate});
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // TODO: Replace with actual transactions from TransactionCubit
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -67,7 +141,7 @@ class _TransactionsList extends StatelessWidget {
           ),
           const SizedBox(height: 4.0),
           Text(
-            _formatDate(selectedDate),
+            'for ${_formatDate(selectedDate)}',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.outline.withValues(alpha: 0.7),
             ),
@@ -107,5 +181,85 @@ class _TransactionsList extends StatelessWidget {
       'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+}
+
+class _TransactionTile extends StatelessWidget {
+  final TransactionEntity transaction;
+  final CategoryState categoryState;
+  final AccountState accountState;
+
+  const _TransactionTile({
+    required this.transaction,
+    required this.categoryState,
+    required this.accountState,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
+
+    // Find category
+    final category = categoryState.categories
+        .where((c) => c.uuid == transaction.categoryUuid)
+        .firstOrNull;
+
+    // Find account
+    final account = accountState.accounts
+        .where((a) => a.uuid == transaction.accountUuid)
+        .firstOrNull;
+
+    final isExpense = transaction.isExpense;
+    final amountColor = isExpense
+        ? const Color(0xFFF38BA8) // red for expense
+        : const Color(0xFFA6E3A1); // green for income
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      child: ListTile(
+        leading: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: context.c.secondary.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            category != null
+                ? AppIcons.fromCode(category.iconCode)
+                : AppIcons.empty,
+            color: context.c.onSurfaceVariant,
+          ),
+        ),
+        title: Text(
+          category?.name ?? 'Unknown Category',
+          style: context.t.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          account?.name ?? 'Unknown Account',
+          style: context.t.bodySmall?.copyWith(color: context.c.outline),
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              '${isExpense ? '-' : '+'}${transaction.money.formatted}',
+              style: context.t.titleMedium?.copyWith(
+                color: amountColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (transaction.hasNote)
+              Text(
+                transaction.note!,
+                style: context.t.bodySmall?.copyWith(color: context.c.outline),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
