@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
@@ -24,73 +26,102 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<CategoryCubit>()..loadCategories(),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Categories'), centerTitle: true),
-        body: Column(
-          children: [
-            Frame(
-              child: CategoryTypeToggle(
-                selectedType: _selectedType,
-                onChanged: (type) {
-                  setState(() {
-                    _selectedType = type;
-                  });
-                },
-              ),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Categories'),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(AppIcons.add),
+                  onPressed: () => _navigateToCategoryForm(context),
+                ),
+              ],
             ),
-            const SizedBox(height: 8.0),
-            Expanded(
-              child: BlocBuilder<CategoryCubit, CategoryState>(
-                builder: (context, state) {
-                  if (state.status == CategoryStatus.loading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final categories =
-                      state.categories
-                          .where((c) => c.type == _selectedType)
-                          .toList()
-                        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
-
-                  if (categories.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.empty,
-                            size: 48.0,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'No ${_selectedType.value} categories',
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return _CategoriesList(
-                    categories: categories,
-                    onReorder: (oldIndex, newIndex) {
-                      _handleReorder(context, categories, oldIndex, newIndex);
+            body: Column(
+              children: [
+                Frame(
+                  child: CategoryTypeToggle(
+                    selectedType: _selectedType,
+                    onChanged: (type) {
+                      setState(() {
+                        _selectedType = type;
+                      });
                     },
-                    onDelete: (category) {
-                      _handleDelete(context, category);
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Expanded(
+                  child: BlocBuilder<CategoryCubit, CategoryState>(
+                    builder: (context, state) {
+                      if (state.status == CategoryStatus.loading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final categories =
+                          state.categories
+                              .where((c) => c.type == _selectedType)
+                              .toList()
+                            ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+                      if (categories.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                AppIcons.empty,
+                                size: 48.0,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'No ${_selectedType.value} categories',
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      color: Theme.of(context).colorScheme.outline,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return _CategoriesList(
+                        categories: categories,
+                        onReorder: (oldIndex, newIndex) {
+                          _handleReorder(context, categories, oldIndex, newIndex);
+                        },
+                        onDelete: (category) {
+                          _handleDelete(context, category);
+                        },
+                        onEdit: (category) {
+                          _navigateToCategoryForm(context, category: category);
+                        },
+                      );
                     },
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  Future<void> _navigateToCategoryForm(
+    BuildContext context, {
+    CategoryEntity? category,
+  }) async {
+    final result = await context.push(
+      AppRoutes.categoryForm,
+      extra: category,
+    );
+    if (result == true && context.mounted) {
+      context.read<CategoryCubit>().loadCategories();
+    }
   }
 
   void _handleReorder(
@@ -148,11 +179,13 @@ class _CategoriesList extends StatelessWidget {
   final List<CategoryEntity> categories;
   final void Function(int oldIndex, int newIndex) onReorder;
   final void Function(CategoryEntity category) onDelete;
+  final void Function(CategoryEntity category) onEdit;
 
   const _CategoriesList({
     required this.categories,
     required this.onReorder,
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -183,6 +216,7 @@ class _CategoriesList extends StatelessWidget {
         return CategoryListTile(
           key: ValueKey(category.uuid),
           category: category,
+          onTap: () => onEdit(category),
           onDelete: () => onDelete(category),
         );
       },

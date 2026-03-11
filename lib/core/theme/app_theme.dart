@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/constants/app_constants.dart';
 import 'package:wisebuget/core/theme/app_colors_scheme.dart';
 import 'package:wisebuget/core/theme/app_text_theme.dart';
+import 'package:wisebuget/core/theme/extensions/pie_theme_x.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
 class AppTheme {
@@ -20,6 +23,26 @@ class AppTheme {
       bodyColor: scheme.onSurface,
       displayColor: scheme.onSurface,
       decorationColor: scheme.onSurface,
+    );
+
+    final PieTheme pieTheme = PieTheme(
+      buttonTheme: PieButtonTheme(
+        backgroundColor: scheme.secondary,
+        iconColor: scheme.onSurface,
+      ),
+      buttonThemeHovered: PieButtonTheme(
+        backgroundColor: scheme.secondary,
+        iconColor: scheme.primary,
+      ),
+      overlayColor: scheme.surface.withAlpha(0xe0),
+      pointerColor: Colors.transparent,
+      angleOffset: 0.0,
+      pointerSize: 2.0,
+      tooltipTextStyle: appTextTheme.displaySmall?.copyWith(
+        color: scheme.onSurface,
+      ),
+      rightClickShowsMenu: true,
+      menuAlignment: Alignment.center,
     );
 
     return ThemeData(
@@ -44,6 +67,7 @@ class AppTheme {
         selectedColor: scheme.secondary,
       ),
       extensions: [
+        PieThemeExtension(pieTheme: pieTheme),
         NavbarTheme(
           backgroundColor: scheme.primary,
           activeIconColor: scheme.onPrimary,

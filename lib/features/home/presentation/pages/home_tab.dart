@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/theme/extensions/build_context_x.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
@@ -34,25 +34,44 @@ class _HomeTabState extends State<HomeTab> {
       ],
       child: Scaffold(
         appBar: AppBar(title: const Text('Home')),
-        body: Column(
-          children: [
-            // Calendar
-            SafeArea(
-              bottom: false,
-              child: CollapsibleCalendar(
-                selectedDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() => _selectedDate = date);
-                },
-              ),
-            ),
+        body: BlocBuilder<TransactionCubit, TransactionState>(
+          builder: (context, transactionState) {
+            // Extract dates that have transactions
+            final datesWithTransactions = _extractDatesWithTransactions(
+              transactionState.transactions,
+            );
 
-            // Transactions for selected date
-            Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
-          ],
+            return Column(
+              children: [
+                // Calendar
+                SafeArea(
+                  bottom: false,
+                  child: CollapsibleCalendar(
+                    selectedDate: _selectedDate,
+                    onDateSelected: (date) {
+                      setState(() => _selectedDate = date);
+                    },
+                    datesWithTransactions: datesWithTransactions,
+                  ),
+                ),
+
+                // Transactions for selected date
+                Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
+              ],
+            );
+          },
         ),
       ),
     );
+  }
+
+  Set<DateTime> _extractDatesWithTransactions(
+    List<TransactionEntity> transactions,
+  ) {
+    return transactions.map((t) {
+      // Normalize to midnight to ensure consistent comparison
+      return DateTime(t.date.year, t.date.month, t.date.day);
+    }).toSet();
   }
 }
 

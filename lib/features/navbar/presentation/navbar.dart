@@ -48,6 +48,7 @@ class Navbar extends StatelessWidget {
             onTap: onTap,
             activeIndex: activeIndex,
           ),
+          const SizedBox(width: 64.0 + 12.0 + 12.0),
           NavbarButton(
             index: 2,
             icon: AppIcons.chart,

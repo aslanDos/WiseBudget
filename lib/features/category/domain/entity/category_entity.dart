@@ -10,6 +10,7 @@ class CategoryEntity extends Equatable {
   final String iconCode;
   final DateTime createdDate;
   final TransactionType type;
+  final int? colorValue;
 
   const CategoryEntity({
     required this.uuid,
@@ -18,6 +19,7 @@ class CategoryEntity extends Equatable {
     required this.iconCode,
     required this.createdDate,
     required this.type,
+    this.colorValue,
   });
 
   CategoryEntity copyWith({
@@ -27,6 +29,7 @@ class CategoryEntity extends Equatable {
     String? iconCode,
     DateTime? createdDate,
     TransactionType? type,
+    int? colorValue,
   }) {
     return CategoryEntity(
       uuid: uuid ?? this.uuid,
@@ -35,6 +38,7 @@ class CategoryEntity extends Equatable {
       iconCode: iconCode ?? this.iconCode,
       createdDate: createdDate ?? this.createdDate,
       type: type ?? this.type,
+      colorValue: colorValue ?? this.colorValue,
     );
   }
 
@@ -43,6 +47,9 @@ class CategoryEntity extends Equatable {
 
   /// Computed property - resolves icon from iconCode
   IconData get icon => AppIcons.fromCode(iconCode);
+
+  /// Computed property - returns Color from colorValue
+  Color? get color => colorValue != null ? Color(colorValue!) : null;
 
   /// Validation
   bool get isValid => name.isNotEmpty && name.length <= maxNameLength;
@@ -55,5 +62,6 @@ class CategoryEntity extends Equatable {
     iconCode,
     createdDate,
     type,
+    colorValue,
   ];
 }

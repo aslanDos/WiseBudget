@@ -35,7 +35,7 @@ class NavbarButton extends StatelessWidget {
           focusColor: Theme.of(context).focusColor,
           hoverColor: Theme.of(context).hoverColor,
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: AnimatedOpacity(
               opacity: isActive ? 1 : navbarTheme.inactiveIconOpacity,
               duration: const Duration(milliseconds: 300),

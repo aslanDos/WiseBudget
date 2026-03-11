@@ -4,7 +4,9 @@ import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_detail_page.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_form_page.dart';
+import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/pages/categories_page.dart';
+import 'package:wisebuget/features/category/presentation/pages/category_form_page.dart';
 import 'package:wisebuget/features/home/presentation/pages/home_page.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
 
@@ -37,6 +39,13 @@ class HomeRouter {
       builder: (context, state) {
         final type = state.extra as TransactionType? ?? TransactionType.expense;
         return TransactionFormPage(initialType: type);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.categoryForm,
+      builder: (context, state) {
+        final category = state.extra as CategoryEntity?;
+        return CategoryFormPage(category: category);
       },
     ),
   ];

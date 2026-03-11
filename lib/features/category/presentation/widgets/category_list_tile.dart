@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 
@@ -41,17 +42,25 @@ class CategoryListTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 12.0),
                 // Icon
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Icon(
-                    category.icon,
-                    color: colorScheme.onPrimaryContainer,
-                    size: 20.0,
-                  ),
+                Builder(
+                  builder: (context) {
+                    final categoryColor = AppPalette.fromValue(
+                      category.colorValue,
+                      defaultColor: colorScheme.primary,
+                    );
+                    return Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: categoryColor.withAlpha(0x33),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Icon(
+                        category.icon,
+                        color: categoryColor,
+                        size: 20.0,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 12.0),
                 // Name

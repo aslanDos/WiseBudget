@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
@@ -30,18 +31,26 @@ class AccountCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Container(
-                width: 56.0,
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: colorScheme.secondary.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Icon(
-                  AppIcons.fromCode(account.iconCode),
-                  size: 28.0,
-                  color: colorScheme.onPrimaryContainer,
-                ),
+              Builder(
+                builder: (context) {
+                  final accountColor = AppPalette.fromValue(
+                    account.colorValue,
+                    defaultColor: colorScheme.secondary,
+                  );
+                  return Container(
+                    width: 56.0,
+                    height: 56.0,
+                    decoration: BoxDecoration(
+                      color: accountColor.withAlpha(0x66),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Icon(
+                      AppIcons.fromCode(account.iconCode),
+                      size: 28.0,
+                      color: accountColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 16.0),
               Expanded(

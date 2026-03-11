@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
 class NewTransactionButton extends StatefulWidget {
@@ -25,34 +26,19 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
   @override
   Widget build(BuildContext context) {
     final navbarTheme = Theme.of(context).extension<NavbarTheme>()!;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return PieMenu(
-      theme: PieTheme(
-        tooltipTextStyle: Theme.of(
-          context,
-        ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-        overlayColor: colorScheme.scrim.withValues(alpha: 0.5),
-        pointerColor: Colors.transparent,
-        buttonTheme: PieButtonTheme(
-          backgroundColor: colorScheme.surface,
-          iconColor: colorScheme.onSurface,
-        ),
-        buttonThemeHovered: PieButtonTheme(
-          backgroundColor: colorScheme.primaryContainer,
-          iconColor: colorScheme.onPrimaryContainer,
-        ),
-        customAngle: 135.0,
-        customAngleDiff: 45.0,
-        radius: 80.0,
-        spacing: 6.0,
+      theme: context.pieTheme.copyWith(
+        customAngle: 90.0,
+        customAngleDiff: 48.0,
+        radius: 100.0,
         customAngleAnchor: PieAnchor.center,
         leftClickShowsMenu: true,
         rightClickShowsMenu: true,
         regularPressShowsMenu: true,
         longPressDuration: Duration.zero,
       ),
-      onToggle: _onToggle,
+      onToggle: onToggle,
       actions: _buttonOrder
           .map(
             (type) => PieAction(
@@ -70,25 +56,23 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
             ),
           )
           .toList(),
-      child: Tooltip(
-        message: 'New Transaction',
-        child: SizedBox(
-          width: 64.0,
-          height: 64.0,
-          child: Material(
-            color: navbarTheme.transactionButtonBackgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(32.0),
-            ),
-            child: Center(
-              child: AnimatedRotation(
-                turns: _buttonRotationTurns,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-                child: Icon(
-                  AppIcons.add,
-                  color: navbarTheme.transactionButtonForegroundColor,
-                ),
+      child: StatefulBuilder(
+        builder: (context, setState) => Material(
+          color: navbarTheme.transactionButtonForegroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: AnimatedRotation(
+              turns: _buttonRotationTurns,
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              child: Icon(
+                AppIcons.add,
+                fill: 0.0,
+                color: navbarTheme.transactionButtonBackgroundColor,
+                weight: 600,
               ),
             ),
           ),
@@ -97,9 +81,8 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
     );
   }
 
-  void _onToggle(bool toggled) {
-    setState(() {
-      _buttonRotationTurns = toggled ? 0.125 : 0.0;
-    });
+  void onToggle(bool toggled) {
+    _buttonRotationTurns = toggled ? 0.125 : 0.25;
+    setState(() {});
   }
 }

@@ -4,12 +4,14 @@ class CollapsibleCalendar extends StatefulWidget {
   final DateTime? selectedDate;
   final ValueChanged<DateTime>? onDateSelected;
   final ValueChanged<DateTime>? onMonthChanged;
+  final Set<DateTime>? datesWithTransactions;
 
   const CollapsibleCalendar({
     super.key,
     this.selectedDate,
     this.onDateSelected,
     this.onMonthChanged,
+    this.datesWithTransactions,
   });
 
   @override
@@ -25,7 +27,7 @@ class _CollapsibleCalendarState extends State<CollapsibleCalendar>
   late final PageController _pageController;
   late int _currentPageIndex;
 
-  static const _weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const _weekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   @override
   void initState() {
@@ -98,11 +100,13 @@ class _CollapsibleCalendarState extends State<CollapsibleCalendar>
                           month: displayDate,
                           selectedDate: _selectedDate,
                           onDateSelected: _onDateSelected,
+                          datesWithTransactions: widget.datesWithTransactions,
                         )
                       : _WeekView(
                           weekStart: _getWeekStart(displayDate),
                           selectedDate: _selectedDate,
                           onDateSelected: _onDateSelected,
+                          datesWithTransactions: widget.datesWithTransactions,
                         );
                 },
               ),
@@ -233,8 +237,18 @@ class _MonthHeader extends StatelessWidget {
 
   String _formatMonth(DateTime date) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${months[date.month - 1]} ${date.year}';
   }
@@ -277,11 +291,13 @@ class _WeekView extends StatelessWidget {
   final DateTime weekStart;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
+  final Set<DateTime>? datesWithTransactions;
 
   const _WeekView({
     required this.weekStart,
     required this.selectedDate,
     required this.onDateSelected,
+    this.datesWithTransactions,
   });
 
   @override
@@ -295,12 +311,14 @@ class _WeekView extends StatelessWidget {
           final date = weekStart.add(Duration(days: index));
           final isSelected = _isSameDay(date, selectedDate);
           final isToday = _isSameDay(date, today);
+          final hasTransaction = _hasTransactionOnDate(date);
 
           return Expanded(
             child: _DayCell(
               date: date,
               isSelected: isSelected,
               isToday: isToday && !isSelected,
+              hasTransaction: hasTransaction,
               onTap: () => onDateSelected(date),
             ),
           );
@@ -312,17 +330,25 @@ class _WeekView extends StatelessWidget {
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
+
+  bool _hasTransactionOnDate(DateTime date) {
+    if (datesWithTransactions == null) return false;
+    final normalizedDate = DateTime(date.year, date.month, date.day);
+    return datesWithTransactions!.contains(normalizedDate);
+  }
 }
 
 class _MonthView extends StatelessWidget {
   final DateTime month;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
+  final Set<DateTime>? datesWithTransactions;
 
   const _MonthView({
     required this.month,
     required this.selectedDate,
     required this.onDateSelected,
+    this.datesWithTransactions,
   });
 
   @override
@@ -332,7 +358,9 @@ class _MonthView extends StatelessWidget {
 
     // Calculate the start of the calendar grid (Monday of the week containing the 1st)
     final startWeekday = firstDayOfMonth.weekday;
-    final gridStart = firstDayOfMonth.subtract(Duration(days: startWeekday - 1));
+    final gridStart = firstDayOfMonth.subtract(
+      Duration(days: startWeekday - 1),
+    );
 
     // Total days to show (6 weeks)
     const totalDays = 42;
@@ -354,12 +382,14 @@ class _MonthView extends StatelessWidget {
           final isCurrentMonth = date.month == month.month;
           final isSelected = _isSameDay(date, selectedDate);
           final isToday = _isSameDay(date, today);
+          final hasTransaction = _hasTransactionOnDate(date);
 
           return _DayCell(
             date: date,
             isSelected: isSelected,
             isToday: isToday && !isSelected,
             isCurrentMonth: isCurrentMonth,
+            hasTransaction: hasTransaction,
             onTap: () => onDateSelected(date),
           );
         },
@@ -370,6 +400,12 @@ class _MonthView extends StatelessWidget {
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
+
+  bool _hasTransactionOnDate(DateTime date) {
+    if (datesWithTransactions == null) return false;
+    final normalizedDate = DateTime(date.year, date.month, date.day);
+    return datesWithTransactions!.contains(normalizedDate);
+  }
 }
 
 class _DayCell extends StatelessWidget {
@@ -377,6 +413,7 @@ class _DayCell extends StatelessWidget {
   final bool isSelected;
   final bool isToday;
   final bool isCurrentMonth;
+  final bool hasTransaction;
   final VoidCallback onTap;
 
   const _DayCell({
@@ -384,6 +421,7 @@ class _DayCell extends StatelessWidget {
     required this.isSelected,
     required this.isToday,
     this.isCurrentMonth = true,
+    this.hasTransaction = false,
     required this.onTap,
   });
 
@@ -409,6 +447,9 @@ class _DayCell extends StatelessWidget {
           : colorScheme.outline.withValues(alpha: 0.4);
     }
 
+    // Dot color: white when selected, primary otherwise
+    final dotColor = isSelected ? colorScheme.onPrimary : colorScheme.primary;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -416,18 +457,31 @@ class _DayCell extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
-          border: isToday
-              ? Border.all(color: colorScheme.primary, width: 2.0)
-              : null,
         ),
-        child: Center(
-          child: Text(
-            '${date.day}',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: textColor,
-              fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.w500,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '${date.day}',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: textColor,
+                fontWeight: isSelected || isToday
+                    ? FontWeight.w700
+                    : FontWeight.w500,
+              ),
             ),
-          ),
+            if (hasTransaction)
+              Container(
+                width: 5.0,
+                height: 5.0,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
+              )
+            else
+              const SizedBox(height: 5.0), // Placeholder to maintain alignment
+          ],
         ),
       ),
     );

@@ -22,6 +22,8 @@ class CategoryModel {
 
   String type;
 
+  int? colorValue;
+
   CategoryModel({
     this.id = 0,
     required this.uuid,
@@ -30,6 +32,7 @@ class CategoryModel {
     required this.iconCode,
     required this.type,
     DateTime? createdDate,
+    this.colorValue,
   }) : createdDate = createdDate ?? DateTime.now();
 
   @Transient()
@@ -56,6 +59,7 @@ class CategoryModel {
       iconCode: iconCode,
       createdDate: createdDate,
       type: transactionType,
+      colorValue: colorValue,
     );
   }
 
@@ -69,6 +73,7 @@ class CategoryModel {
       iconCode: entity.iconCode,
       createdDate: entity.createdDate,
       type: entity.type.value,
+      colorValue: entity.colorValue,
     );
   }
 }

@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 382033324989994512),
     name: 'AccountModel',
-    lastPropertyId: const obx_int.IdUid(8, 2150691393952799244),
+    lastPropertyId: const obx_int.IdUid(9, 4906712001452350410),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -77,6 +77,12 @@ final _entities = <obx_int.ModelEntity>[
         type: 8,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 4906712001452350410),
+        name: 'colorValue',
+        type: 6,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -84,7 +90,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 9214700060690020303),
     name: 'CategoryModel',
-    lastPropertyId: const obx_int.IdUid(7, 2927885393013914745),
+    lastPropertyId: const obx_int.IdUid(8, 7816551088761546060),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -129,6 +135,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(7, 2927885393013914745),
         name: 'type',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 7816551088761546060),
+        name: 'colorValue',
+        type: 6,
         flags: 0,
       ),
     ],
@@ -281,7 +293,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final currencyOffset = fbb.writeString(object.currency);
         final iconCodeOffset = fbb.writeString(object.iconCode);
-        fbb.startTable(9);
+        fbb.startTable(10);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addOffset(2, nameOffset);
@@ -290,6 +302,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(5, iconCodeOffset);
         fbb.addInt64(6, object.createdDate.millisecondsSinceEpoch);
         fbb.addFloat64(7, object.balance);
+        fbb.addInt64(8, object.colorValue);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -329,6 +342,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
         );
+        final colorValueParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
         final object = AccountModel(
           id: idParam,
           uuid: uuidParam,
@@ -338,6 +356,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           sortOrder: sortOrderParam,
           iconCode: iconCodeParam,
           createdDate: createdDateParam,
+          colorValue: colorValueParam,
         );
 
         return object;
@@ -356,7 +375,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final iconCodeOffset = fbb.writeString(object.iconCode);
         final typeOffset = fbb.writeString(object.type);
-        fbb.startTable(8);
+        fbb.startTable(9);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addOffset(2, nameOffset);
@@ -364,6 +383,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(4, iconCodeOffset);
         fbb.addInt64(5, object.createdDate.millisecondsSinceEpoch);
         fbb.addOffset(6, typeOffset);
+        fbb.addInt64(7, object.colorValue);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -397,6 +417,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
         );
+        final colorValueParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          18,
+        );
         final object = CategoryModel(
           id: idParam,
           uuid: uuidParam,
@@ -405,6 +430,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           iconCode: iconCodeParam,
           type: typeParam,
           createdDate: createdDateParam,
+          colorValue: colorValueParam,
         );
 
         return object;
@@ -542,6 +568,11 @@ class AccountModel_ {
   static final balance = obx.QueryDoubleProperty<AccountModel>(
     _entities[0].properties[7],
   );
+
+  /// See [AccountModel.colorValue].
+  static final colorValue = obx.QueryIntegerProperty<AccountModel>(
+    _entities[0].properties[8],
+  );
 }
 
 /// [CategoryModel] entity fields to define ObjectBox queries.
@@ -579,6 +610,11 @@ class CategoryModel_ {
   /// See [CategoryModel.type].
   static final type = obx.QueryStringProperty<CategoryModel>(
     _entities[1].properties[6],
+  );
+
+  /// See [CategoryModel.colorValue].
+  static final colorValue = obx.QueryIntegerProperty<CategoryModel>(
+    _entities[1].properties[7],
   );
 }
 

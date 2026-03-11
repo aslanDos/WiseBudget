@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/theme/extensions/build_context_x.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class ToolCard extends StatelessWidget {
   final IconData icon;

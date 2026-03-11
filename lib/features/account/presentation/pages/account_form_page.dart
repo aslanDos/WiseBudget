@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/shared/widgets/color_picker.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
@@ -25,6 +27,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
   late final TextEditingController _balanceController;
   late String _selectedCurrency;
   late String _selectedIconCode;
+  late int _selectedColorValue;
 
   static const _currencies = ['KZT', 'USD', 'EUR', 'RUB'];
   static const _iconOptions = [
@@ -45,6 +48,8 @@ class _AccountFormPageState extends State<AccountFormPage> {
     );
     _selectedCurrency = widget.account?.currency ?? 'KZT';
     _selectedIconCode = widget.account?.iconCode ?? 'wallet';
+    _selectedColorValue =
+        widget.account?.colorValue ?? AppPalette.defaultAccountColor;
   }
 
   @override
@@ -59,8 +64,8 @@ class _AccountFormPageState extends State<AccountFormPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return BlocProvider(
-      create: (_) => sl<AccountCubit>(),
+    return BlocProvider.value(
+      value: sl<AccountCubit>(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.isEditing ? 'Edit Account' : 'New Account'),
@@ -102,6 +107,16 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     ),
                   );
                 }).toList(),
+              ),
+              const SizedBox(height: 24.0),
+
+              // Color selector
+              Text('Color', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 8.0),
+              ColorPicker(
+                selectedColorValue: _selectedColorValue,
+                onColorSelected: (colorValue) =>
+                    setState(() => _selectedColorValue = colorValue),
               ),
               const SizedBox(height: 24.0),
 
@@ -212,6 +227,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
         currency: _selectedCurrency,
         balance: balance,
         iconCode: _selectedIconCode,
+        colorValue: _selectedColorValue,
       );
       cubit.editAccount(updated);
     } else {
@@ -222,6 +238,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
         balance: balance,
         iconCode: _selectedIconCode,
         createdDate: DateTime.now(),
+        colorValue: _selectedColorValue,
       );
       cubit.addAccount(newAccount);
     }

@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:382033324989994512",
-      "lastPropertyId": "8:2150691393952799244",
+      "lastPropertyId": "9:4906712001452350410",
       "name": "AccountModel",
       "properties": [
         {
@@ -52,13 +52,18 @@
           "id": "8:2150691393952799244",
           "name": "balance",
           "type": 8
+        },
+        {
+          "id": "9:4906712001452350410",
+          "name": "colorValue",
+          "type": 6
         }
       ],
       "relations": []
     },
     {
       "id": "2:9214700060690020303",
-      "lastPropertyId": "7:2927885393013914745",
+      "lastPropertyId": "8:7816551088761546060",
       "name": "CategoryModel",
       "properties": [
         {
@@ -100,6 +105,11 @@
           "id": "7:2927885393013914745",
           "name": "type",
           "type": 9
+        },
+        {
+          "id": "8:7816551088761546060",
+          "name": "colorValue",
+          "type": 6
         }
       ],
       "relations": []

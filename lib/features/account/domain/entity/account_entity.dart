@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
 
@@ -9,6 +11,7 @@ class AccountEntity extends Equatable {
   final int sortOrder;
   final String iconCode;
   final DateTime createdDate;
+  final int? colorValue;
 
   /// Validation constants
   static const int maxNameLength = 48;
@@ -18,6 +21,9 @@ class AccountEntity extends Equatable {
 
   /// Computed property - returns balance as Money value object
   Money get money => Money(balance, currency);
+
+  /// Computed property - returns Color from colorValue
+  Color? get color => colorValue != null ? Color(colorValue!) : null;
 
   /// Convenience getters
   bool get isEmpty => balance == 0;
@@ -31,6 +37,7 @@ class AccountEntity extends Equatable {
     this.sortOrder = -1,
     required this.iconCode,
     required this.createdDate,
+    this.colorValue,
   });
 
   AccountEntity copyWith({
@@ -41,6 +48,7 @@ class AccountEntity extends Equatable {
     int? sortOrder,
     String? iconCode,
     DateTime? createdDate,
+    int? colorValue,
   }) {
     return AccountEntity(
       uuid: uuid ?? this.uuid,
@@ -50,6 +58,7 @@ class AccountEntity extends Equatable {
       sortOrder: sortOrder ?? this.sortOrder,
       iconCode: iconCode ?? this.iconCode,
       createdDate: createdDate ?? this.createdDate,
+      colorValue: colorValue ?? this.colorValue,
     );
   }
 
@@ -62,5 +71,6 @@ class AccountEntity extends Equatable {
     sortOrder,
     iconCode,
     createdDate,
+    colorValue,
   ];
 }

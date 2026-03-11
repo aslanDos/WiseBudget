@@ -21,6 +21,8 @@ class AccountModel {
   @Property(type: PropertyType.date)
   DateTime createdDate;
 
+  int? colorValue;
+
   AccountModel({
     this.id = 0,
     required this.uuid,
@@ -30,6 +32,7 @@ class AccountModel {
     this.sortOrder = -1,
     required this.iconCode,
     DateTime? createdDate,
+    this.colorValue,
   }) : createdDate = createdDate ?? DateTime.now();
 
   /// Convert to domain entity
@@ -42,6 +45,7 @@ class AccountModel {
       sortOrder: sortOrder,
       iconCode: iconCode,
       createdDate: createdDate,
+      colorValue: colorValue,
     );
   }
 
@@ -56,6 +60,7 @@ class AccountModel {
       sortOrder: entity.sortOrder,
       iconCode: entity.iconCode,
       createdDate: entity.createdDate,
+      colorValue: entity.colorValue,
     );
   }
 }
