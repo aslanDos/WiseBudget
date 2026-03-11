@@ -3,63 +3,90 @@ import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 import 'package:wisebuget/features/navbar/presentation/widgets/navbar_button.dart';
 
+/// A floating navigation bar with a center gap for the transaction button.
+///
+/// Layout structure:
+/// ```
+/// [Button][Button]  [GAP]  [Button][Button]
+/// ```
+/// The gap is reserved for the floating center button (NewTransactionButton)
+/// which is positioned separately in the parent Stack.
 class Navbar extends StatelessWidget {
   final int activeIndex;
-  final Function(int i) onTap;
+  final ValueChanged<int> onTap;
 
-  const Navbar({super.key, required this.onTap, this.activeIndex = 0});
+  const Navbar({
+    super.key,
+    required this.onTap,
+    this.activeIndex = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final NavbarTheme navbarTheme = Theme.of(context).extension<NavbarTheme>()!;
+    final navbarTheme = Theme.of(context).extension<NavbarTheme>()!;
 
     return Container(
-      constraints: BoxConstraints(maxWidth: 480.0),
+      height: NavbarTheme.height,
+      constraints: const BoxConstraints(maxWidth: 480.0),
       decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        borderRadius: .circular(999.9),
+        borderRadius: BorderRadius.circular(NavbarTheme.height / 2),
         color: navbarTheme.backgroundColor,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0x05000000),
-            blurRadius: 16.0,
-            offset: const Offset(0, 2),
+            color: Color(0x08000000),
+            blurRadius: 24.0,
+            offset: Offset(0, 4),
           ),
           BoxShadow(
-            color: const Color(0x10000000),
-            blurRadius: 4.0,
-            offset: const Offset(0, 2),
+            color: Color(0x10000000),
+            blurRadius: 8.0,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: .spaceEvenly,
         children: [
-          NavbarButton(
-            index: 0,
-            icon: AppIcons.circle,
-            onTap: onTap,
-            activeIndex: activeIndex,
+          // Left section (2 buttons)
+          Expanded(
+            child: Row(
+              children: [
+                NavbarButton(
+                  index: 0,
+                  icon: AppIcons.circle,
+                  activeIndex: activeIndex,
+                  onTap: onTap,
+                ),
+                NavbarButton(
+                  index: 1,
+                  icon: AppIcons.wallet,
+                  activeIndex: activeIndex,
+                  onTap: onTap,
+                ),
+              ],
+            ),
           ),
-          NavbarButton(
-            index: 1,
-            icon: AppIcons.wallet,
-            onTap: onTap,
-            activeIndex: activeIndex,
-          ),
-          const SizedBox(width: 64.0 + 12.0 + 12.0),
-          NavbarButton(
-            index: 2,
-            icon: AppIcons.chart,
-            onTap: onTap,
-            activeIndex: activeIndex,
-          ),
-          NavbarButton(
-            index: 3,
-            icon: AppIcons.briefCase,
-            onTap: onTap,
-            activeIndex: activeIndex,
+
+          // Center gap for floating button
+          const SizedBox(width: NavbarTheme.centerGapWidth),
+
+          // Right section (2 buttons)
+          Expanded(
+            child: Row(
+              children: [
+                NavbarButton(
+                  index: 2,
+                  icon: AppIcons.chart,
+                  activeIndex: activeIndex,
+                  onTap: onTap,
+                ),
+                NavbarButton(
+                  index: 3,
+                  icon: AppIcons.briefCase,
+                  activeIndex: activeIndex,
+                  onTap: onTap,
+                ),
+              ],
+            ),
           ),
         ],
       ),

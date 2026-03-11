@@ -56,25 +56,28 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
             ),
           )
           .toList(),
-      child: StatefulBuilder(
-        builder: (context, setState) => Material(
+      child: Container(
+        width: NavbarTheme.centerButtonSize,
+        height: NavbarTheme.centerButtonSize,
+        decoration: BoxDecoration(
           color: navbarTheme.transactionButtonForegroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: AnimatedRotation(
-              turns: _buttonRotationTurns,
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutCubic,
-              child: Icon(
-                AppIcons.add,
-                fill: 0.0,
-                color: navbarTheme.transactionButtonBackgroundColor,
-                weight: 600,
-              ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: navbarTheme.transactionButtonForegroundColor.withAlpha(0x40),
+              blurRadius: 12.0,
+              offset: const Offset(0, 4),
             ),
+          ],
+        ),
+        child: AnimatedRotation(
+          turns: _buttonRotationTurns,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          child: Icon(
+            AppIcons.add,
+            color: navbarTheme.transactionButtonBackgroundColor,
+            size: 28.0,
           ),
         ),
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/constants/app_constants.dart';
 import 'package:wisebuget/core/theme/app_colors_scheme.dart';
@@ -71,7 +70,8 @@ class AppTheme {
         NavbarTheme(
           backgroundColor: scheme.primary,
           activeIconColor: scheme.onPrimary,
-          inactiveIconOpacity: 0.5,
+          inactiveIconColor: scheme.onPrimary.withAlpha(0x80),
+          indicatorColor: scheme.onPrimary,
           transactionButtonBackgroundColor: scheme.primary,
           transactionButtonForegroundColor: scheme.onPrimary,
         ),
