@@ -78,7 +78,8 @@ class _AccountTabState extends State<AccountTab>
                     ),
                     const SizedBox(height: 16.0),
                     FilledButton(
-                      onPressed: () => context.read<AccountCubit>().loadAccounts(),
+                      onPressed: () =>
+                          context.read<AccountCubit>().loadAccounts(),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -106,7 +107,8 @@ class _AccountTabState extends State<AccountTab>
               },
               onDeleteAccount: (account) => _handleDelete(context, account),
               onAddAccount: () => _showAddAccountDialog(context),
-              onAccountTap: (account) => _navigateToAccountDetail(context, account),
+              onAccountTap: (account) =>
+                  _navigateToAccountDetail(context, account),
             );
           },
         ),
@@ -183,10 +185,7 @@ class _AccountTabState extends State<AccountTab>
     BuildContext context,
     AccountEntity account,
   ) async {
-    final result = await context.push(
-      AppRoutes.accountDetail,
-      extra: account,
-    );
+    final result = await context.push(AppRoutes.accountDetail, extra: account);
     if (result == true && context.mounted) {
       context.read<AccountCubit>().loadAccounts();
     }
@@ -225,8 +224,8 @@ class _AccountsContent extends StatelessWidget {
     final filteredAccounts = searchQuery.isEmpty
         ? accounts
         : accounts
-            .where((a) => a.name.toLowerCase().contains(searchQuery))
-            .toList();
+              .where((a) => a.name.toLowerCase().contains(searchQuery))
+              .toList();
 
     return Column(
       children: [
@@ -331,14 +330,19 @@ class _ReorderableAccountList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(bottom: 96.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+      ).copyWith(bottom: 96.0),
       itemCount: accounts.length,
       onReorder: onReorder,
       proxyDecorator: (child, index, animation) {
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
-            final elevation = Tween<double>(begin: 0, end: 4).animate(animation);
+            final elevation = Tween<double>(
+              begin: 0,
+              end: 4,
+            ).animate(animation);
             return Material(
               elevation: elevation.value,
               borderRadius: BorderRadius.circular(16.0),

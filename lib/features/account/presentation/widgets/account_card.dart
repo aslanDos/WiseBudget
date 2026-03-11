@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
 class AccountCard extends StatelessWidget {
@@ -20,8 +21,8 @@ class AccountCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Card(
-      margin: EdgeInsets.zero,
+    return Material(
+      color: context.c.secondary.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: InkWell(
         onTap: onTap,
@@ -37,12 +38,20 @@ class AccountCard extends StatelessWidget {
                     account.colorValue,
                     defaultColor: colorScheme.secondary,
                   );
+                  // ICON
+                  //     Container(
+                  //   padding: const EdgeInsets.all(16.0),
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(16.0),
+                  //     color: iconColor.withValues(alpha: 0.3),
+                  //   ),
+                  //   child: Icon(icon, size: 28.0, color: iconColor),
+                  // ),
                   return Container(
-                    width: 56.0,
-                    height: 56.0,
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      color: accountColor.withAlpha(0x66),
-                      borderRadius: BorderRadius.circular(12.0),
+                      color: accountColor.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Icon(
                       AppIcons.fromCode(account.iconCode),

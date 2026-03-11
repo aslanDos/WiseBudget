@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
-import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
@@ -11,6 +9,7 @@ import 'package:wisebuget/features/home/presentation/widgets/collapsible_calenda
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
+import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
 
 class HomeTab extends StatefulWidget {
   final ScrollController? scrollController;
@@ -54,6 +53,8 @@ class _HomeTabState extends State<HomeTab> {
                     datesWithTransactions: datesWithTransactions,
                   ),
                 ),
+
+                const SizedBox(height: 10),
 
                 // Transactions for selected date
                 Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
@@ -216,8 +217,6 @@ class _TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context);
-
     // Find category
     final category = categoryState.categories
         .where((c) => c.uuid == transaction.categoryUuid)
@@ -228,57 +227,13 @@ class _TransactionTile extends StatelessWidget {
         .where((a) => a.uuid == transaction.accountUuid)
         .firstOrNull;
 
-    final isExpense = transaction.isExpense;
-    final amountColor = isExpense
-        ? const Color(0xFFF38BA8) // red for expense
-        : const Color(0xFFA6E3A1); // green for income
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      child: ListTile(
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: context.c.secondary.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            category != null
-                ? AppIcons.fromCode(category.iconCode)
-                : AppIcons.empty,
-            color: context.c.onSurfaceVariant,
-          ),
-        ),
-        title: Text(
-          category?.name ?? 'Unknown Category',
-          style: context.t.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-        ),
-        subtitle: Text(
-          account?.name ?? 'Unknown Account',
-          style: context.t.bodySmall?.copyWith(color: context.c.outline),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${isExpense ? '-' : '+'}${transaction.money.formatted}',
-              style: context.t.titleMedium?.copyWith(
-                color: amountColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (transaction.hasNote)
-              Text(
-                transaction.note!,
-                style: context.t.bodySmall?.copyWith(color: context.c.outline),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-      ),
+    return TransactionCard(
+      transaction: transaction,
+      category: category,
+      account: account,
+      onTap: () {
+        // TODO: Navigate to transaction details
+      },
     );
   }
 }
