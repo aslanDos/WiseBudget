@@ -7,17 +7,20 @@ class CategoryListTile extends StatelessWidget {
   final CategoryEntity category;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onToggleVisibility;
 
   const CategoryListTile({
     super.key,
     required this.category,
     this.onTap,
     this.onDelete,
+    this.onToggleVisibility,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isHidden = !category.visible;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -28,19 +31,9 @@ class CategoryListTile extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(12.0),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
             child: Row(
               children: [
-                // Drag handle
-                Icon(
-                  AppIcons.gripVertical,
-                  color: colorScheme.outline,
-                  size: 20.0,
-                ),
-                const SizedBox(width: 12.0),
                 // Icon
                 Builder(
                   builder: (context) {
@@ -48,41 +41,60 @@ class CategoryListTile extends StatelessWidget {
                       category.colorValue,
                       defaultColor: colorScheme.primary,
                     );
-                    return Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: categoryColor.withAlpha(0x33),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Icon(
-                        category.icon,
-                        color: categoryColor,
-                        size: 20.0,
+                    return Opacity(
+                      opacity: isHidden ? 0.4 : 1.0,
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: categoryColor.withAlpha(0x33),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Icon(
+                          category.icon,
+                          color: categoryColor,
+                          size: 20.0,
+                        ),
                       ),
                     );
                   },
                 ),
+
                 const SizedBox(width: 12.0),
+
                 // Name
                 Expanded(
-                  child: Text(
-                    category.name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                  child: Opacity(
+                    opacity: isHidden ? 0.4 : 1.0,
+                    child: Text(
+                      category.name,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
-                // Delete button
-                if (onDelete != null)
+
+                // Visibility toggle
+                if (onToggleVisibility != null)
                   IconButton(
-                    onPressed: onDelete,
+                    onPressed: onToggleVisibility,
                     icon: Icon(
-                      AppIcons.trash,
-                      color: colorScheme.error,
+                      isHidden ? AppIcons.eyeOff : AppIcons.eye,
+                      color: isHidden
+                          ? colorScheme.outline
+                          : colorScheme.primary,
                       size: 20.0,
                     ),
                     visualDensity: VisualDensity.compact,
                   ),
+
+                const SizedBox(width: 12.0),
+                // Drag handle
+                Icon(
+                  AppIcons.gripVertical,
+                  color: colorScheme.outline,
+                  size: 20.0,
+                ),
               ],
             ),
           ),

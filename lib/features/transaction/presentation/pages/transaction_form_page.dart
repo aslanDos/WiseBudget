@@ -426,12 +426,12 @@ class _CategorySelector extends StatelessWidget {
           return const LinearProgressIndicator();
         }
 
-        // Filter categories by transaction type
+        // Filter categories by transaction type and visibility
         final categoryType = selectedType == TransactionType.income
             ? TransactionType.income
             : TransactionType.expense;
         final categories = state.categories
-            .where((c) => c.type == categoryType)
+            .where((c) => c.type == categoryType && c.visible)
             .toList();
 
         if (categories.isEmpty) {

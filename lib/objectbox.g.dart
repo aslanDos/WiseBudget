@@ -90,7 +90,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 9214700060690020303),
     name: 'CategoryModel',
-    lastPropertyId: const obx_int.IdUid(8, 7816551088761546060),
+    lastPropertyId: const obx_int.IdUid(9, 7593247305184856939),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -141,6 +141,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(8, 7816551088761546060),
         name: 'colorValue',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 7593247305184856939),
+        name: 'visible',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -375,7 +381,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final iconCodeOffset = fbb.writeString(object.iconCode);
         final typeOffset = fbb.writeString(object.type);
-        fbb.startTable(9);
+        fbb.startTable(10);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addOffset(2, nameOffset);
@@ -384,6 +390,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(5, object.createdDate.millisecondsSinceEpoch);
         fbb.addOffset(6, typeOffset);
         fbb.addInt64(7, object.colorValue);
+        fbb.addBool(8, object.visible);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -422,6 +429,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           18,
         );
+        final visibleParam = const fb.BoolReader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
         final object = CategoryModel(
           id: idParam,
           uuid: uuidParam,
@@ -431,6 +443,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           type: typeParam,
           createdDate: createdDateParam,
           colorValue: colorValueParam,
+          visible: visibleParam,
         );
 
         return object;
@@ -615,6 +628,11 @@ class CategoryModel_ {
   /// See [CategoryModel.colorValue].
   static final colorValue = obx.QueryIntegerProperty<CategoryModel>(
     _entities[1].properties[7],
+  );
+
+  /// See [CategoryModel.visible].
+  static final visible = obx.QueryBooleanProperty<CategoryModel>(
+    _entities[1].properties[8],
   );
 }
 

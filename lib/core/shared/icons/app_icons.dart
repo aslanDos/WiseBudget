@@ -68,4 +68,8 @@ class AppIcons {
   static const IconData gamepad = LucideIcons.gamepad2;
   static const IconData receipt = LucideIcons.receipt;
   static const IconData gift = LucideIcons.gift;
+
+  // Visibility icons
+  static const IconData eye = LucideIcons.eye;
+  static const IconData eyeOff = LucideIcons.eyeOff;
 }

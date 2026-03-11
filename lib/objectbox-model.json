@@ -63,7 +63,7 @@
     },
     {
       "id": "2:9214700060690020303",
-      "lastPropertyId": "8:7816551088761546060",
+      "lastPropertyId": "9:7593247305184856939",
       "name": "CategoryModel",
       "properties": [
         {
@@ -110,6 +110,11 @@
           "id": "8:7816551088761546060",
           "name": "colorValue",
           "type": 6
+        },
+        {
+          "id": "9:7593247305184856939",
+          "name": "visible",
+          "type": 1
         }
       ],
       "relations": []

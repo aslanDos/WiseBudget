@@ -11,6 +11,13 @@ class CategoryEntity extends Equatable {
   final DateTime createdDate;
   final TransactionType type;
   final int? colorValue;
+  final bool? _visible;
+
+  /// Returns true if category is visible (null is treated as visible)
+  bool get visible => _visible ?? true;
+
+  /// Raw visibility value for persistence (null means visible by default)
+  bool? get visibleRaw => _visible;
 
   const CategoryEntity({
     required this.uuid,
@@ -20,7 +27,8 @@ class CategoryEntity extends Equatable {
     required this.createdDate,
     required this.type,
     this.colorValue,
-  });
+    bool? visible,
+  }) : _visible = visible;
 
   CategoryEntity copyWith({
     String? uuid,
@@ -30,6 +38,7 @@ class CategoryEntity extends Equatable {
     DateTime? createdDate,
     TransactionType? type,
     int? colorValue,
+    bool? visible,
   }) {
     return CategoryEntity(
       uuid: uuid ?? this.uuid,
@@ -39,6 +48,7 @@ class CategoryEntity extends Equatable {
       createdDate: createdDate ?? this.createdDate,
       type: type ?? this.type,
       colorValue: colorValue ?? this.colorValue,
+      visible: visible ?? _visible,
     );
   }
 
@@ -63,5 +73,6 @@ class CategoryEntity extends Equatable {
     createdDate,
     type,
     colorValue,
+    _visible,
   ];
 }

@@ -99,6 +99,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         onEdit: (category) {
                           _navigateToCategoryForm(context, category: category);
                         },
+                        onToggleVisibility: (category) {
+                          _handleToggleVisibility(context, category);
+                        },
                       );
                     },
                   ),
@@ -173,6 +176,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
       ),
     );
   }
+
+  void _handleToggleVisibility(BuildContext context, CategoryEntity category) {
+    final cubit = context.read<CategoryCubit>();
+    cubit.editCategory(category.copyWith(visible: !category.visible));
+  }
 }
 
 class _CategoriesList extends StatelessWidget {
@@ -180,12 +188,14 @@ class _CategoriesList extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) onReorder;
   final void Function(CategoryEntity category) onDelete;
   final void Function(CategoryEntity category) onEdit;
+  final void Function(CategoryEntity category) onToggleVisibility;
 
   const _CategoriesList({
     required this.categories,
     required this.onReorder,
     required this.onDelete,
     required this.onEdit,
+    required this.onToggleVisibility,
   });
 
   @override
@@ -218,6 +228,7 @@ class _CategoriesList extends StatelessWidget {
           category: category,
           onTap: () => onEdit(category),
           onDelete: () => onDelete(category),
+          onToggleVisibility: () => onToggleVisibility(category),
         );
       },
     );

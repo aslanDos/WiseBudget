@@ -24,6 +24,8 @@ class CategoryModel {
 
   int? colorValue;
 
+  bool? visible;
+
   CategoryModel({
     this.id = 0,
     required this.uuid,
@@ -33,6 +35,7 @@ class CategoryModel {
     required this.type,
     DateTime? createdDate,
     this.colorValue,
+    this.visible,
   }) : createdDate = createdDate ?? DateTime.now();
 
   @Transient()
@@ -60,6 +63,7 @@ class CategoryModel {
       createdDate: createdDate,
       type: transactionType,
       colorValue: colorValue,
+      visible: visible,
     );
   }
 
@@ -74,6 +78,7 @@ class CategoryModel {
       createdDate: entity.createdDate,
       type: entity.type.value,
       colorValue: entity.colorValue,
+      visible: entity.visibleRaw,
     );
   }
 }
