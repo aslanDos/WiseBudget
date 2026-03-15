@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class Numpad extends StatelessWidget {
   final ValueChanged<String> onKeyPressed;
@@ -12,8 +14,8 @@ class Numpad extends StatelessWidget {
     required this.onKeyPressed,
     this.onBackspace,
     this.onClear,
-    this.spacing = 8.0,
-    this.buttonHeight = 56.0,
+    this.spacing = 10.0,
+    this.buttonHeight = 52.0,
   });
 
   @override
@@ -34,10 +36,15 @@ class Numpad extends StatelessWidget {
 
   Widget _buildRow(List<String> keys, BuildContext context) {
     return Row(
-      children: keys.map((key) {
+      children: keys.asMap().entries.map((entry) {
+        final index = entry.key;
+        final key = entry.value;
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+            padding: EdgeInsets.only(
+              left: index == 0 ? 0 : spacing / 2,
+              right: index == keys.length - 1 ? 0 : spacing / 2,
+            ),
             child: NumpadKey(
               label: key,
               height: buttonHeight,
@@ -54,7 +61,7 @@ class Numpad extends StatelessWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+            padding: EdgeInsets.only(right: spacing / 2),
             child: NumpadKey(
               label: '.',
               height: buttonHeight,
@@ -74,7 +81,7 @@ class Numpad extends StatelessWidget {
         ),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+            padding: EdgeInsets.only(left: spacing / 2),
             child: NumpadKey(
               icon: Icons.backspace_outlined,
               height: buttonHeight,
@@ -101,7 +108,7 @@ class NumpadKey extends StatelessWidget {
     this.icon,
     this.onPressed,
     this.onLongPress,
-    this.height = 56.0,
+    this.height = 52.0,
   }) : assert(label != null || icon != null);
 
   @override
@@ -110,23 +117,35 @@ class NumpadKey extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
-      color: colorScheme.surfaceContainerHighest,
+      color: context.c.secondary.withValues(alpha: 0.3),
       borderRadius: BorderRadius.circular(12.0),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onPressed,
-        onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(12.0),
-        child: Container(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onPressed?.call();
+        },
+        onLongPress: onLongPress != null
+            ? () {
+                HapticFeedback.mediumImpact();
+                onLongPress?.call();
+              }
+            : null,
+        splashColor: colorScheme.primary.withAlpha(0x1A),
+        highlightColor: colorScheme.primary.withAlpha(0x0D),
+        child: SizedBox(
           height: height,
-          alignment: Alignment.center,
-          child: icon != null
-              ? Icon(icon, size: 24.0)
-              : Text(
-                  label!,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
+          child: Center(
+            child: icon != null
+                ? Icon(icon, size: 22.0, color: colorScheme.onSurface)
+                : Text(
+                    label!,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
     );

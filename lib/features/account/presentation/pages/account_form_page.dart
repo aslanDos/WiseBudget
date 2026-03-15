@@ -183,6 +183,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
 
               // Save button
               BlocConsumer<AccountCubit, AccountState>(
+                listenWhen: (previous, current) =>
+                    previous.status == AccountStatus.loading &&
+                    current.status != AccountStatus.loading,
                 listener: (context, state) {
                   if (state.status == AccountStatus.success) {
                     context.pop(true);

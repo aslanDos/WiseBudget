@@ -35,7 +35,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         _accountCubit = accountCubit,
         super(const TransactionState());
 
-  Future<void> loadTransactions({bool recalculateBalances = true}) async {
+  Future<void> loadTransactions({bool recalculateBalances = false}) async {
     emit(state.copyWith(status: TransactionStatus.loading));
 
     final result = await _getTransactions(const NoParams());
@@ -124,7 +124,12 @@ class TransactionCubit extends Cubit<TransactionState> {
           transactions: [created, ...state.transactions],
         ));
         // Update account balance
-        _adjustAccountBalance(created.accountUuid, created.amount, created.type);
+        _adjustAccountBalance(
+          created.accountUuid,
+          created.amount,
+          created.type,
+          toAccountUuid: created.toAccountUuid,
+        );
       },
     );
   }
@@ -161,9 +166,15 @@ class TransactionCubit extends Cubit<TransactionState> {
             oldTransaction.accountUuid,
             oldTransaction.amount,
             oldTransaction.type,
+            toAccountUuid: oldTransaction.toAccountUuid,
           );
         }
-        _adjustAccountBalance(updated.accountUuid, updated.amount, updated.type);
+        _adjustAccountBalance(
+          updated.accountUuid,
+          updated.amount,
+          updated.type,
+          toAccountUuid: updated.toAccountUuid,
+        );
       },
     );
   }
@@ -195,6 +206,7 @@ class TransactionCubit extends Cubit<TransactionState> {
             transaction.accountUuid,
             transaction.amount,
             transaction.type,
+            toAccountUuid: transaction.toAccountUuid,
           );
         }
       },
@@ -203,18 +215,25 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   /// Adjusts account balance based on transaction type.
   /// Expense: decreases balance, Income: increases balance
+  /// Transfer: decreases source, increases destination
   void _adjustAccountBalance(
     String accountUuid,
     double amount,
-    TransactionType type,
-  ) {
-    final delta = switch (type) {
-      TransactionType.expense => -amount,
-      TransactionType.income => amount,
-      TransactionType.transfer => 0.0, // Transfer handled separately
-    };
-    if (delta != 0) {
-      _accountCubit.adjustBalance(accountUuid, delta);
+    TransactionType type, {
+    String? toAccountUuid,
+  }) {
+    switch (type) {
+      case TransactionType.expense:
+        _accountCubit.adjustBalance(accountUuid, -amount);
+      case TransactionType.income:
+        _accountCubit.adjustBalance(accountUuid, amount);
+      case TransactionType.transfer:
+        if (toAccountUuid != null) {
+          // Decrease source account balance
+          _accountCubit.adjustBalance(accountUuid, -amount);
+          // Increase destination account balance
+          _accountCubit.adjustBalance(toAccountUuid, amount);
+        }
     }
   }
 
@@ -222,15 +241,21 @@ class TransactionCubit extends Cubit<TransactionState> {
   void _reverseAccountBalance(
     String accountUuid,
     double amount,
-    TransactionType type,
-  ) {
-    final delta = switch (type) {
-      TransactionType.expense => amount, // Reverse: add back
-      TransactionType.income => -amount, // Reverse: subtract
-      TransactionType.transfer => 0.0,
-    };
-    if (delta != 0) {
-      _accountCubit.adjustBalance(accountUuid, delta);
+    TransactionType type, {
+    String? toAccountUuid,
+  }) {
+    switch (type) {
+      case TransactionType.expense:
+        _accountCubit.adjustBalance(accountUuid, amount); // Reverse: add back
+      case TransactionType.income:
+        _accountCubit.adjustBalance(accountUuid, -amount); // Reverse: subtract
+      case TransactionType.transfer:
+        if (toAccountUuid != null) {
+          // Reverse: add back to source
+          _accountCubit.adjustBalance(accountUuid, amount);
+          // Reverse: subtract from destination
+          _accountCubit.adjustBalance(toAccountUuid, -amount);
+        }
     }
   }
 }

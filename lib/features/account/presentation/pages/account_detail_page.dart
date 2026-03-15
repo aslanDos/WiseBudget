@@ -9,6 +9,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
 
 class AccountDetailPage extends StatelessWidget {
   final AccountEntity account;
@@ -214,6 +215,13 @@ class _TransactionListTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8.0),
       child: ListTile(
+        onTap: () {
+          showTransactionFormModal(
+            context: context,
+            initialType: transaction.type,
+            transaction: transaction,
+          );
+        },
         leading: Container(
           width: 40.0,
           height: 40.0,

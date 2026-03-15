@@ -20,6 +20,9 @@ class TransactionModel {
   @Index()
   String accountUuid;
 
+  /// For transfers: destination account UUID
+  String? toAccountUuid;
+
   String? note;
 
   @Property(type: PropertyType.date)
@@ -37,6 +40,7 @@ class TransactionModel {
     required this.type,
     required this.categoryUuid,
     required this.accountUuid,
+    this.toAccountUuid,
     this.note,
     required this.date,
     DateTime? createdDate,
@@ -66,6 +70,7 @@ class TransactionModel {
       type: transactionType,
       categoryUuid: categoryUuid,
       accountUuid: accountUuid,
+      toAccountUuid: toAccountUuid,
       note: note,
       date: date,
       createdDate: createdDate,
@@ -82,6 +87,7 @@ class TransactionModel {
       type: entity.type.value,
       categoryUuid: entity.categoryUuid,
       accountUuid: entity.accountUuid,
+      toAccountUuid: entity.toAccountUuid,
       note: entity.note,
       date: entity.date,
       createdDate: entity.createdDate,

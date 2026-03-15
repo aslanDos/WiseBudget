@@ -91,7 +91,7 @@ void _initCategoryFeature() {
   sl.registerLazySingleton(() => SeedDefaultCategories(sl()));
 
   // Cubit
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => CategoryCubit(
       getCategories: sl(),
       createCategory: sl(),

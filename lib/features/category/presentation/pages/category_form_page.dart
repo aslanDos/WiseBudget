@@ -62,8 +62,8 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return BlocProvider(
-      create: (_) => sl<CategoryCubit>(),
+    return BlocProvider.value(
+      value: sl<CategoryCubit>(),
       child: Builder(
         builder: (context) {
           return Scaffold(
@@ -161,6 +161,9 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
 
                   // Save button
                   BlocConsumer<CategoryCubit, CategoryState>(
+                    listenWhen: (previous, current) =>
+                        previous.status == CategoryStatus.loading &&
+                        current.status != CategoryStatus.loading,
                     listener: (context, state) {
                       if (state.status == CategoryStatus.success) {
                         context.pop(true);

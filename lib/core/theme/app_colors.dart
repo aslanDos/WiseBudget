@@ -20,6 +20,8 @@ class AppColors {
   // ===== Accent =====
   static const accent = Color(0xFF444444);
 
-  // ===== Error =====
-  static const red = Color(0xFFB00020);
+  // ===== Custom =====
+  static const green = Color.fromARGB(255, 69, 255, 119);
+  static const red = Color.fromARGB(255, 191, 0, 35);
+  static const blue = Color.fromARGB(255, 0, 0, 255);
 }

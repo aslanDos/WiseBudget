@@ -23,9 +23,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
   TransactionType _selectedType = TransactionType.expense;
 
   @override
+  void initState() {
+    super.initState();
+    sl<CategoryCubit>().loadCategories();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<CategoryCubit>()..loadCategories(),
+    return BlocProvider.value(
+      value: sl<CategoryCubit>(),
       child: Builder(
         builder: (context) {
           return Scaffold(

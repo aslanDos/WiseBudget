@@ -28,6 +28,7 @@ dependencies:
   uuid: ^4.5.1
   intl: ^0.20.2
   pie_menu: ^3.3.1
+  modal_bottom_sheet: ^3.0.0
 
 dev_dependencies:
   flutter_test:

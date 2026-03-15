@@ -141,17 +141,31 @@ class AccountCubit extends Cubit<AccountState> {
 
     for (final transaction in transactions) {
       final currentBalance = balanceMap[transaction.accountUuid] ?? 0.0;
-      final delta = switch (transaction.type) {
-        TransactionType.expense => -transaction.amount,
-        TransactionType.income => transaction.amount,
-        TransactionType.transfer => 0.0,
-      };
-      balanceMap[transaction.accountUuid] = currentBalance + delta;
+
+      switch (transaction.type) {
+        case TransactionType.expense:
+          balanceMap[transaction.accountUuid] = currentBalance - transaction.amount;
+        case TransactionType.income:
+          balanceMap[transaction.accountUuid] = currentBalance + transaction.amount;
+        case TransactionType.transfer:
+          // Decrease source account
+          balanceMap[transaction.accountUuid] = currentBalance - transaction.amount;
+          // Increase destination account
+          if (transaction.toAccountUuid != null) {
+            final toBalance = balanceMap[transaction.toAccountUuid!] ?? 0.0;
+            balanceMap[transaction.toAccountUuid!] = toBalance + transaction.amount;
+          }
+      }
     }
 
     // Update accounts with calculated balances
+    // Only update if there are transactions affecting this account
     final updatedAccounts = state.accounts.map((account) {
-      final calculatedBalance = balanceMap[account.uuid] ?? 0.0;
+      // If no transactions for this account, keep the original balance
+      if (!balanceMap.containsKey(account.uuid)) {
+        return account;
+      }
+      final calculatedBalance = balanceMap[account.uuid]!;
       if (account.balance != calculatedBalance) {
         _log.fine(
           'Account ${account.name}: ${account.balance} -> $calculatedBalance',

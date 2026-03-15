@@ -156,7 +156,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(3, 4887377587349221783),
     name: 'TransactionModel',
-    lastPropertyId: const obx_int.IdUid(10, 1046574712184831675),
+    lastPropertyId: const obx_int.IdUid(11, 8236143487117282939),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -221,6 +221,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(10, 1046574712184831675),
         name: 'createdDate',
         type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 8236143487117282939),
+        name: 'toAccountUuid',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -466,7 +472,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final noteOffset = object.note == null
             ? null
             : fbb.writeString(object.note!);
-        fbb.startTable(11);
+        final toAccountUuidOffset = object.toAccountUuid == null
+            ? null
+            : fbb.writeString(object.toAccountUuid!);
+        fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addFloat64(2, object.amount);
@@ -477,6 +486,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(7, noteOffset);
         fbb.addInt64(8, object.date.millisecondsSinceEpoch);
         fbb.addInt64(9, object.createdDate.millisecondsSinceEpoch);
+        fbb.addOffset(10, toAccountUuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -510,6 +520,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final accountUuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 16, '');
+        final toAccountUuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 24);
         final noteParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 18);
@@ -527,6 +540,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           type: typeParam,
           categoryUuid: categoryUuidParam,
           accountUuid: accountUuidParam,
+          toAccountUuid: toAccountUuidParam,
           note: noteParam,
           date: dateParam,
           createdDate: createdDateParam,
@@ -686,5 +700,10 @@ class TransactionModel_ {
   /// See [TransactionModel.createdDate].
   static final createdDate = obx.QueryDateProperty<TransactionModel>(
     _entities[2].properties[9],
+  );
+
+  /// See [TransactionModel.toAccountUuid].
+  static final toAccountUuid = obx.QueryStringProperty<TransactionModel>(
+    _entities[2].properties[10],
   );
 }

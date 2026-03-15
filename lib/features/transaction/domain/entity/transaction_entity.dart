@@ -9,6 +9,7 @@ class TransactionEntity extends Equatable {
   final TransactionType type;
   final String categoryUuid;
   final String accountUuid;
+  final String? toAccountUuid; // For transfers: destination account
   final String? note;
   final DateTime date;
   final DateTime createdDate;
@@ -23,6 +24,7 @@ class TransactionEntity extends Equatable {
     required this.type,
     required this.categoryUuid,
     required this.accountUuid,
+    this.toAccountUuid,
     this.note,
     required this.date,
     required this.createdDate,
@@ -52,6 +54,7 @@ class TransactionEntity extends Equatable {
     TransactionType? type,
     String? categoryUuid,
     String? accountUuid,
+    String? toAccountUuid,
     String? note,
     DateTime? date,
     DateTime? createdDate,
@@ -63,6 +66,7 @@ class TransactionEntity extends Equatable {
       type: type ?? this.type,
       categoryUuid: categoryUuid ?? this.categoryUuid,
       accountUuid: accountUuid ?? this.accountUuid,
+      toAccountUuid: toAccountUuid ?? this.toAccountUuid,
       note: note ?? this.note,
       date: date ?? this.date,
       createdDate: createdDate ?? this.createdDate,
@@ -77,6 +81,7 @@ class TransactionEntity extends Equatable {
         type,
         categoryUuid,
         accountUuid,
+        toAccountUuid,
         note,
         date,
         createdDate,

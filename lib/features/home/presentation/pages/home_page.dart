@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pie_menu/pie_menu.dart';
-import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_tab.dart';
@@ -95,6 +94,6 @@ class _HomePageState extends State<HomePage>
   }
 
   void _onNewTransaction(TransactionType type) {
-    context.push(AppRoutes.transactionForm, extra: type);
+    showTransactionFormModal(context: context, initialType: type);
   }
 }

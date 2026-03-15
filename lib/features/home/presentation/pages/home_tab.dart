@@ -9,6 +9,7 @@ import 'package:wisebuget/features/home/presentation/widgets/collapsible_calenda
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
 
 class HomeTab extends StatefulWidget {
@@ -24,12 +25,20 @@ class _HomeTabState extends State<HomeTab> {
   DateTime _selectedDate = DateTime.now();
 
   @override
+  void initState() {
+    super.initState();
+    sl<TransactionCubit>().loadTransactions();
+    sl<CategoryCubit>().loadCategories();
+    sl<AccountCubit>().loadAccounts();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: sl<TransactionCubit>()..loadTransactions()),
-        BlocProvider(create: (_) => sl<CategoryCubit>()..loadCategories()),
-        BlocProvider.value(value: sl<AccountCubit>()..loadAccounts()),
+        BlocProvider.value(value: sl<TransactionCubit>()),
+        BlocProvider.value(value: sl<CategoryCubit>()),
+        BlocProvider.value(value: sl<AccountCubit>()),
       ],
       child: Scaffold(
         appBar: AppBar(title: const Text('Home')),
@@ -113,6 +122,7 @@ class _TransactionsList extends StatelessWidget {
             return BlocBuilder<AccountCubit, AccountState>(
               builder: (context, accountState) {
                 return ListView.builder(
+                  key: const PageStorageKey('home_transactions_list'),
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   itemCount: transactions.length,
                   itemBuilder: (context, index) {
@@ -232,7 +242,11 @@ class _TransactionTile extends StatelessWidget {
       category: category,
       account: account,
       onTap: () {
-        // TODO: Navigate to transaction details
+        showTransactionFormModal(
+          context: context,
+          initialType: transaction.type,
+          transaction: transaction,
+        );
       },
     );
   }
