@@ -290,7 +290,13 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
               icon: const Icon(AppIcons.close),
             ),
             Expanded(child: Center(child: _buildAccountSelector())),
-            const SizedBox(width: 48), // Balance the close button
+            if (widget.isEditing)
+              IconButton(
+                onPressed: () => _showDeleteDialog(context),
+                icon: Icon(AppIcons.trash, color: colorScheme.error),
+              )
+            else
+              const SizedBox(width: 48), // Balance the close button
           ],
         ),
       ),
@@ -530,6 +536,34 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
         SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
       );
     }
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Transaction'),
+        content: const Text(
+          'Are you sure you want to delete this transaction?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: colorScheme.error),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              sl<TransactionCubit>().removeTransaction(widget.transaction!.uuid);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _saveTransaction(BuildContext context) {

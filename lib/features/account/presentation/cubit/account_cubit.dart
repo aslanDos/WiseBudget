@@ -47,6 +47,8 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> addAccount(AccountEntity account) async {
+    emit(state.copyWith(status: AccountStatus.loading));
+
     final result = await _createAccount(CreateAccountParams(account: account));
 
     result.fold(
@@ -62,6 +64,8 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> editAccount(AccountEntity account) async {
+    emit(state.copyWith(status: AccountStatus.loading));
+
     final result = await _updateAccount(UpdateAccountParams(account: account));
 
     result.fold(
@@ -82,6 +86,8 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> removeAccount(String uuid) async {
+    emit(state.copyWith(status: AccountStatus.loading));
+
     final result = await _deleteAccount(DeleteAccountParams(uuid: uuid));
 
     result.fold(

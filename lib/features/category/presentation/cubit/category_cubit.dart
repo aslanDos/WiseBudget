@@ -45,6 +45,8 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   Future<void> addCategory(CategoryEntity category) async {
+    emit(state.copyWith(status: CategoryStatus.loading));
+
     final result = await _createCategory(CreateCategoryParams(category: category));
 
     result.fold(
@@ -60,6 +62,8 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   Future<void> editCategory(CategoryEntity category) async {
+    emit(state.copyWith(status: CategoryStatus.loading));
+
     final result = await _updateCategory(UpdateCategoryParams(category: category));
 
     result.fold(
@@ -80,6 +84,8 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   Future<void> removeCategory(String uuid) async {
+    emit(state.copyWith(status: CategoryStatus.loading));
+
     final result = await _deleteCategory(DeleteCategoryParams(uuid: uuid));
 
     result.fold(

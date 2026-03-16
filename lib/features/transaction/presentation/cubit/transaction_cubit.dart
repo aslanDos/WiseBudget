@@ -106,6 +106,8 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> addTransaction(TransactionEntity transaction) async {
+    emit(state.copyWith(status: TransactionStatus.loading));
+
     final result = await _createTransaction(
       CreateTransactionParams(transaction: transaction),
     );
@@ -135,6 +137,8 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> editTransaction(TransactionEntity transaction) async {
+    emit(state.copyWith(status: TransactionStatus.loading));
+
     // Find the old transaction to reverse its effect
     final oldTransaction = state.transactions
         .where((t) => t.uuid == transaction.uuid)
@@ -180,6 +184,8 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> removeTransaction(String uuid) async {
+    emit(state.copyWith(status: TransactionStatus.loading));
+
     // Find the transaction to reverse its effect
     final transaction = state.transactions.where((t) => t.uuid == uuid).firstOrNull;
 
