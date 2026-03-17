@@ -190,10 +190,91 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:516645738032068282",
+      "lastPropertyId": "14:4435095045484900961",
+      "name": "BudgetModel",
+      "properties": [
+        {
+          "id": "1:482135398141518351",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4536444126363286022",
+          "name": "uuid",
+          "indexId": "9:4183726674299080721",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:6048914976728778061",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:8784581597611773700",
+          "name": "limit",
+          "type": 8
+        },
+        {
+          "id": "5:8272195491393556555",
+          "name": "currency",
+          "type": 9
+        },
+        {
+          "id": "6:8900869700902175302",
+          "name": "period",
+          "type": 9
+        },
+        {
+          "id": "7:3976552463014462078",
+          "name": "startDate",
+          "type": 10
+        },
+        {
+          "id": "8:222811725277230559",
+          "name": "endDate",
+          "type": 10
+        },
+        {
+          "id": "9:8583479747986165835",
+          "name": "categoryUuidsJson",
+          "type": 9
+        },
+        {
+          "id": "10:7361168452143996346",
+          "name": "accountUuidsJson",
+          "type": 9
+        },
+        {
+          "id": "11:1517212347246724844",
+          "name": "iconCode",
+          "type": 9
+        },
+        {
+          "id": "12:1301111373706831441",
+          "name": "colorValue",
+          "type": 6
+        },
+        {
+          "id": "13:9128017136830030662",
+          "name": "createdDate",
+          "type": 10
+        },
+        {
+          "id": "14:4435095045484900961",
+          "name": "isArchived",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:4887377587349221783",
-  "lastIndexId": "8:995482463966676039",
+  "lastEntityId": "4:516645738032068282",
+  "lastIndexId": "9:4183726674299080721",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

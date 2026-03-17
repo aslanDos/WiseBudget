@@ -8,6 +8,12 @@ import 'package:wisebuget/features/account/data/repository/account_repository_im
 import 'package:wisebuget/features/account/domain/repository/account_repository.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/budget/data/data_source/budget_local_datasource.dart';
+import 'package:wisebuget/features/budget/data/data_source/budget_local_datasource_impl.dart';
+import 'package:wisebuget/features/budget/data/repository/budget_repository_impl.dart';
+import 'package:wisebuget/features/budget/domain/repository/budget_repository.dart';
+import 'package:wisebuget/features/budget/domain/usecases/budget_usecases.dart';
+import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource_impl.dart';
 import 'package:wisebuget/features/category/data/repository/category_repository_impl.dart';
@@ -38,6 +44,7 @@ Future<void> init() async {
   _initAccountFeature();
   _initCategoryFeature();
   _initTransactionFeature();
+  _initBudgetFeature();
 }
 
 void _initAccountFeature() {
@@ -132,6 +139,38 @@ void _initTransactionFeature() {
       updateTransaction: sl(),
       deleteTransaction: sl(),
       accountCubit: sl(),
+    ),
+  );
+}
+
+void _initBudgetFeature() {
+  // Data sources
+  sl.registerLazySingleton<BudgetLocalDataSource>(
+    () => BudgetLocalDataSourceImpl(sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<BudgetRepository>(
+    () => BudgetRepositoryImpl(localDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetBudgets(sl()));
+  sl.registerLazySingleton(() => GetBudgetById(sl()));
+  sl.registerLazySingleton(() => CreateBudget(sl()));
+  sl.registerLazySingleton(() => UpdateBudget(sl()));
+  sl.registerLazySingleton(() => DeleteBudget(sl()));
+  sl.registerLazySingleton(() => CalculateBudgetProgress());
+
+  // Cubit (singleton so all screens share the same state)
+  sl.registerLazySingleton(
+    () => BudgetCubit(
+      getBudgets: sl(),
+      createBudget: sl(),
+      updateBudget: sl(),
+      deleteBudget: sl(),
+      calculateProgress: sl(),
+      transactionCubit: sl(),
     ),
   );
 }

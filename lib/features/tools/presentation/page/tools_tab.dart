@@ -37,7 +37,7 @@ class ToolsTab extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 12.0,
             crossAxisSpacing: 12.0,
-            childAspectRatio: 1.1,
+            childAspectRatio: 0.95,
           ),
           itemCount: ToolItem.items.length,
           itemBuilder: (context, index) {

@@ -8,7 +8,7 @@ import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
-import 'package:wisebuget/core/shared/widgets/numpad.dart';
+import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
@@ -58,7 +58,7 @@ class TransactionFormSheet extends StatefulWidget {
 
 class _TransactionFormSheetState extends State<TransactionFormSheet> {
   late TransactionType _selectedType;
-  String _amount = '';
+  double _amount = 0;
   String? _selectedAccountUuid;
   String? _selectedToAccountUuid; // For transfers: destination account
   String? _selectedIncomeCategoryUuid;
@@ -96,7 +96,7 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
   void _initializeFormData() {
     final tx = widget.transaction;
     _selectedType = tx?.type ?? widget.initialType;
-    _amount = tx?.amount.toString() ?? '';
+    _amount = tx?.amount ?? 0;
     _note = tx?.note ?? '';
     _selectedAccountUuid = tx?.accountUuid;
     _selectedToAccountUuid = tx?.toAccountUuid;
@@ -150,8 +150,9 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
     _hasShownToAccountPicker = true;
 
     // Filter out the source account
-    final availableAccounts =
-        accounts.where((a) => a.uuid != _selectedAccountUuid).toList();
+    final availableAccounts = accounts
+        .where((a) => a.uuid != _selectedAccountUuid)
+        .toList();
     if (availableAccounts.isEmpty) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -223,7 +224,14 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
     );
   }
 
-  String get _displayAmount => _amount.isEmpty ? '0' : _amount;
+  String get _displayAmount {
+    if (_amount == 0) return '0';
+    // Format with up to 2 decimal places, removing trailing zeros
+    if (_amount == _amount.truncate()) {
+      return _amount.truncate().toString();
+    }
+    return _amount.toStringAsFixed(2).replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -242,22 +250,18 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
           child: Column(
             children: [
               _buildHeader(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    _buildTypeToggle(),
-                    const SizedBox(height: 24.0),
-                    _buildFormContent(),
-                  ],
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildTypeToggle(),
+                      const SizedBox(height: 24.0),
+                      _buildFormContent(),
+                    ],
+                  ),
                 ),
               ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildNumpad(),
-              ),
-              const Spacer(),
               _buildSaveButton(),
             ],
           ),
@@ -372,7 +376,10 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
 
             return Column(
               children: [
-                AmountDisplay(amount: _displayAmount, type: _selectedType),
+                GestureDetector(
+                  onTap: _showAmountInput,
+                  child: AmountDisplay(amount: _displayAmount, type: _selectedType),
+                ),
                 const SizedBox(height: 16.0),
                 TransactionPickers(
                   selectedType: _selectedType,
@@ -401,19 +408,18 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
     );
   }
 
-  Widget _buildNumpad() {
-    return Numpad(
-      onKeyPressed: _onNumpadKeyPressed,
-      onBackspace: _onBackspace,
-      onClear: _onClear,
+  Future<void> _showAmountInput() async {
+    final result = await showInputAmountSheet(
+      context: context,
+      initialAmount: _amount,
+      title: _selectedType.label,
     );
+    if (result != null) {
+      setState(() => _amount = result);
+    }
   }
 
-  bool get _isValidAmount {
-    if (_amount.isEmpty) return false;
-    final parsed = double.tryParse(_amount);
-    return parsed != null && parsed > 0;
-  }
+  bool get _isValidAmount => _amount > 0;
 
   Widget _buildSaveButton() {
     return Padding(
@@ -497,35 +503,15 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
     AccountState state,
   ) {
     // Filter out the source account from available destinations
-    final availableAccounts =
-        state.accounts.where((a) => a.uuid != _selectedAccountUuid).toList();
+    final availableAccounts = state.accounts
+        .where((a) => a.uuid != _selectedAccountUuid)
+        .toList();
     final selected = availableAccounts
         .where((a) => a.uuid == _selectedToAccountUuid)
         .firstOrNull;
     final name = selected?.name ?? 'Select destination';
     return (name, selected, availableAccounts);
   }
-
-  // Numpad handlers
-  void _onNumpadKeyPressed(String key) {
-    setState(() {
-      if (key == '.' && _amount.contains('.')) return;
-      if (key == '.' && _amount.isEmpty) {
-        _amount = '0.';
-        return;
-      }
-      if (_amount.contains('.') && _amount.split('.').last.length >= 2) return;
-      _amount += key;
-    });
-  }
-
-  void _onBackspace() {
-    if (_amount.isNotEmpty) {
-      setState(() => _amount = _amount.substring(0, _amount.length - 1));
-    }
-  }
-
-  void _onClear() => setState(() => _amount = '');
 
   // Transaction handling
   void _handleTransactionState(BuildContext context, TransactionState state) {
@@ -557,7 +543,9 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
             style: TextButton.styleFrom(foregroundColor: colorScheme.error),
             onPressed: () {
               Navigator.pop(dialogContext);
-              sl<TransactionCubit>().removeTransaction(widget.transaction!.uuid);
+              sl<TransactionCubit>().removeTransaction(
+                widget.transaction!.uuid,
+              );
             },
             child: const Text('Delete'),
           ),
@@ -575,7 +563,6 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
       return;
     }
 
-    final amount = double.parse(_amount);
     final account = context.read<AccountCubit>().state.accounts.firstWhere(
       (a) => a.uuid == _selectedAccountUuid,
     );
@@ -590,7 +577,7 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
     if (widget.isEditing) {
       cubit.editTransaction(
         widget.transaction!.copyWith(
-          amount: amount,
+          amount: _amount,
           currency: account.currency,
           type: _selectedType,
           categoryUuid: categoryUuid,
@@ -604,7 +591,7 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
       cubit.addTransaction(
         TransactionEntity(
           uuid: const Uuid().v4(),
-          amount: amount,
+          amount: _amount,
           currency: account.currency,
           type: _selectedType,
           categoryUuid: categoryUuid,
@@ -619,11 +606,8 @@ class _TransactionFormSheetState extends State<TransactionFormSheet> {
   }
 
   String? _validateForm() {
-    if (_amount.isEmpty || double.tryParse(_amount) == null) {
+    if (_amount <= 0) {
       return 'Please enter a valid amount';
-    }
-    if (double.parse(_amount) <= 0) {
-      return 'Amount must be greater than 0';
     }
     if (_selectedAccountUuid == null) {
       return 'Please select an account';

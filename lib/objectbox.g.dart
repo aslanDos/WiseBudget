@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/account/data/model/account_model.dart';
+import 'features/budget/data/model/budget_model.dart';
 import 'features/category/data/model/category_model.dart';
 import 'features/transaction/data/model/transaction_model.dart';
 
@@ -233,6 +234,101 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(4, 516645738032068282),
+    name: 'BudgetModel',
+    lastPropertyId: const obx_int.IdUid(14, 4435095045484900961),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 482135398141518351),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4536444126363286022),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(9, 4183726674299080721),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 6048914976728778061),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 8784581597611773700),
+        name: 'limit',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 8272195491393556555),
+        name: 'currency',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8900869700902175302),
+        name: 'period',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 3976552463014462078),
+        name: 'startDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 222811725277230559),
+        name: 'endDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 8583479747986165835),
+        name: 'categoryUuidsJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 7361168452143996346),
+        name: 'accountUuidsJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 1517212347246724844),
+        name: 'iconCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 1301111373706831441),
+        name: 'colorValue',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 9128017136830030662),
+        name: 'createdDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 4435095045484900961),
+        name: 'isArchived',
+        type: 1,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -278,8 +374,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 4887377587349221783),
-    lastIndexId: const obx_int.IdUid(8, 995482463966676039),
+    lastEntityId: const obx_int.IdUid(4, 516645738032068282),
+    lastIndexId: const obx_int.IdUid(9, 4183726674299080721),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -549,6 +645,124 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    BudgetModel: obx_int.EntityDefinition<BudgetModel>(
+      model: _entities[3],
+      toOneRelations: (BudgetModel object) => [],
+      toManyRelations: (BudgetModel object) => {},
+      getId: (BudgetModel object) => object.id,
+      setId: (BudgetModel object, int id) {
+        object.id = id;
+      },
+      objectToFB: (BudgetModel object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final nameOffset = fbb.writeString(object.name);
+        final currencyOffset = fbb.writeString(object.currency);
+        final periodOffset = fbb.writeString(object.period);
+        final categoryUuidsJsonOffset = fbb.writeString(
+          object.categoryUuidsJson,
+        );
+        final accountUuidsJsonOffset = fbb.writeString(object.accountUuidsJson);
+        final iconCodeOffset = fbb.writeString(object.iconCode);
+        fbb.startTable(15);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addOffset(2, nameOffset);
+        fbb.addFloat64(3, object.limit);
+        fbb.addOffset(4, currencyOffset);
+        fbb.addOffset(5, periodOffset);
+        fbb.addInt64(6, object.startDate.millisecondsSinceEpoch);
+        fbb.addInt64(7, object.endDate?.millisecondsSinceEpoch);
+        fbb.addOffset(8, categoryUuidsJsonOffset);
+        fbb.addOffset(9, accountUuidsJsonOffset);
+        fbb.addOffset(10, iconCodeOffset);
+        fbb.addInt64(11, object.colorValue);
+        fbb.addInt64(12, object.createdDate.millisecondsSinceEpoch);
+        fbb.addBool(13, object.isArchived);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final endDateValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          18,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final limitParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final currencyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final periodParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final startDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
+        );
+        final endDateParam = endDateValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endDateValue);
+        final categoryUuidsJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 20, '');
+        final accountUuidsJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 22, '');
+        final iconCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 24, '');
+        final colorValueParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          26,
+          0,
+        );
+        final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0),
+        );
+        final isArchivedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          30,
+          false,
+        );
+        final object = BudgetModel(
+          id: idParam,
+          uuid: uuidParam,
+          name: nameParam,
+          limit: limitParam,
+          currency: currencyParam,
+          period: periodParam,
+          startDate: startDateParam,
+          endDate: endDateParam,
+          categoryUuidsJson: categoryUuidsJsonParam,
+          accountUuidsJson: accountUuidsJsonParam,
+          iconCode: iconCodeParam,
+          colorValue: colorValueParam,
+          createdDate: createdDateParam,
+          isArchived: isArchivedParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -705,5 +919,78 @@ class TransactionModel_ {
   /// See [TransactionModel.toAccountUuid].
   static final toAccountUuid = obx.QueryStringProperty<TransactionModel>(
     _entities[2].properties[10],
+  );
+}
+
+/// [BudgetModel] entity fields to define ObjectBox queries.
+class BudgetModel_ {
+  /// See [BudgetModel.id].
+  static final id = obx.QueryIntegerProperty<BudgetModel>(
+    _entities[3].properties[0],
+  );
+
+  /// See [BudgetModel.uuid].
+  static final uuid = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[1],
+  );
+
+  /// See [BudgetModel.name].
+  static final name = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[2],
+  );
+
+  /// See [BudgetModel.limit].
+  static final limit = obx.QueryDoubleProperty<BudgetModel>(
+    _entities[3].properties[3],
+  );
+
+  /// See [BudgetModel.currency].
+  static final currency = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[4],
+  );
+
+  /// See [BudgetModel.period].
+  static final period = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[5],
+  );
+
+  /// See [BudgetModel.startDate].
+  static final startDate = obx.QueryDateProperty<BudgetModel>(
+    _entities[3].properties[6],
+  );
+
+  /// See [BudgetModel.endDate].
+  static final endDate = obx.QueryDateProperty<BudgetModel>(
+    _entities[3].properties[7],
+  );
+
+  /// See [BudgetModel.categoryUuidsJson].
+  static final categoryUuidsJson = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[8],
+  );
+
+  /// See [BudgetModel.accountUuidsJson].
+  static final accountUuidsJson = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[9],
+  );
+
+  /// See [BudgetModel.iconCode].
+  static final iconCode = obx.QueryStringProperty<BudgetModel>(
+    _entities[3].properties[10],
+  );
+
+  /// See [BudgetModel.colorValue].
+  static final colorValue = obx.QueryIntegerProperty<BudgetModel>(
+    _entities[3].properties[11],
+  );
+
+  /// See [BudgetModel.createdDate].
+  static final createdDate = obx.QueryDateProperty<BudgetModel>(
+    _entities[3].properties[12],
+  );
+
+  /// See [BudgetModel.isArchived].
+  static final isArchived = obx.QueryBooleanProperty<BudgetModel>(
+    _entities[3].properties[13],
   );
 }

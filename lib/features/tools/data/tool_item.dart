@@ -20,12 +20,13 @@ class ToolItem {
   });
 
   static final List<ToolItem> items = [
-    const ToolItem(
-      icon: AppIcons.crown,
-      title: 'Premium',
-      subtitle: 'Unlock all features',
-      iconColor: Color(0xFFFFB800),
-      backgroundColor: Color(0xFFFFF8E1),
+    ToolItem(
+      icon: Icons.pie_chart_outline_rounded,
+      title: 'Budgets',
+      subtitle: 'Track spending limits',
+      iconColor: const Color(0xFF8B5CF6),
+      backgroundColor: const Color(0xFFF3E8FF),
+      route: AppRoutes.budgets,
     ),
     ToolItem(
       icon: AppIcons.grid,
@@ -34,6 +35,13 @@ class ToolItem {
       iconColor: const Color(0xFF6366F1),
       backgroundColor: const Color(0xFFEEF2FF),
       route: AppRoutes.manageCategories,
+    ),
+    const ToolItem(
+      icon: AppIcons.crown,
+      title: 'Premium',
+      subtitle: 'Unlock all features',
+      iconColor: Color(0xFFFFB800),
+      backgroundColor: Color(0xFFFFF8E1),
     ),
     const ToolItem(
       icon: AppIcons.bell,
