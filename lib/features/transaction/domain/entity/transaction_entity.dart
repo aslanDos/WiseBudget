@@ -40,12 +40,20 @@ class TransactionEntity extends Equatable {
   bool get hasNote => note != null && note!.isNotEmpty;
 
   /// Validation
-  bool get isValid =>
-      amount > 0 &&
-      currency.isNotEmpty &&
-      categoryUuid.isNotEmpty &&
-      accountUuid.isNotEmpty &&
-      (note == null || note!.length <= maxNoteLength);
+  bool get isValid {
+    if (amount <= 0) return false;
+    if (currency.isEmpty) return false;
+    if (accountUuid.isEmpty) return false;
+    if (note != null && note!.length > maxNoteLength) return false;
+
+    // Transfer-specific validation
+    if (isTransfer) {
+      return toAccountUuid != null && toAccountUuid!.isNotEmpty;
+    }
+
+    // Income/Expense require category
+    return categoryUuid.isNotEmpty;
+  }
 
   TransactionEntity copyWith({
     String? uuid,

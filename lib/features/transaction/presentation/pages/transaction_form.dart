@@ -17,7 +17,7 @@ import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cu
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_amount_section.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_details_section.dart';
-import 'package:wisebuget/features/transaction/presentation/widgets/transaction_form_state.dart';
+import 'package:wisebuget/features/transaction/presentation/models/transaction_form_data.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_pickers.dart';
 
 Future<bool?> showTransactionFormModal({
@@ -140,9 +140,9 @@ class _TransactionFormState extends State<TransactionForm> {
           builder: (context, categoryState) {
             _autoShowPickers(accountState, categoryState);
 
-            final categories = _form.getFilteredCategories(categoryState);
+            final categories = _form.filterCategories(categoryState.categories);
             final availableToAccounts =
-                _form.getAvailableToAccounts(accountState);
+                _form.filterToAccounts(accountState.accounts);
 
             return Column(
               children: [
@@ -156,11 +156,11 @@ class _TransactionFormState extends State<TransactionForm> {
                   type: _form.type,
                   date: _form.date,
                   note: _form.note,
-                  selectedCategory: _form.getSelectedCategory(categoryState),
+                  selectedCategory: _form.findSelectedCategory(categoryState.categories),
                   categories: categories,
                   onCategorySelected: (uuid) =>
                       setState(() => _form.categoryUuid = uuid),
-                  selectedToAccount: _form.getSelectedToAccount(accountState),
+                  selectedToAccount: _form.findSelectedToAccount(accountState.accounts),
                   availableToAccounts: availableToAccounts,
                   onToAccountSelected: (uuid) =>
                       setState(() => _form.toAccountUuid = uuid),
@@ -222,7 +222,7 @@ class _TransactionFormState extends State<TransactionForm> {
           _form.toAccountUuid == null &&
           !_hasShownToAccountPicker) {
         _hasShownToAccountPicker = true;
-        final available = _form.getAvailableToAccounts(accountState);
+        final available = _form.filterToAccounts(accountState.accounts);
         if (available.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showAccountPicker(
@@ -238,7 +238,7 @@ class _TransactionFormState extends State<TransactionForm> {
       return;
     }
 
-    final categories = _form.getFilteredCategories(categoryState);
+    final categories = _form.filterCategories(categoryState.categories);
     if (_form.accountUuid != null &&
         _form.categoryUuid == null &&
         !_hasShownCategoryPicker &&

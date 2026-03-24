@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
+import 'package:wisebuget/features/account/domain/services/balance_service.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
@@ -15,6 +15,7 @@ class AccountCubit extends Cubit<AccountState> {
   final UpdateAccount _updateAccount;
   final DeleteAccount _deleteAccount;
   final SeedDefaultAccount _seedDefaultAccount;
+  final BalanceService _balanceService;
 
   AccountCubit({
     required GetAccounts getAccounts,
@@ -22,12 +23,18 @@ class AccountCubit extends Cubit<AccountState> {
     required UpdateAccount updateAccount,
     required DeleteAccount deleteAccount,
     required SeedDefaultAccount seedDefaultAccount,
+    BalanceService balanceService = const BalanceService(),
   })  : _getAccounts = getAccounts,
         _createAccount = createAccount,
         _updateAccount = updateAccount,
         _deleteAccount = deleteAccount,
         _seedDefaultAccount = seedDefaultAccount,
+        _balanceService = balanceService,
         super(const AccountState());
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CRUD Operations
+  // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> loadAccounts() async {
     emit(state.copyWith(status: AccountStatus.loading));
@@ -114,10 +121,13 @@ class AccountCubit extends Cubit<AccountState> {
     );
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Balance Operations
+  // ─────────────────────────────────────────────────────────────────────────
+
   /// Adjusts the balance of an account by the given delta amount.
-  /// Positive delta increases balance, negative delta decreases it.
   Future<void> adjustBalance(String accountUuid, double delta) async {
-    final account = state.accounts.where((a) => a.uuid == accountUuid).firstOrNull;
+    final account = _findAccount(accountUuid);
     if (account == null) {
       _log.warning('Cannot adjust balance: account $accountUuid not found');
       return;
@@ -127,10 +137,30 @@ class AccountCubit extends Cubit<AccountState> {
     await editAccount(updated);
   }
 
+  /// Applies balance changes from a map of accountUuid -> delta.
+  Future<void> applyBalanceChanges(Map<String, double> changes) async {
+    for (final entry in changes.entries) {
+      await adjustBalance(entry.key, entry.value);
+    }
+  }
+
+  /// Applies the balance effect of a transaction.
+  Future<void> applyTransactionEffect(TransactionEntity transaction) async {
+    final changes = _balanceService.calculateAllBalanceChanges(transaction);
+    await applyBalanceChanges(changes);
+  }
+
+  /// Reverses the balance effect of a transaction.
+  Future<void> reverseTransactionEffect(TransactionEntity transaction) async {
+    final changes = _balanceService.calculateAllBalanceChanges(
+      transaction,
+      reverse: true,
+    );
+    await applyBalanceChanges(changes);
+  }
+
   /// Recalculates all account balances based on the provided transactions.
-  /// This ensures balances are in sync with actual transaction history.
   Future<void> recalculateBalances(List<TransactionEntity> transactions) async {
-    // Ensure accounts are loaded first
     if (state.accounts.isEmpty && state.status != AccountStatus.loading) {
       await loadAccounts();
     }
@@ -142,36 +172,19 @@ class AccountCubit extends Cubit<AccountState> {
 
     _log.fine('Recalculating balances for ${state.accounts.length} accounts');
 
-    // Calculate balance for each account from transactions
+    // Calculate balance for each account using BalanceService
     final balanceMap = <String, double>{};
-
-    for (final transaction in transactions) {
-      final currentBalance = balanceMap[transaction.accountUuid] ?? 0.0;
-
-      switch (transaction.type) {
-        case TransactionType.expense:
-          balanceMap[transaction.accountUuid] = currentBalance - transaction.amount;
-        case TransactionType.income:
-          balanceMap[transaction.accountUuid] = currentBalance + transaction.amount;
-        case TransactionType.transfer:
-          // Decrease source account
-          balanceMap[transaction.accountUuid] = currentBalance - transaction.amount;
-          // Increase destination account
-          if (transaction.toAccountUuid != null) {
-            final toBalance = balanceMap[transaction.toAccountUuid!] ?? 0.0;
-            balanceMap[transaction.toAccountUuid!] = toBalance + transaction.amount;
-          }
-      }
+    for (final account in state.accounts) {
+      balanceMap[account.uuid] = _balanceService.calculateTotalBalance(
+        transactions,
+        account.uuid,
+        0.0, // Start from zero since we're recalculating from all transactions
+      );
     }
 
     // Update accounts with calculated balances
-    // Only update if there are transactions affecting this account
     final updatedAccounts = state.accounts.map((account) {
-      // If no transactions for this account, keep the original balance
-      if (!balanceMap.containsKey(account.uuid)) {
-        return account;
-      }
-      final calculatedBalance = balanceMap[account.uuid]!;
+      final calculatedBalance = balanceMap[account.uuid] ?? 0.0;
       if (account.balance != calculatedBalance) {
         _log.fine(
           'Account ${account.name}: ${account.balance} -> $calculatedBalance',
@@ -193,5 +206,13 @@ class AccountCubit extends Cubit<AccountState> {
       status: AccountStatus.success,
       accounts: updatedAccounts,
     ));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Private Helpers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  AccountEntity? _findAccount(String uuid) {
+    return state.accounts.where((a) => a.uuid == uuid).firstOrNull;
   }
 }

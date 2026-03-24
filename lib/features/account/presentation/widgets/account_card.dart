@@ -22,7 +22,7 @@ class AccountCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
-      color: context.c.secondary.withValues(alpha: 0.3),
+      color: context.c.secondary.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: InkWell(
         onTap: onTap,
