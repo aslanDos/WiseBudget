@@ -45,68 +45,89 @@ class TransactionDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _NoteDateRow(
-          date: date,
-          note: note,
-          onDateSelected: onDateSelected,
-          onNoteChanged: onNoteChanged,
+        // Date
+        _LabeledField(
+          label: 'Date',
+          child: _DatePicker(
+            date: date,
+            onDateSelected: onDateSelected,
+          ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
+        // Category or To Account
         if (type == TransactionType.transfer)
-          _ToAccountPicker(
-            selectedAccount: selectedToAccount,
-            accounts: availableToAccounts,
-            onSelected: onToAccountSelected,
+          _LabeledField(
+            label: 'To account',
+            child: _ToAccountPicker(
+              selectedAccount: selectedToAccount,
+              accounts: availableToAccounts,
+              onSelected: onToAccountSelected,
+            ),
           )
         else
-          _CategoryPicker(
-            selectedCategory: selectedCategory,
-            categories: categories,
-            onSelected: onCategorySelected,
+          _LabeledField(
+            label: 'Category',
+            child: _CategoryPicker(
+              selectedCategory: selectedCategory,
+              categories: categories,
+              onSelected: onCategorySelected,
+            ),
           ),
+        const SizedBox(height: 16),
+        // Note
+        _LabeledField(
+          label: 'Note',
+          child: _NoteField(
+            note: note,
+            onNoteChanged: onNoteChanged,
+          ),
+        ),
       ],
     );
   }
 }
 
-class _NoteDateRow extends StatelessWidget {
-  final DateTime date;
-  final String note;
-  final ValueChanged<DateTime> onDateSelected;
-  final ValueChanged<String> onNoteChanged;
+class _LabeledField extends StatelessWidget {
+  final String label;
+  final Widget child;
 
-  const _NoteDateRow({
-    required this.date,
-    required this.note,
-    required this.onDateSelected,
-    required this.onNoteChanged,
+  const _LabeledField({
+    required this.label,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _buildNoteField(context)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildDatePicker(context)),
+        Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        child,
       ],
     );
   }
+}
 
-  Widget _buildNoteField(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return PickerField(
-      icon: Icons.notes_outlined,
-      iconColor: colorScheme.secondary,
-      iconBackgroundColor: context.c.secondary.withValues(alpha: 0.3),
-      label: note.isEmpty ? 'Add note' : note,
-      showChevron: false,
-      onTap: () => _showNoteInput(context),
-    );
-  }
+class _DatePicker extends StatelessWidget {
+  final DateTime date;
+  final ValueChanged<DateTime> onDateSelected;
 
-  Widget _buildDatePicker(BuildContext context) {
+  const _DatePicker({
+    required this.date,
+    required this.onDateSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return PickerField(
       icon: AppIcons.calendar,
@@ -138,6 +159,29 @@ class _NoteDateRow extends StatelessWidget {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) onDateSelected(picked);
+  }
+}
+
+class _NoteField extends StatelessWidget {
+  final String note;
+  final ValueChanged<String> onNoteChanged;
+
+  const _NoteField({
+    required this.note,
+    required this.onNoteChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return PickerField(
+      icon: Icons.notes_outlined,
+      iconColor: colorScheme.secondary,
+      iconBackgroundColor: context.c.secondary.withValues(alpha: 0.3),
+      label: note.isEmpty ? 'Add note' : note,
+      showChevron: false,
+      onTap: () => _showNoteInput(context),
+    );
   }
 
   Future<void> _showNoteInput(BuildContext context) async {
@@ -177,7 +221,7 @@ class _CategoryPicker extends StatelessWidget {
           ? AppIcons.fromCode(selectedCategory!.iconCode)
           : AppIcons.grid,
       iconColor: color,
-      iconBackgroundColor: color.withAlpha(0x1A),
+      iconBackgroundColor: context.c.secondary.withValues(alpha: 0.3),
       label: selectedCategory?.name ?? 'Select category',
       showChevron: false,
       onTap: () => _showPicker(context),
@@ -245,7 +289,7 @@ class _ToAccountPicker extends StatelessWidget {
     return PickerField(
       icon: AppIcons.wallet,
       iconColor: colorScheme.tertiary,
-      iconBackgroundColor: colorScheme.tertiary.withAlpha(0x1A),
+      iconBackgroundColor: context.c.secondary.withValues(alpha: 0.3),
       label: selectedAccount?.name ?? 'Select destination',
       showChevron: false,
       onTap: () => _showPicker(context),

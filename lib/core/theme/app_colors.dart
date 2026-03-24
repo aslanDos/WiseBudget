@@ -21,7 +21,7 @@ class AppColors {
   static const accent = Color(0xFF444444);
 
   // ===== Custom =====
-  static const green = Color.fromARGB(255, 69, 255, 119);
-  static const red = Color.fromARGB(255, 191, 0, 35);
-  static const blue = Color.fromARGB(255, 0, 0, 255);
+  static const green = Color(0xFF22C55E);
+  static const red = Color(0xFFEF4444);
+  static const blue = Color(0xFF3B82F6);
 }

@@ -27,7 +27,8 @@ Future<bool?> showTransactionFormModal({
 }) {
   return showCupertinoModalBottomSheet<bool>(
     context: context,
-    expand: true,
+    expand: false,
+    barrierColor: Colors.black54,
     builder: (context) => TransactionForm(
       initialType: initialType,
       transaction: transaction,
@@ -92,6 +93,7 @@ class _TransactionFormState extends State<TransactionForm> {
         child: SafeArea(
           top: false,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _FormHeader(
                 isEditing: isEditing,
@@ -100,16 +102,15 @@ class _TransactionFormState extends State<TransactionForm> {
                     setState(() => _form.accountUuid = uuid),
                 onDelete: () => _showDeleteDialog(context),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildTypeToggle(),
-                      const SizedBox(height: 24),
-                      _buildFormContent(),
-                    ],
-                  ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildTypeToggle(),
+                    const SizedBox(height: 24),
+                    _buildFormContent(),
+                  ],
                 ),
               ),
               _buildSaveButton(),
