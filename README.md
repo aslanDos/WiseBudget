@@ -2,6 +2,16 @@
 
 A personal finance management app built with Flutter. Track transactions, manage multiple accounts, categorize spending, and gain insights into your financial habits.
 
+## Screenshots
+
+| Home | Add Transaction |
+|------|----------------|
+| ![](screenshots/home.png) | ![](screenshots/home_add_transaction_button.png) |
+
+| Accounts | Tools (Settings) |
+|-----------|----------|
+| ![](screenshots/accounts.png) | ![](screenshots/tools.png) |
+
 ## Features
 
 - **Multi-Account Management** - Track balances across multiple accounts
