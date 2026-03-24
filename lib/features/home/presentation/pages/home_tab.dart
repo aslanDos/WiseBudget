@@ -9,7 +9,7 @@ import 'package:wisebuget/features/home/presentation/widgets/collapsible_calenda
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
-import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
 
 class HomeTab extends StatefulWidget {

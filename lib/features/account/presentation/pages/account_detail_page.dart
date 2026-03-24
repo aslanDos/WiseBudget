@@ -9,7 +9,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
-import 'package:wisebuget/features/transaction/presentation/pages/transaction_form_page.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 
 class AccountDetailPage extends StatelessWidget {
   final AccountEntity account;

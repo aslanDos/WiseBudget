@@ -1,8 +1,6 @@
 import "package:flutter/material.dart";
 import "package:pie_menu/pie_menu.dart";
 
-import "package:wisebuget/core/logger/logging.dart";
-
 class PieThemeExtension extends ThemeExtension<PieThemeExtension> {
   final PieTheme pieTheme;
 
@@ -18,10 +16,6 @@ class PieThemeExtension extends ThemeExtension<PieThemeExtension> {
     ThemeExtension<PieThemeExtension>? other,
     double t,
   ) {
-    mainLogger.warning(
-      "[PieThemeExtension] lerp is not available for PieTheme",
-    );
-
     return (t < 0.5 ? this : other) as PieThemeExtension;
   }
 }

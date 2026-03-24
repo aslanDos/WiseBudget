@@ -94,6 +94,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 0,
           iconCode: 'utensils',
           type: TransactionType.expense.value,
+          colorValue: 0xFFEF5350,
         ),
         CategoryModel(
           uuid: const Uuid().v4(),
@@ -101,6 +102,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 1,
           iconCode: 'car',
           type: TransactionType.expense.value,
+          colorValue: 0xFFEC407A,
         ),
         CategoryModel(
           uuid: const Uuid().v4(),
@@ -108,6 +110,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 2,
           iconCode: 'shoppingBag',
           type: TransactionType.expense.value,
+          colorValue: 0xFFAB47BC,
         ),
         CategoryModel(
           uuid: const Uuid().v4(),
@@ -115,6 +118,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 3,
           iconCode: 'gamepad',
           type: TransactionType.expense.value,
+          colorValue: 0xFF7E57C2,
         ),
         CategoryModel(
           uuid: const Uuid().v4(),
@@ -122,6 +126,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 4,
           iconCode: 'receipt',
           type: TransactionType.expense.value,
+          colorValue: 0xFF5C6BC0,
         ),
         // Income categories
         CategoryModel(
@@ -130,6 +135,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 0,
           iconCode: 'briefCase',
           type: TransactionType.income.value,
+          colorValue: 0xFF42A5F5,
         ),
         CategoryModel(
           uuid: const Uuid().v4(),
@@ -137,6 +143,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
           sortOrder: 1,
           iconCode: 'gift',
           type: TransactionType.income.value,
+          colorValue: 0xFF29B6F6,
         ),
       ];
 
