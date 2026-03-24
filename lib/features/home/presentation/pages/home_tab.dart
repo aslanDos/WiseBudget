@@ -41,7 +41,7 @@ class _HomeTabState extends State<HomeTab> {
         BlocProvider.value(value: sl<AccountCubit>()),
       ],
       child: Scaffold(
-        appBar: AppBar(title: const Text('Home')),
+        appBar: AppBar(title: const Text('Home'), centerTitle: true),
         body: BlocBuilder<TransactionCubit, TransactionState>(
           builder: (context, transactionState) {
             // Extract dates that have transactions
