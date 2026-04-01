@@ -7,7 +7,7 @@ import 'package:wisebuget/features/budget/presentation/pages/budget_list_page.da
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/pages/categories_page.dart';
 import 'package:wisebuget/features/category/presentation/pages/category_form_page.dart';
-import 'package:wisebuget/features/home/presentation/pages/home_page.dart';
+import 'package:wisebuget/core/app/home_page.dart';
 
 class HomeRouter {
   static final routes = <GoRoute>[

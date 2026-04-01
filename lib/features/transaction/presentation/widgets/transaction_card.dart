@@ -33,7 +33,7 @@ class TransactionCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Material(
-        color: context.c.secondary.withValues(alpha: 0.2),
+        color: context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(16.0),
         child: InkWell(
           onTap: onTap,
@@ -74,13 +74,13 @@ class _CategoryIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48.0,
-      height: 48.0,
+      width: 36.0,
+      height: 36.0,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.0),
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(icon, color: color, size: 22.0),
+      child: Icon(icon, color: color, size: 18.0),
     );
   }
 }
@@ -98,28 +98,20 @@ class _TransactionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           categoryName,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
+          style: context.t.headlineMedium,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2.0),
         Text(
           _buildSecondaryText(),
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: context.t.bodySmall,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -130,7 +122,7 @@ class _TransactionDetails extends StatelessWidget {
   String _buildSecondaryText() {
     final account = accountName ?? 'Unknown Account';
     final hasNote = note != null && note!.isNotEmpty;
-    return hasNote ? '$account · $note' : account;
+    return hasNote ? '$note' : account;
   }
 }
 
@@ -141,25 +133,19 @@ class _TransactionAmount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final (prefix, color) = _getAmountStyle(context);
 
     return Text(
       '$prefix${transaction.money.formatted}',
-      style: theme.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: color,
-      ),
+      style: context.t.headlineMedium?.copyWith(color: color),
     );
   }
 
   (String, Color) _getAmountStyle(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return switch (transaction.type) {
       TransactionType.expense => ('-', AppColors.red),
       TransactionType.income => ('+', AppColors.green),
-      TransactionType.transfer => ('', colorScheme.onSurfaceVariant),
+      TransactionType.transfer => ('', AppColors.blue),
     };
   }
 }

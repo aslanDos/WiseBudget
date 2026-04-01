@@ -45,7 +45,7 @@ class Numpad extends StatelessWidget {
               left: index == 0 ? 0 : spacing / 2,
               right: index == keys.length - 1 ? 0 : spacing / 2,
             ),
-            child: NumpadKey(
+            child: _NumpadKey(
               label: key,
               height: buttonHeight,
               onPressed: () => onKeyPressed(key),
@@ -62,7 +62,7 @@ class Numpad extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: EdgeInsets.only(right: spacing / 2),
-            child: NumpadKey(
+            child: _NumpadKey(
               label: '.',
               height: buttonHeight,
               onPressed: () => onKeyPressed('.'),
@@ -72,7 +72,7 @@ class Numpad extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: spacing / 2),
-            child: NumpadKey(
+            child: _NumpadKey(
               label: '0',
               height: buttonHeight,
               onPressed: () => onKeyPressed('0'),
@@ -82,7 +82,7 @@ class Numpad extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: EdgeInsets.only(left: spacing / 2),
-            child: NumpadKey(
+            child: _NumpadKey(
               icon: Icons.backspace_outlined,
               height: buttonHeight,
               onPressed: onBackspace,
@@ -95,15 +95,14 @@ class Numpad extends StatelessWidget {
   }
 }
 
-class NumpadKey extends StatelessWidget {
+class _NumpadKey extends StatelessWidget {
   final String? label;
   final IconData? icon;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
   final double height;
 
-  const NumpadKey({
-    super.key,
+  const _NumpadKey({
     this.label,
     this.icon,
     this.onPressed,

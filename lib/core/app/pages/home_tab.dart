@@ -5,7 +5,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
-import 'package:wisebuget/features/home/presentation/widgets/collapsible_calendar.dart';
+import 'package:wisebuget/core/shared/widgets/calendar/calendar.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
@@ -54,7 +54,7 @@ class _HomeTabState extends State<HomeTab> {
                 // Calendar
                 SafeArea(
                   bottom: false,
-                  child: CollapsibleCalendar(
+                  child: Calendar(
                     selectedDate: _selectedDate,
                     onDateSelected: (date) {
                       setState(() => _selectedDate = date);

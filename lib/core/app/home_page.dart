@@ -4,12 +4,12 @@ import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
-import 'package:wisebuget/features/account/presentation/pages/account_tab.dart';
-import 'package:wisebuget/features/home/presentation/pages/home_tab.dart';
-import 'package:wisebuget/features/analytics/presentation/pages/analytics_tab.dart';
+import 'package:wisebuget/core/app/pages/account_tab.dart';
+import 'package:wisebuget/core/app/pages/home_tab.dart';
+import 'package:wisebuget/core/app/pages/analytics_tab.dart';
 import 'package:wisebuget/features/navbar/presentation/navbar.dart';
 import 'package:wisebuget/features/navbar/presentation/widgets/new_transaction_button.dart';
-import 'package:wisebuget/features/tools/presentation/page/tools_tab.dart';
+import 'package:wisebuget/core/app/pages/tools_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

@@ -97,7 +97,7 @@ class AppTheme {
         iconColor: scheme.primary,
         selectedTileColor: scheme.secondary,
         selectedColor: isDark ? scheme.primary : null,
-        subtitleTextStyle: textTheme.bodyMedium!.copyWith(
+        subtitleTextStyle: textTheme.bodyMedium?.copyWith(
           color: scheme.onSurface,
         ),
       ),
