@@ -1,19 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
-/// A reusable picker field widget that looks like an iOS settings cell.
-///
-/// This widget displays a tappable row with an icon on the left and text on the right.
-/// It's designed to be used for selecting values like dates, categories, accounts, etc.
-///
-/// Example usage:
-/// ```dart
-/// PickerField(
-///   icon: Icons.calendar_today,
-///   label: 'Date',
-///   value: 'Today',
-///   onTap: () => _showDatePicker(),
-/// )
-/// ```
 class PickerField extends StatelessWidget {
   /// The icon displayed on the left side of the field.
   final IconData icon;
@@ -53,6 +40,8 @@ class PickerField extends StatelessWidget {
   /// Optional trailing widget to display instead of the default chevron/value.
   final Widget? trailing;
 
+  final bool shrink;
+
   const PickerField({
     super.key,
     required this.icon,
@@ -61,26 +50,19 @@ class PickerField extends StatelessWidget {
     this.iconBackgroundColor,
     this.value,
     this.valueStyle,
-    this.showChevron = true,
+    this.showChevron = false,
     this.onTap,
     this.backgroundColor,
-    this.borderRadius = 14.0,
-    this.padding = EdgeInsets.zero,
+    this.borderRadius = 12,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     this.trailing,
+    this.shrink = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    final effectiveBackgroundColor =
-        backgroundColor ?? colorScheme.surfaceContainerHighest.withAlpha(0x80);
-
-    final effectiveIconColor = iconColor ?? colorScheme.onSurfaceVariant;
-
     return Material(
-      color: effectiveBackgroundColor,
+      color: backgroundColor ?? context.c.secondary,
       borderRadius: BorderRadius.circular(borderRadius),
       child: InkWell(
         onTap: onTap,
@@ -88,51 +70,34 @@ class PickerField extends StatelessWidget {
         child: Padding(
           padding: padding,
           child: Row(
+            mainAxisSize: shrink ? MainAxisSize.min : MainAxisSize.max,
             children: [
-              // Icon (optionally with background)
-              if (iconBackgroundColor != null)
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: iconBackgroundColor,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Icon(icon, size: 20.0, color: effectiveIconColor),
-                )
-              else
-                Icon(icon, size: 24.0, color: effectiveIconColor),
+              // Icon
+              Icon(icon, size: 16, color: iconColor ?? context.c.onSecondary),
               const SizedBox(width: 12.0),
               // Label
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface,
+              if (shrink)
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.t.bodyMedium?.copyWith(
+                      color: iconColor ?? context.c.onSecondary,
+                    ),
+                  ),
+                )
+              else
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.t.bodyMedium?.copyWith(
+                      color: iconColor ?? context.c.onSecondary,
+                    ),
                   ),
                 ),
-              ),
-              // Value or trailing widget
-              if (trailing != null)
-                trailing!
-              else ...[
-                if (value != null)
-                  Text(
-                    value!,
-                    style:
-                        valueStyle ??
-                        theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                if (showChevron) ...[
-                  const SizedBox(width: 4.0),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20.0,
-                    color: colorScheme.onSurfaceVariant.withAlpha(0x80),
-                  ),
-                ],
-              ],
             ],
           ),
         ),

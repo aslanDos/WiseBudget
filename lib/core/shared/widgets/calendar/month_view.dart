@@ -29,35 +29,31 @@ class MonthView extends StatelessWidget {
     // Total days to show (6 weeks)
     const totalDays = 42;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7,
-          childAspectRatio: 1.0,
-          mainAxisSpacing: 2.0,
-          crossAxisSpacing: 2.0,
-        ),
-        itemCount: totalDays,
-        itemBuilder: (context, index) {
-          final date = gridStart.add(Duration(days: index));
-          final isCurrentMonth = date.month == month.month;
-          final isSelected = _isSameDay(date, selectedDate);
-          final isToday = _isSameDay(date, today);
-          final hasTransaction = _hasTransactionOnDate(date);
-
-          return DayCell(
-            date: date,
-            isSelected: isSelected,
-            isToday: isToday && !isSelected,
-            isCurrentMonth: isCurrentMonth,
-            hasTransaction: hasTransaction,
-            onTap: () => onDateSelected(date),
-          );
-        },
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        mainAxisSpacing: 2.0,
+        crossAxisSpacing: 2.0,
+        mainAxisExtent: 40,
       ),
+      itemCount: totalDays,
+      itemBuilder: (context, index) {
+        final date = gridStart.add(Duration(days: index));
+        final isCurrentMonth = date.month == month.month;
+        final isSelected = _isSameDay(date, selectedDate);
+        final isToday = _isSameDay(date, today);
+        final hasTransaction = _hasTransactionOnDate(date);
+
+        return DayCell(
+          date: date,
+          isSelected: isSelected,
+          isToday: isToday && !isSelected,
+          isCurrentMonth: isCurrentMonth,
+          hasTransaction: hasTransaction,
+          onTap: () => onDateSelected(date),
+        );
+      },
     );
   }
 

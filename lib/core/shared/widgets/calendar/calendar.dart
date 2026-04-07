@@ -3,6 +3,7 @@ import 'package:wisebuget/core/shared/widgets/calendar/month_header.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/month_view.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/week_day_labels.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/week_view.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class Calendar extends StatefulWidget {
   final DateTime? selectedDate;
@@ -31,8 +32,6 @@ class _CalendarState extends State<Calendar>
   late final PageController _pageController;
   late int _currentPageIndex;
 
-  static const _weekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-
   @override
   void initState() {
     super.initState();
@@ -50,20 +49,16 @@ class _CalendarState extends State<Calendar>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(24.0),
-        ),
+        color: context.c.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.1),
+            color: context.c.shadow.withValues(alpha: 0.1),
             blurRadius: 8.0,
             offset: const Offset(0, 2),
           ),
@@ -80,7 +75,7 @@ class _CalendarState extends State<Calendar>
           ),
 
           // Week day labels
-          const WeekDayLabels(weekDays: _weekDays),
+          const WeekDayLabels(),
           const SizedBox(height: 8.0),
 
           // Calendar grid
@@ -121,17 +116,13 @@ class _CalendarState extends State<Calendar>
           GestureDetector(
             onTap: _toggleExpanded,
             onVerticalDragEnd: _onVerticalDragEnd,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Center(
-                child: Container(
-                  width: 40.0,
-                  height: 4.0,
-                  decoration: BoxDecoration(
-                    color: colorScheme.outline.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(2.0),
-                  ),
+            child: Center(
+              child: Container(
+                width: 40.0,
+                height: 4.0,
+                decoration: BoxDecoration(
+                  color: context.c.outline.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
@@ -183,6 +174,8 @@ class _CalendarState extends State<Calendar>
 
   void _toggleExpanded() {
     setState(() => _isExpanded = !_isExpanded);
+    // Джампаем без анимации, чтобы не было визуального скачка
+    _pageController.jumpToPage(1000);
   }
 
   void _onVerticalDragEnd(DragEndDetails details) {
@@ -191,9 +184,11 @@ class _CalendarState extends State<Calendar>
     if (details.primaryVelocity! > 0) {
       // Swiping down - expand
       setState(() => _isExpanded = true);
+      _pageController.jumpToPage(1000);
     } else if (details.primaryVelocity! < 0) {
       // Swiping up - collapse
       setState(() => _isExpanded = false);
+      _pageController.jumpToPage(1000);
     }
   }
 }

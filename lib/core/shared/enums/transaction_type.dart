@@ -23,7 +23,7 @@ enum TransactionType {
   IconData get icon => switch (this) {
     TransactionType.income => AppIcons.arrowDownRight,
     TransactionType.expense => AppIcons.arrowUpleft,
-    TransactionType.transfer => LucideIcons.arrowLeftRight,
+    TransactionType.transfer => AppIcons.arrowUpDown,
   };
 
   /// Action button foreground color

@@ -126,11 +126,11 @@ class ModalSheet extends StatelessWidget {
     final Widget? titleWidget = title == null
         ? null
         : DefaultTextStyle(
-            style: textTheme.headlineSmall!,
-            textAlign: TextAlign.center,
+            style: textTheme.titleMedium!,
+            textAlign: TextAlign.start,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: title!,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Align(alignment: Alignment.centerLeft, child: title!),
             ),
           );
 
@@ -157,7 +157,7 @@ class ModalSheet extends StatelessWidget {
               if (shouldShowDragHandle)
                 Container(
                   margin: const EdgeInsets.only(top: 12.0),
-                  width: 36.0,
+                  width: 44.0,
                   height: 5.0,
                   decoration: BoxDecoration(
                     color: colorScheme.onSurfaceVariant.withAlpha(0x4D),

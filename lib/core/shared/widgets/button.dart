@@ -35,6 +35,9 @@ class Button extends StatelessWidget {
           : (icon ?? const SizedBox.shrink()),
       label: Text(label),
       style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // 👈 radius
+        ),
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         padding: padding,

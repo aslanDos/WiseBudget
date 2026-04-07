@@ -37,7 +37,7 @@ class AppTheme {
       pointerColor: Colors.transparent,
       angleOffset: 0.0,
       pointerSize: 2.0,
-      tooltipTextStyle: appTextTheme.displaySmall?.copyWith(
+      tooltipTextStyle: appTextTheme.headlineLarge?.copyWith(
         color: scheme.onSurface,
       ),
       rightClickShowsMenu: true,
@@ -62,16 +62,15 @@ class AppTheme {
         surfaceTintColor: scheme.primary,
       ),
       chipTheme: ChipThemeData(
-        labelStyle: textTheme.labelLarge!.copyWith(color: scheme.onSurface),
+        labelStyle: textTheme.titleLarge!.copyWith(color: scheme.onSurface),
         selectedColor: scheme.secondary,
       ),
       extensions: [
         PieThemeExtension(pieTheme: pieTheme),
         NavbarTheme(
-          backgroundColor: scheme.primary,
-          activeIconColor: scheme.onPrimary,
-          inactiveIconColor: scheme.onPrimary.withAlpha(0x80),
-          indicatorColor: scheme.onPrimary,
+          backgroundColor: scheme.surface,
+          activeIconColor: scheme.primary,
+          inactiveIconColor: scheme.onSecondary,
           transactionButtonBackgroundColor: scheme.primary,
           transactionButtonForegroundColor: scheme.onPrimary,
         ),

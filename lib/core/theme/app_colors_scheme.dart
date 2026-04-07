@@ -14,7 +14,7 @@ class AppColorsScheme {
     error: AppColors.red,
     onError: AppColors.white,
 
-    surface: AppColors.black2,
+    surface: AppColors.black4,
     onSurface: AppColors.black13,
 
     surfaceContainer: AppColors.white,

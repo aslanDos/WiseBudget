@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/router/routes.dart';
+import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
+import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_card.dart';
-import 'package:wisebuget/features/account/presentation/widgets/add_account_card.dart';
 import 'package:wisebuget/features/account/presentation/widgets/no_accounts.dart';
 import 'package:wisebuget/features/account/presentation/widgets/total_balance_card.dart';
 
@@ -40,16 +41,19 @@ class _AccountTabState extends State<AccountTab>
       create: (_) => sl<AccountCubit>()..loadAccounts(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Accounts'),
-          centerTitle: true,
+          actionsPadding: EdgeInsets.only(right: 16),
           actions: [
+            CircleIconButton(
+              icon: AppIcons.add,
+              onTap: () => _showAddAccountDialog(context),
+            ),
+            SizedBox(width: 12),
             BlocBuilder<AccountCubit, AccountState>(
               builder: (context, state) {
                 if (state.accounts.isEmpty) return const SizedBox.shrink();
-                return IconButton(
-                  onPressed: _toggleReorderMode,
-                  tooltip: _reordering ? 'Done' : 'Reorder',
-                  icon: Icon(_reordering ? Icons.check : Icons.reorder),
+                return CircleIconButton(
+                  icon: _reordering ? AppIcons.check : AppIcons.chevronUpDown,
+                  onTap: _toggleReorderMode,
                 );
               },
             ),
@@ -230,9 +234,10 @@ class _AccountsContent extends StatelessWidget {
     return Column(
       children: [
         Frame(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Column(
             children: [
-              TotalBalanceCard(accounts: accounts),
+              TotalBalanceCard(accounts: accounts, lowOpacity: reordering),
               if (hasSearchBar && !reordering) ...[
                 const SizedBox(height: 16.0),
                 TextField(
@@ -259,7 +264,6 @@ class _AccountsContent extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16.0),
         Expanded(
           child: reordering
               ? _ReorderableAccountList(
@@ -294,19 +298,11 @@ class _AccountList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: accounts.length + 1, // +1 for add button
+      itemCount: accounts.length,
       itemBuilder: (context, index) {
-        if (index == accounts.length) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 96.0),
-            child: AddAccountCard(onTap: onAddAccount),
-          );
-        }
-
         final account = accounts[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
           child: AccountCard(
             account: account,
             onTap: () => onAccountTap(account),
@@ -330,9 +326,6 @@ class _ReorderableAccountList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-      ).copyWith(bottom: 96.0),
       itemCount: accounts.length,
       onReorder: onReorder,
       proxyDecorator: (child, index, animation) {
@@ -356,7 +349,7 @@ class _ReorderableAccountList extends StatelessWidget {
         final account = accounts[index];
         return Padding(
           key: ValueKey(account.uuid),
-          padding: const EdgeInsets.only(bottom: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
           child: AccountCard(account: account),
         );
       },

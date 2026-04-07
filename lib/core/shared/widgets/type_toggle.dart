@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class TypeToggle<T> extends StatefulWidget {
   final List<TypeToggleItem<T>> items;
@@ -26,13 +27,10 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withAlpha(0x80),
+        color: context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: LayoutBuilder(
@@ -51,17 +49,10 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
                 width: itemWidth,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: widget.selectedBackgroundColor
-                            ?.call(widget.selected) ??
-                        colorScheme.primary,
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(0x1A),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    color:
+                        widget.items[_selectedIndex].selectedBackgroundColor ??
+                        context.c.primary,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
@@ -69,10 +60,6 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
               Row(
                 children: widget.items.map((item) {
                   final isSelected = item.value == widget.selected;
-                  final foregroundColor = isSelected
-                      ? (widget.selectedForegroundColor?.call(item.value) ??
-                          colorScheme.onPrimary)
-                      : colorScheme.onSurfaceVariant;
 
                   return Expanded(
                     child: GestureDetector(
@@ -80,17 +67,34 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
                       behavior: HitTestBehavior.opaque,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        padding: const EdgeInsets.all(8),
                         child: Center(
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 200),
-                            style: theme.textTheme.labelLarge!.copyWith(
-                              color: foregroundColor,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
+                            style: !isSelected
+                                ? context.t.bodySmall!
+                                : context.t.titleSmall!.copyWith(
+                                    color: context.c.onPrimary,
+                                  ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (item.icon != null)
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeOutCubic,
+                                    width: isSelected ? 18 : 0,
+                                    child: isSelected
+                                        ? Icon(
+                                            item.icon,
+                                            size: 16,
+                                            color: context.c.onPrimary,
+                                          )
+                                        : null,
+                                  ),
+                                Text(item.label),
+                              ],
                             ),
-                            child: Text(item.label),
                           ),
                         ),
                       ),
@@ -111,5 +115,14 @@ class TypeToggleItem<T> {
   final String label;
   final IconData? icon;
 
-  const TypeToggleItem({required this.value, required this.label, this.icon});
+  final Color? selectedBackgroundColor;
+  final Color? selectedForegroundColor;
+
+  const TypeToggleItem({
+    required this.value,
+    required this.label,
+    this.icon,
+    this.selectedBackgroundColor,
+    this.selectedForegroundColor,
+  });
 }

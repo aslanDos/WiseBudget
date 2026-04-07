@@ -1,34 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class AmountDisplay extends StatelessWidget {
   final String amount;
   final TransactionType type;
 
-  const AmountDisplay({
-    super.key,
-    required this.amount,
-    required this.type,
-  });
+  const AmountDisplay({super.key, required this.amount, required this.type});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      decoration: BoxDecoration(
-        color: type.actionBackgroundColor(context).withAlpha(0x1A),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(
+    return Center(
+      child: TweenAnimationBuilder<double>(
+        key: ValueKey(amount),
+        tween: Tween<double>(begin: 1.15, end: 1.0),
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        builder: (context, scale, child) =>
+            Transform.scale(scale: scale, child: child),
         child: Text(
-          amount,
+          '$amount ₸',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.displayMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: context.t.headlineLarge?.copyWith(
             color: type.actionBackgroundColor(context),
           ),
         ),

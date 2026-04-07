@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/utils/date_formatter.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
@@ -41,7 +43,6 @@ class _HomeTabState extends State<HomeTab> {
         BlocProvider.value(value: sl<AccountCubit>()),
       ],
       child: Scaffold(
-        appBar: AppBar(title: const Text('Home'), centerTitle: true),
         body: BlocBuilder<TransactionCubit, TransactionState>(
           builder: (context, transactionState) {
             // Extract dates that have transactions
@@ -49,25 +50,32 @@ class _HomeTabState extends State<HomeTab> {
               transactionState.transactions,
             );
 
-            return Column(
-              children: [
-                // Calendar
-                SafeArea(
-                  bottom: false,
-                  child: Calendar(
-                    selectedDate: _selectedDate,
-                    onDateSelected: (date) {
-                      setState(() => _selectedDate = date);
-                    },
-                    datesWithTransactions: datesWithTransactions,
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  // Calendar
+                  SafeArea(
+                    bottom: false,
+                    child: Calendar(
+                      selectedDate: _selectedDate,
+                      onDateSelected: (date) {
+                        setState(() => _selectedDate = date);
+                      },
+                      datesWithTransactions: datesWithTransactions,
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 10),
+                  const SizedBox(height: 24),
 
-                // Transactions for selected date
-                Expanded(child: _TransactionsList(selectedDate: _selectedDate)),
-              ],
+                  _Header(selectedDate: _selectedDate),
+
+                  // Transactions for selected date
+                  Expanded(
+                    child: _TransactionsList(selectedDate: _selectedDate),
+                  ),
+                ],
+              ),
             );
           },
         ),
@@ -121,16 +129,35 @@ class _TransactionsList extends StatelessWidget {
           builder: (context, categoryState) {
             return BlocBuilder<AccountCubit, AccountState>(
               builder: (context, accountState) {
-                return ListView.builder(
+                return ListView.separated(
                   key: const PageStorageKey('home_transactions_list'),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
                   itemCount: transactions.length,
                   itemBuilder: (context, index) {
                     final transaction = transactions[index];
-                    return _TransactionTile(
+                    // Find category
+                    final category = categoryState.categories
+                        .where((c) => c.uuid == transaction.categoryUuid)
+                        .firstOrNull;
+
+                    // Find account
+                    final account = accountState.accounts
+                        .where((a) => a.uuid == transaction.accountUuid)
+                        .firstOrNull;
+
+                    return TransactionCard(
                       transaction: transaction,
-                      categoryState: categoryState,
-                      accountState: accountState,
+                      category: category,
+                      account: account,
+                      onTap: () {
+                        showTransactionFormModal(
+                          context: context,
+                          initialType: transaction.type,
+                          transaction: transaction,
+                        );
+                      },
                     );
                   },
                 );
@@ -143,6 +170,21 @@ class _TransactionsList extends StatelessWidget {
   }
 }
 
+class _Header extends StatelessWidget {
+  final DateTime selectedDate;
+  const _Header({required this.selectedDate});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(DateFormatter.format(selectedDate), style: context.t.titleMedium),
+      ],
+    );
+  }
+}
+
 class _EmptyState extends StatelessWidget {
   final DateTime selectedDate;
 
@@ -150,9 +192,6 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -160,94 +199,22 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.receipt_long_outlined,
             size: 64.0,
-            color: colorScheme.outline.withValues(alpha: 0.5),
+            color: context.c.onSecondary,
           ),
           const SizedBox(height: 16.0),
           Text(
             'No transactions',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.outline,
+            style: context.t.titleMedium?.copyWith(
+              color: context.c.onSecondary,
             ),
           ),
           const SizedBox(height: 4.0),
           Text(
-            'for ${_formatDate(selectedDate)}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.outline.withValues(alpha: 0.7),
-            ),
+            'for ${DateFormatter.format(selectedDate)}',
+            style: context.t.bodyMedium?.copyWith(color: context.c.onSecondary),
           ),
         ],
       ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    if (date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day) {
-      return 'Today';
-    }
-
-    final yesterday = now.subtract(const Duration(days: 1));
-    if (date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day) {
-      return 'Yesterday';
-    }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-}
-
-class _TransactionTile extends StatelessWidget {
-  final TransactionEntity transaction;
-  final CategoryState categoryState;
-  final AccountState accountState;
-
-  const _TransactionTile({
-    required this.transaction,
-    required this.categoryState,
-    required this.accountState,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Find category
-    final category = categoryState.categories
-        .where((c) => c.uuid == transaction.categoryUuid)
-        .firstOrNull;
-
-    // Find account
-    final account = accountState.accounts
-        .where((a) => a.uuid == transaction.accountUuid)
-        .firstOrNull;
-
-    return TransactionCard(
-      transaction: transaction,
-      category: category,
-      account: account,
-      onTap: () {
-        showTransactionFormModal(
-          context: context,
-          initialType: transaction.type,
-          transaction: transaction,
-        );
-      },
     );
   }
 }

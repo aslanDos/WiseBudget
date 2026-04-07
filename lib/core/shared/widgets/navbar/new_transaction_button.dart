@@ -60,11 +60,13 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
         width: NavbarTheme.centerButtonSize,
         height: NavbarTheme.centerButtonSize,
         decoration: BoxDecoration(
-          color: navbarTheme.transactionButtonForegroundColor,
+          color: navbarTheme.transactionButtonBackgroundColor,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: navbarTheme.transactionButtonForegroundColor.withAlpha(0x40),
+              color: navbarTheme.transactionButtonBackgroundColor.withAlpha(
+                0x40,
+              ),
               blurRadius: 12.0,
               offset: const Offset(0, 4),
             ),
@@ -76,7 +78,7 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
           curve: Curves.easeOutCubic,
           child: Icon(
             AppIcons.add,
-            color: navbarTheme.transactionButtonBackgroundColor,
+            color: navbarTheme.transactionButtonForegroundColor,
             size: 28.0,
           ),
         ),

@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:wisebuget/core/theme/extensions/theme_extensions.dart";
 
 class Frame extends StatelessWidget {
   final bool pad;
@@ -24,7 +25,7 @@ class Frame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: withSurface ? Theme.of(context).colorScheme.surface : null,
+      color: withSurface ? context.c.surface : null,
       padding: pad ? padding : EdgeInsets.zero,
       child: child,
     );

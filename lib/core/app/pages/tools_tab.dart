@@ -8,8 +8,10 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/frame.dart';
+import 'package:wisebuget/features/category/presentation/pages/categories_page.dart';
 import 'package:wisebuget/features/tools/data/tool_item.dart';
 import 'package:wisebuget/features/tools/presentation/widgets/tool_card.dart';
 
@@ -49,7 +51,9 @@ class ToolsTab extends StatelessWidget {
               iconColor: item.iconColor,
               backgroundColor: item.backgroundColor,
               onTap: () {
-                if (item.route != null) {
+                if (item.route == AppRoutes.manageCategories) {
+                  showCategoriesModal(context: context);
+                } else if (item.route != null) {
                   context.push(item.route!);
                 }
               },

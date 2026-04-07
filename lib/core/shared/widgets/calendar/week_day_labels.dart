@@ -1,34 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class WeekDayLabels extends StatelessWidget {
-  final List<String> weekDays;
+  const WeekDayLabels({super.key});
 
-  const WeekDayLabels({super.key, required this.weekDays});
+  static const List<String> _weekDays = [
+    'Mo',
+    'Tu',
+    'We',
+    'Th',
+    'Fr',
+    'Sa',
+    'Su',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        children: weekDays
-            .map(
-              (day) => Expanded(
-                child: Center(
-                  child: Text(
-                    day,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: _weekDays
+          .map(
+            (day) => Expanded(
+              child: Center(child: Text(day, style: context.t.titleMedium)),
+            ),
+          )
+          .toList(),
     );
   }
 }

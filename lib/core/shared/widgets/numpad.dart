@@ -14,7 +14,7 @@ class Numpad extends StatelessWidget {
     required this.onKeyPressed,
     this.onBackspace,
     this.onClear,
-    this.spacing = 10.0,
+    this.spacing = 8.0,
     this.buttonHeight = 52.0,
   });
 
@@ -112,11 +112,8 @@ class _NumpadKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Material(
-      color: context.c.secondary.withValues(alpha: 0.3),
+      color: context.c.secondary,
       borderRadius: BorderRadius.circular(12.0),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -130,18 +127,17 @@ class _NumpadKey extends StatelessWidget {
                 onLongPress?.call();
               }
             : null,
-        splashColor: colorScheme.primary.withAlpha(0x1A),
-        highlightColor: colorScheme.primary.withAlpha(0x0D),
+        splashColor: context.c.primary.withAlpha(0x1A),
+        highlightColor: context.c.primary.withAlpha(0x0D),
         child: SizedBox(
           height: height,
           child: Center(
             child: icon != null
-                ? Icon(icon, size: 22.0, color: colorScheme.onSurface)
+                ? Icon(icon, size: 18.0, color: context.c.onSurface)
                 : Text(
                     label!,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.onSurface,
+                    style: context.t.titleLarge?.copyWith(
+                      color: context.c.onSurface,
                     ),
                   ),
           ),

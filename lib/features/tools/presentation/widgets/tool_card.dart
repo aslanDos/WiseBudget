@@ -22,8 +22,8 @@ class ToolCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.c.secondary.withValues(alpha: 0.3),
-      borderRadius: BorderRadius.circular(16.0),
+      color: context.c.surfaceContainer,
+      borderRadius: BorderRadius.circular(12.0),
       child: InkWell(
         overlayColor: WidgetStateProperty.all(Colors.transparent),
         focusColor: Theme.of(context).focusColor,
@@ -54,6 +54,7 @@ class ToolCard extends StatelessWidget {
               const SizedBox(height: 4.0),
               Text(
                 subtitle,
+                textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(color: context.c.onSurface),

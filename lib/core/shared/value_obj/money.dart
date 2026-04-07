@@ -87,25 +87,23 @@ class Money {
     int decimalDigits = 2,
   }) {
     final num value = takeAbsoluteValue ? amount.abs() : amount;
-    final String curr = includeCurrency ? currency : "";
 
-    final String? symbol = useCurrencySymbol && includeCurrency
+    final formatter = NumberFormat.decimalPattern()
+      ..minimumFractionDigits = decimalDigits
+      ..maximumFractionDigits = decimalDigits;
+
+    final formattedNumber = compact
+        ? NumberFormat.compact().format(value)
+        : formatter.format(value);
+
+    if (!includeCurrency) return formattedNumber;
+
+    final symbol = useCurrencySymbol
         ? NumberFormat.simpleCurrency(name: currency).currencySymbol
-        : null;
+        : currency;
 
-    if (compact) {
-      return NumberFormat.compactCurrency(
-        name: curr,
-        symbol: symbol,
-        decimalDigits: decimalDigits,
-      ).format(value);
-    }
-
-    return NumberFormat.currency(
-      name: curr,
-      symbol: symbol,
-      decimalDigits: decimalDigits,
-    ).format(value);
+    // 👉 символ В КОНЦЕ
+    return '$formattedNumber $symbol';
   }
 
   @override

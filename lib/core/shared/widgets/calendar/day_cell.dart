@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class DayCell extends StatelessWidget {
   final DateTime date;
@@ -20,33 +21,22 @@ class DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final textColor = isSelected
+        ? context.c.onPrimary
+        : isToday
+        ? context.c.primary
+        : isCurrentMonth
+        ? context.c.onSurface
+        : context.c.onSecondary;
 
-    Color? backgroundColor;
-    Color textColor;
+    final backgroundColor = isSelected ? context.c.primary : null;
 
-    if (isSelected) {
-      backgroundColor = colorScheme.primary;
-      textColor = colorScheme.onPrimary;
-    } else if (isToday) {
-      // Today but not selected - just primary text color, no background
-      backgroundColor = null;
-      textColor = colorScheme.primary;
-    } else {
-      backgroundColor = null;
-      textColor = isCurrentMonth
-          ? colorScheme.onSurface
-          : colorScheme.outline.withValues(alpha: 0.4);
-    }
-
-    // Dot color: white when selected, primary otherwise
-    final dotColor = isSelected ? colorScheme.onPrimary : colorScheme.primary;
+    final dotColor = isSelected ? context.c.onPrimary : context.c.primary;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.all(2.0),
+        margin: EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
@@ -56,7 +46,7 @@ class DayCell extends StatelessWidget {
           children: [
             Text(
               '${date.day}',
-              style: theme.textTheme.bodyLarge?.copyWith(
+              style: context.t.bodyLarge?.copyWith(
                 color: textColor,
                 fontWeight: isSelected || isToday
                     ? FontWeight.w700
@@ -65,15 +55,15 @@ class DayCell extends StatelessWidget {
             ),
             if (hasTransaction)
               Container(
-                width: 5.0,
-                height: 5.0,
+                width: 4.0,
+                height: 4.0,
                 decoration: BoxDecoration(
                   color: dotColor,
                   shape: BoxShape.circle,
                 ),
               )
             else
-              const SizedBox(height: 5.0), // Placeholder to maintain alignment
+              const SizedBox(height: 4.0), // Placeholder to maintain alignment
           ],
         ),
       ),

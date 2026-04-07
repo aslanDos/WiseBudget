@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class MonthHeader extends StatelessWidget {
   final DateTime focusedDate;
@@ -14,28 +15,19 @@ class MonthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: onPrevious,
-            visualDensity: VisualDensity.compact,
+          GestureDetector(
+            onTap: onPrevious,
+            child: Icon(Icons.chevron_left, size: 24),
           ),
-          Text(
-            _formatMonth(focusedDate),
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: onNext,
-            visualDensity: VisualDensity.compact,
+          Text(_formatMonth(focusedDate), style: context.t.titleMedium),
+          GestureDetector(
+            onTap: onNext,
+            child: Icon(Icons.chevron_right, size: 24),
           ),
         ],
       ),

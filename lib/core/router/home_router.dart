@@ -4,16 +4,14 @@ import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_detail_page.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_form_page.dart';
 import 'package:wisebuget/features/budget/presentation/pages/budget_list_page.dart';
-import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/pages/categories_page.dart';
-import 'package:wisebuget/features/category/presentation/pages/category_form_page.dart';
-import 'package:wisebuget/core/app/home_page.dart';
+import 'package:wisebuget/core/app/main_shell.dart';
 
 class HomeRouter {
   static final routes = <GoRoute>[
     GoRoute(
       path: AppRoutes.home,
-      builder: (context, state) => const HomePage(),
+      builder: (context, state) => const MainShell(),
     ),
     GoRoute(
       path: AppRoutes.manageCategories,
@@ -33,13 +31,7 @@ class HomeRouter {
         return AccountFormPage(account: account);
       },
     ),
-    GoRoute(
-      path: AppRoutes.categoryForm,
-      builder: (context, state) {
-        final category = state.extra as CategoryEntity?;
-        return CategoryFormPage(category: category);
-      },
-    ),
+
     GoRoute(
       path: AppRoutes.budgets,
       builder: (context, state) => const BudgetListPage(),

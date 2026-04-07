@@ -80,9 +80,7 @@ class AmountFormatter {
   /// Handles strings with currency symbols and signs.
   static double? parse(String text) {
     // Remove common currency symbols and whitespace
-    final cleaned = text
-        .replaceAll(RegExp(r'[^\d.+-]'), '')
-        .trim();
+    final cleaned = text.replaceAll(RegExp(r'[^\d.+-]'), '').trim();
 
     if (cleaned.isEmpty) return null;
 

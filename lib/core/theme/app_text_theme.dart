@@ -3,96 +3,68 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 final TextTheme appTextTheme = TextTheme(
-  displaySmall: AppTextStyle.headingSmall,
+  headlineLarge: AppTextStyle.heading36,
+  headlineMedium: AppTextStyle.heading24,
 
-  headlineLarge: AppTextStyle.headingLarge,
-  headlineMedium: AppTextStyle.headingMedium,
-  headlineSmall: AppTextStyle.headingSmall,
+  titleLarge: AppTextStyle.subHeading20,
+  titleMedium: AppTextStyle.subHeading16,
+  titleSmall: AppTextStyle.subHeading12,
 
-  titleLarge: AppTextStyle.titleLarge,
-  titleMedium: AppTextStyle.titleMedium,
-  titleSmall: AppTextStyle.titleSmall,
-
-  bodyLarge: AppTextStyle.bodyLarge,
-  bodyMedium: AppTextStyle.bodyMedium,
-  bodySmall: AppTextStyle.bodySmall,
-
-  labelLarge: AppTextStyle.titleSmall,
+  bodyLarge: AppTextStyle.body16,
+  bodyMedium: AppTextStyle.body14,
+  bodySmall: AppTextStyle.body12,
 );
 
 class AppTextStyle {
   AppTextStyle._();
 
-  static const TextStyle headingLarge = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    height: 1.4,
+  static const TextStyle heading36 = TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.w500,
+    height: 1.1,
   );
 
-  static const TextStyle headingMedium = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    height: 1.4,
-    letterSpacing: 0.2,
+  static const TextStyle heading24 = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w500,
+    height: 1.1,
   );
 
-  static const TextStyle headingSmall = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    height: 1.4,
+  static const TextStyle subHeading20 = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w500,
+    height: 1.2,
   );
 
-  static const TextStyle headingXSmall = TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.bold,
-    height: 1.4,
-  );
-
-  static const TextStyle titleLarge = TextStyle(
+  static const TextStyle subHeading16 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
-    height: 1.4,
+    height: 1.25,
   );
 
-  static const TextStyle titleMedium = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    height: 1.4,
-  );
-
-  static const TextStyle titleSmall = TextStyle(
+  static const TextStyle subHeading12 = TextStyle(
     fontSize: 12,
-    fontWeight: FontWeight.w500,
-    height: 1.4,
+    fontWeight: FontWeight.w600,
+    height: 1.33,
   );
 
-  static const TextStyle titleXSmall = TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w500,
-    height: 1.4,
-  );
-
-  static const TextStyle bodyLarge = TextStyle(
+  static const TextStyle body16 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,
-    height: 1.4,
+    height: 1.5,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
+  static const TextStyle body14 = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
-    height: 1.4,
+    height: 1.43,
+    letterSpacing: 0.28,
   );
 
-  static final TextStyle bodySmall = TextStyle(
+  static const TextStyle body12 = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
-    height: 1.4,
-  );
-
-  static const TextStyle bodyXSmall = TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w400,
-    height: 1.4,
+    height: 1.33,
+    letterSpacing: 0.24,
   );
 }
