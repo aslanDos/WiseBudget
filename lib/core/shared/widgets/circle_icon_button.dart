@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
-class CircleIconButton extends StatelessWidget {
+class CircleIconButton extends StatefulWidget {
   final VoidCallback? onTap;
   final IconData icon;
   final double size;
@@ -22,28 +23,27 @@ class CircleIconButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  State<CircleIconButton> createState() => _CircleIconButtonState();
+}
 
-    return Material(
-      color: backgroundColor ?? theme.colorScheme.surfaceContainer,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Ink(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: border ?? Border.all(color: context.c.onSurface),
-          ),
-          child: Center(
-            child: Icon(
-              icon,
-              size: iconSize,
-              color: iconColor ?? theme.colorScheme.onSurface,
-            ),
+class _CircleIconButtonState extends State<CircleIconButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Pressable(
+      onTap: widget.onTap,
+      child: Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: context.c.surfaceContainer,
+          border: widget.border ?? Border.all(color: context.c.onSurface),
+        ),
+        child: Center(
+          child: Icon(
+            widget.icon,
+            size: widget.iconSize,
+            color: widget.iconColor ?? context.c.onSurface,
           ),
         ),
       ),

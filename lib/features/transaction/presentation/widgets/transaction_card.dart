@@ -3,13 +3,14 @@ import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
+import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
-class TransactionCard extends StatelessWidget {
+class TransactionCard extends StatefulWidget {
   final TransactionEntity transaction;
   final CategoryEntity? category;
   final AccountEntity? account;
@@ -26,48 +27,52 @@ class TransactionCard extends StatelessWidget {
   });
 
   @override
+  State<TransactionCard> createState() => _TransactionCardState();
+}
+
+class _TransactionCardState extends State<TransactionCard> {
+  @override
   Widget build(BuildContext context) {
-    final isTransfer = transaction.isTransfer;
+    final isTransfer = widget.transaction.isTransfer;
     final categoryColor = isTransfer
         ? AppColors.blue
         : AppPalette.fromValue(
-            category?.colorValue,
+            widget.category?.colorValue,
             defaultColor: context.c.primary,
           );
 
-    return Material(
-      color: context.c.surfaceContainer,
-      borderRadius: BorderRadius.circular(12.0),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16.0),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              ColoredIconBox(
-                size: 24,
-                icon: isTransfer
-                    ? AppIcons.arrowUpDown
-                    : (category?.icon ?? AppIcons.empty),
-                color: categoryColor,
-              ),
-              const SizedBox(width: 12.0),
-              Expanded(
-                child: isTransfer
-                    ? _TransferDetails(
-                        fromAccount: account,
-                        toAccount: toAccount,
-                      )
-                    : _TransactionDetails(
-                        categoryName: category?.name ?? 'Unknown',
-                        accountName: account?.name,
-                        note: transaction.note,
-                      ),
-              ),
-              _TransactionAmount(transaction: transaction),
-            ],
-          ),
+    return Pressable(
+      onTap: widget.onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: context.c.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            ColoredIconBox(
+              size: 24,
+              icon: isTransfer
+                  ? AppIcons.arrowUpDown
+                  : (widget.category?.icon ?? AppIcons.empty),
+              color: categoryColor,
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: isTransfer
+                  ? _TransferDetails(
+                      fromAccount: widget.account,
+                      toAccount: widget.toAccount,
+                    )
+                  : _TransactionDetails(
+                      categoryName: widget.category?.name ?? 'Unknown',
+                      accountName: widget.account?.name,
+                      note: widget.transaction.note,
+                    ),
+            ),
+            _TransactionAmount(transaction: widget.transaction),
+          ],
         ),
       ),
     );
@@ -78,10 +83,7 @@ class _TransferDetails extends StatelessWidget {
   final AccountEntity? fromAccount;
   final AccountEntity? toAccount;
 
-  const _TransferDetails({
-    required this.fromAccount,
-    required this.toAccount,
-  });
+  const _TransferDetails({required this.fromAccount, required this.toAccount});
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +106,9 @@ class _TransferDetails extends StatelessWidget {
             Flexible(
               child: Text(
                 fromName,
-                style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
+                style: context.t.bodySmall?.copyWith(
+                  color: context.c.onSecondary,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -120,7 +124,9 @@ class _TransferDetails extends StatelessWidget {
             Flexible(
               child: Text(
                 toName,
-                style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
+                style: context.t.bodySmall?.copyWith(
+                  color: context.c.onSecondary,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

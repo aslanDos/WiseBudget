@@ -6,7 +6,7 @@ import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
-import 'package:wisebuget/core/shared/widgets/form_section.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
@@ -17,6 +17,7 @@ import 'package:wisebuget/features/category/presentation/cubit/category_state.da
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
 
 class AccountDetailPage extends StatelessWidget {
@@ -39,7 +40,6 @@ class AccountDetailPage extends StatelessWidget {
         appBar: AppBar(
           centerTitle: true,
           actionsPadding: const EdgeInsets.only(right: 16),
-
           actions: [
             CircleIconButton(
               icon: AppIcons.pencil,
@@ -53,21 +53,110 @@ class AccountDetailPage extends StatelessWidget {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: _AccountHeaderCard(account: account),
-              ),
-              const SizedBox(height: 16),
-              _RecentTransactionsSection(account: account),
-            ],
-          ),
+        body: BlocBuilder<TransactionCubit, TransactionState>(
+          builder: (context, txState) {
+            if (txState.status == CubitStatus.loading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final sorted = [...txState.transactions]
+              ..sort((a, b) => b.date.compareTo(a.date));
+
+            final groups = <String, List<TransactionEntity>>{};
+            for (final t in sorted) {
+              groups.putIfAbsent(DateFormatter.format(t.date), () => []).add(t);
+            }
+
+            return BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, catState) {
+                return BlocBuilder<AccountCubit, AccountState>(
+                  builder: (context, accState) {
+                    return CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: _AccountHeaderCard(account: account),
+                          ),
+                        ),
+                        if (sorted.isEmpty)
+                          SliverFillRemaining(child: _EmptyTransactions())
+                        else
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                            sliver: SliverList.list(
+                              children: _buildGroups(
+                                context,
+                                groups,
+                                catState,
+                                accState,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
     );
+  }
+
+  List<Widget> _buildGroups(
+    BuildContext context,
+    Map<String, List<TransactionEntity>> groups,
+    CategoryState catState,
+    AccountState accState,
+  ) {
+    final widgets = <Widget>[];
+
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Text('Recent Transactions', style: context.t.titleLarge),
+      ),
+    );
+
+    bool firstGroup = true;
+    for (final entry in groups.entries) {
+      if (!firstGroup) widgets.add(const SizedBox(height: 16));
+      firstGroup = false;
+
+      widgets.add(_DateHeader(label: entry.key));
+      widgets.add(const SizedBox(height: 8));
+
+      for (final t in entry.value) {
+        final category = catState.categories
+            .where((c) => c.uuid == t.categoryUuid)
+            .firstOrNull;
+        final acc = accState.accounts
+            .where((a) => a.uuid == t.accountUuid)
+            .firstOrNull;
+        final toAcc = accState.accounts
+            .where((a) => a.uuid == t.toAccountUuid)
+            .firstOrNull;
+
+        widgets.add(
+          TransactionCard(
+            transaction: t,
+            category: category,
+            account: acc,
+            toAccount: toAcc,
+            onTap: () => showTransactionFormModal(
+              context: context,
+              initialType: t.type,
+              transaction: t,
+            ),
+          ),
+        );
+        widgets.add(const SizedBox(height: 8));
+      }
+    }
+
+    return widgets;
   }
 
   Future<void> _navigateToEdit(BuildContext context) async {
@@ -80,31 +169,20 @@ class AccountDetailPage extends StatelessWidget {
     }
   }
 
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
+  Future<void> _showDeleteDialog(BuildContext context) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: Text(
+      title: 'Delete Account',
+      message:
           'Are you sure you want to delete "${account.name}"? '
           'This will also delete all associated transactions.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<AccountCubit>().removeAccount(account.uuid);
-              Navigator.pop(dialogContext);
-              context.pop(true);
-            },
-            child: Text('Delete', style: TextStyle(color: context.c.error)),
-          ),
-        ],
-      ),
+      confirmText: 'Delete',
+      isDestructive: true,
     );
+    if (confirmed == true && context.mounted) {
+      context.read<AccountCubit>().removeAccount(account.uuid);
+      context.pop(true);
+    }
   }
 }
 
@@ -160,113 +238,16 @@ class _AccountHeaderCard extends StatelessWidget {
   }
 }
 
-class _RecentTransactionsSection extends StatelessWidget {
-  final AccountEntity account;
+class _DateHeader extends StatelessWidget {
+  final String label;
 
-  const _RecentTransactionsSection({required this.account});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<TransactionCubit, TransactionState>(
-      builder: (context, transactionState) {
-        if (transactionState.status == CubitStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final sorted = [...transactionState.transactions]
-          ..sort((a, b) => b.date.compareTo(a.date));
-        final recent = sorted.take(5).toList();
-
-        return FormSection(
-          title: 'Recent Transactions',
-          actionLabel: transactionState.transactions.length > 5
-              ? 'See All'
-              : null,
-          onAction: () {
-            // TODO: Navigate to all transactions for this account
-          },
-          child: recent.isEmpty
-              ? _EmptyTransactions()
-              : BlocBuilder<CategoryCubit, CategoryState>(
-                  builder: (context, categoryState) {
-                    return BlocBuilder<AccountCubit, AccountState>(
-                      builder: (context, accountState) {
-                        return _GroupedTransactionList(
-                          transactions: recent,
-                          categoryState: categoryState,
-                          accountState: accountState,
-                        );
-                      },
-                    );
-                  },
-                ),
-        );
-      },
-    );
-  }
-}
-
-class _GroupedTransactionList extends StatelessWidget {
-  final List<TransactionEntity> transactions;
-  final CategoryState categoryState;
-  final AccountState accountState;
-
-  const _GroupedTransactionList({
-    required this.transactions,
-    required this.categoryState,
-    required this.accountState,
-  });
+  const _DateHeader({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    // Group transactions by date
-    final groups = <String, List<TransactionEntity>>{};
-    for (final t in transactions) {
-      final label = DateFormatter.format(t.date);
-      groups.putIfAbsent(label, () => []).add(t);
-    }
-
-    final widgets = <Widget>[];
-    for (final entry in groups.entries) {
-      widgets.add(
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 8),
-          child: Text(
-            entry.key,
-            style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
-          ),
-        ),
-      );
-
-      for (int i = 0; i < entry.value.length; i++) {
-        final transaction = entry.value[i];
-        final category = categoryState.categories
-            .where((c) => c.uuid == transaction.categoryUuid)
-            .firstOrNull;
-        final account = accountState.accounts
-            .where((a) => a.uuid == transaction.accountUuid)
-            .firstOrNull;
-        final toAccount = accountState.accounts
-            .where((a) => a.uuid == transaction.toAccountUuid)
-            .firstOrNull;
-
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: TransactionCard(
-              transaction: transaction,
-              category: category,
-              account: account,
-              toAccount: toAccount,
-            ),
-          ),
-        );
-      }
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
+    return Text(
+      label,
+      style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
     );
   }
 }
@@ -274,21 +255,17 @@ class _GroupedTransactionList extends StatelessWidget {
 class _EmptyTransactions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Center(
-        child: Column(
-          children: [
-            Icon(AppIcons.receipt, size: 40, color: context.c.onSecondary),
-            const SizedBox(height: 12),
-            Text(
-              'No transactions yet',
-              style: context.t.bodyMedium?.copyWith(
-                color: context.c.onSecondary,
-              ),
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(AppIcons.receipt, size: 48, color: context.c.onSecondary),
+          const SizedBox(height: 12),
+          Text(
+            'No transactions yet',
+            style: context.t.bodyMedium?.copyWith(color: context.c.onSecondary),
+          ),
+        ],
       ),
     );
   }

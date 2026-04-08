@@ -112,8 +112,7 @@ class _HomeTabState extends State<HomeTab> {
 
                   Calendar(
                     selectedDate: _selectedDate,
-                    onDateSelected: (date) =>
-                        widget.onDateChanged(date),
+                    onDateSelected: (date) => widget.onDateChanged(date),
                     datesWithTransactions: datesWithTransactions,
                   ),
 
@@ -254,11 +253,7 @@ class _Header extends StatelessWidget {
   final Money? income;
   final Money? expense;
 
-  const _Header({
-    required this.selectedDate,
-    this.income,
-    this.expense,
-  });
+  const _Header({required this.selectedDate, this.income, this.expense});
 
   @override
   Widget build(BuildContext context) {
@@ -266,9 +261,11 @@ class _Header extends StatelessWidget {
       children: [
         Text(DateFormatter.format(selectedDate), style: context.t.titleMedium),
         const Spacer(),
-        if (expense != null) _TotalChip(prefix: '-', money: expense!, color: AppColors.red),
+        if (expense != null)
+          _TotalChip(prefix: '-', money: expense!, color: AppColors.red),
         if (income != null && expense != null) const SizedBox(width: 8),
-        if (income != null) _TotalChip(prefix: '+', money: income!, color: AppColors.green),
+        if (income != null)
+          _TotalChip(prefix: '+', money: income!, color: AppColors.green),
       ],
     );
   }
@@ -290,12 +287,15 @@ class _TotalChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withAlpha(0x1A),
+        color: context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         '$prefix${money.formattedNoMarker}',
-        style: context.t.bodySmall?.copyWith(color: color, fontWeight: FontWeight.w600),
+        style: context.t.bodySmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
