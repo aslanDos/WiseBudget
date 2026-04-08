@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
-import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_transaction_tile.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
@@ -162,7 +162,7 @@ class AccountDetailPage extends StatelessWidget {
   }
 
   Future<void> _navigateToEdit(BuildContext context) async {
-    final result = await context.push(AppRoutes.accountForm, extra: account);
+    final result = await showAccountFormModal(context: context, account: account);
     if (result == true && context.mounted) {
       context.pop(true);
     }

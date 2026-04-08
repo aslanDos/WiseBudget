@@ -8,91 +8,86 @@ import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
+import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
+import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
+import 'package:wisebuget/core/shared/widgets/picker_field.dart';
+import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
+import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
+import 'package:wisebuget/features/account/presentation/widgets/account_name_field.dart';
+import 'package:wisebuget/features/account/presentation/widgets/account_sheet_header.dart';
 import 'package:wisebuget/core/shared/widgets/color_grid.dart';
 import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
-import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/form_section.dart';
 import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
 import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
-import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
-import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
-import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
-import 'package:wisebuget/features/category/presentation/widgets/category_name_field.dart';
-import 'package:wisebuget/features/category/presentation/widgets/category_sheet_header.dart';
 
-const kCategoryIconOptions = [
-  'utensils',
-  'shoppingBag',
-  'shoppingCart',
-  'receipt',
-  'car',
-  'bus',
-  'plane',
-  'bike',
-  'home',
-  'building',
-  'briefCase',
+const kAccountIconOptions = [
   'wallet',
-  'gamepad',
-  'music',
-  'heart',
-  'star',
-  'coffee',
-  'gift',
-  'book',
-  'graduationCap',
-  'phone',
-  'laptop',
-  'dumbbell',
-  'stethoscope',
-  'zap',
+  'briefCase',
+  'building',
+  'home',
+  'shoppingBag',
+  'car',
+  'plane',
   'globe',
+  'receipt',
+  'gift',
+  'star',
+  'laptop',
 ];
 
-Future<bool?> showCategoryFormModal({
+const _currencies = ['KZT', 'USD', 'EUR', 'RUB'];
+
+Future<bool?> showAccountFormModal({
   required BuildContext context,
-  CategoryEntity? category,
+  AccountEntity? account,
 }) {
   return showCupertinoModalBottomSheet<bool>(
     context: context,
     expand: false,
     barrierColor: Colors.black54,
-    builder: (context) => CategoryForm(category: category),
+    builder: (context) => AccountForm(account: account),
   );
 }
 
-class CategoryForm extends StatefulWidget {
-  final CategoryEntity? category;
+class AccountForm extends StatefulWidget {
+  final AccountEntity? account;
 
-  const CategoryForm({super.key, this.category});
+  const AccountForm({super.key, this.account});
 
-  bool get isEditing => category != null;
+  bool get isEditing => account != null;
 
   @override
-  State<CategoryForm> createState() => _CategoryFormState();
+  State<AccountForm> createState() => _AccountFormState();
 }
 
-class _CategoryFormState extends State<CategoryForm> {
+class _AccountFormState extends State<AccountForm> {
   late String _name;
   late String _selectedIconCode;
   late int _selectedColorValue;
-  late TransactionType _selectedType;
+  late String _selectedCurrency;
+  late String _balance;
 
   @override
   void initState() {
     super.initState();
     final rng = Random();
-    _name = widget.category?.name ?? '';
+    _name = widget.account?.name ?? '';
     _selectedIconCode =
-        widget.category?.iconCode ??
-        kCategoryIconOptions[rng.nextInt(kCategoryIconOptions.length)];
+        widget.account?.iconCode ??
+        kAccountIconOptions[rng.nextInt(kAccountIconOptions.length)];
     _selectedColorValue =
-        widget.category?.colorValue ??
+        widget.account?.colorValue ??
         AppPalette.colors[rng.nextInt(AppPalette.colors.length)];
-    _selectedType = widget.category?.type ?? TransactionType.expense;
+    _selectedCurrency = widget.account?.currency ?? 'KZT';
+    _balance = widget.account != null
+        ? widget.account!.balance.toString()
+        : '0';
   }
 
   @override
@@ -100,8 +95,8 @@ class _CategoryFormState extends State<CategoryForm> {
     final selectedColor = Color(_selectedColorValue);
 
     return BlocProvider.value(
-      value: sl<CategoryCubit>(),
-      child: BlocConsumer<CategoryCubit, CategoryState>(
+      value: sl<AccountCubit>(),
+      child: BlocConsumer<AccountCubit, AccountState>(
         listenWhen: (previous, current) =>
             previous.status == CubitStatus.loading &&
             current.status != CubitStatus.loading,
@@ -119,14 +114,16 @@ class _CategoryFormState extends State<CategoryForm> {
 
           return Material(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24.0)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24.0),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CategorySheetHeader(
-                  selectedType: _selectedType,
-                  onTypeChanged: (type) => setState(() => _selectedType = type),
+                AccountSheetHeader(
+                  title: widget.isEditing
+                      ? widget.account!.name
+                      : 'New account',
                   trailing: widget.isEditing
                       ? CircleIconButton(
                           icon: AppIcons.trash,
@@ -152,9 +149,29 @@ class _CategoryFormState extends State<CategoryForm> {
                           ),
                         ),
                         const SizedBox(height: 16.0),
-                        CategoryNameField(
+                        AccountNameField(
                           name: _name,
                           onNameChanged: (name) => setState(() => _name = name),
+                        ),
+                        const SizedBox(height: 12.0),
+                        PickerFieldGroup(
+                          backgroundColor: context.c.surfaceContainer,
+                          children: [
+                            PickerField(
+                              icon: Icons.account_balance_rounded,
+                              label: 'Balance',
+                              value: _balance,
+                              shrink: false,
+                              onTap: () => _showBalanceInput(context),
+                            ),
+                            PickerField(
+                              icon: Icons.currency_exchange_rounded,
+                              label: 'Currency',
+                              value: _selectedCurrency,
+                              shrink: false,
+                              onTap: () => _showCurrencyPicker(context),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12.0),
                         FormSection(
@@ -184,7 +201,7 @@ class _CategoryFormState extends State<CategoryForm> {
                                 setState(() => _selectedIconCode = code),
                           ),
                           child: IconGrid(
-                            iconOptions: kCategoryIconOptions,
+                            iconOptions: kAccountIconOptions,
                             selectedIconCode: _selectedIconCode,
                             selectedColor: selectedColor,
                             onIconSelected: (code) =>
@@ -199,11 +216,11 @@ class _CategoryFormState extends State<CategoryForm> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Button(
-                    label: widget.isEditing ? 'Save Changes' : 'Save',
+                    label: 'Save',
                     isLoading: isLoading,
                     onPressed: isLoading || _name.trim().isEmpty
                         ? null
-                        : () => _saveCategory(context),
+                        : () => _saveAccount(context),
                     width: double.infinity,
                   ),
                 ),
@@ -216,13 +233,53 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
+  Future<void> _showCurrencyPicker(BuildContext context) async {
+    final result = await showModal<String>(
+      context: context,
+      builder: (context) => ModalSheet.scrollable(
+        title: Text('Select Currency'),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: _currencies.length,
+          itemBuilder: (context, index) {
+            final currency = _currencies[index];
+            return PickerListTile(
+              icon: Icons.currency_exchange_rounded,
+              iconColor: Theme.of(context).colorScheme.primary,
+              iconBackgroundColor: Theme.of(
+                context,
+              ).colorScheme.primary.withAlpha(0x33),
+              title: currency,
+              isSelected: currency == _selectedCurrency,
+              onTap: () => Navigator.pop(context, currency),
+            );
+          },
+        ),
+      ),
+    );
+    if (result != null) setState(() => _selectedCurrency = result);
+  }
+
+  Future<void> _showBalanceInput(BuildContext context) async {
+    final result = await showModalInput(
+      context: context,
+      initialValue: _balance == '0' ? '' : _balance,
+      hintText: '0.00',
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+    );
+    if (result != null) {
+      final parsed = double.tryParse(result);
+      setState(() => _balance = parsed != null ? result : _balance);
+    }
+  }
+
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Category'),
+        title: const Text('Delete Account'),
         content: Text(
-          'Are you sure you want to delete "${widget.category!.name}"?',
+          'Are you sure you want to delete "${widget.account!.name}"?',
         ),
         actions: [
           TextButton(
@@ -232,9 +289,7 @@ class _CategoryFormState extends State<CategoryForm> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<CategoryCubit>().removeCategory(
-                widget.category!.uuid,
-              );
+              context.read<AccountCubit>().removeAccount(widget.account!.uuid);
               Navigator.pop(context, true);
             },
             child: Text(
@@ -247,34 +302,37 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  void _saveCategory(BuildContext context) {
+  void _saveAccount(BuildContext context) {
     final name = _name.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a category name')),
+        const SnackBar(content: Text('Please enter an account name')),
       );
       return;
     }
 
-    final cubit = context.read<CategoryCubit>();
+    final balance = double.tryParse(_balance) ?? 0.0;
+    final cubit = context.read<AccountCubit>();
 
     if (widget.isEditing) {
-      cubit.editCategory(
-        widget.category!.copyWith(
+      cubit.editAccount(
+        widget.account!.copyWith(
           name: name,
+          currency: _selectedCurrency,
+          balance: balance,
           iconCode: _selectedIconCode,
           colorValue: _selectedColorValue,
-          type: _selectedType,
         ),
       );
     } else {
-      cubit.addCategory(
-        CategoryEntity(
+      cubit.addAccount(
+        AccountEntity(
           uuid: const Uuid().v4(),
           name: name,
+          currency: _selectedCurrency,
+          balance: balance,
           iconCode: _selectedIconCode,
           createdDate: DateTime.now(),
-          type: _selectedType,
           colorValue: _selectedColorValue,
         ),
       );

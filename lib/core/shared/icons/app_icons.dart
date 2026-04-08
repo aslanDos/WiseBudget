@@ -52,6 +52,47 @@ class AppIcons {
     'zap': zap,
     'star': star,
     'globe': globe,
+    // Finance
+    'piggyBank': piggyBank,
+    'creditCard': creditCard,
+    'coins': coins,
+    'banknote': banknote,
+    'trendingUp': trendingUp,
+    // Transport
+    'train': train,
+    'ship': ship,
+    'truck': truck,
+    'fuel': fuel,
+    // Home
+    'sofa': sofa,
+    'wrench': wrench,
+    'tree': tree,
+    'lamp': lamp,
+    // Food & Drink
+    'pizza': pizza,
+    'wine': wine,
+    'beer': beer,
+    'cake': cake,
+    'salad': salad,
+    // Health & Sports
+    'activity': activity,
+    'pill': pill,
+    'syringe': syringe,
+    'apple': apple,
+    // Work & Education
+    'monitor': monitor,
+    'code': code,
+
+    'presentation': presentation,
+    'pen': pen,
+    // Entertainment
+    'tv': tv,
+    'film': film,
+    'headphones': headphones,
+    'camera': camera,
+    'palette': palette,
+    'ticket': ticket,
+    'clapperboard': clapperboard,
   };
 
   /// Resolves icon code to IconData, returns [empty] if not found
@@ -113,4 +154,51 @@ class AppIcons {
   // Visibility icons
   static const IconData eye = LucideIcons.eye;
   static const IconData eyeOff = LucideIcons.eyeOff;
+
+  // Finance
+  static const IconData piggyBank = LucideIcons.piggyBank;
+  static const IconData creditCard = LucideIcons.creditCard;
+  static const IconData coins = LucideIcons.coins;
+  static const IconData banknote = LucideIcons.banknote;
+  static const IconData trendingUp = LucideIcons.trendingUp;
+
+  // Transport
+  static const IconData train = LucideIcons.trainFront;
+  static const IconData ship = LucideIcons.ship;
+  static const IconData truck = LucideIcons.truck;
+  static const IconData fuel = LucideIcons.fuel;
+
+  // Home
+  static const IconData sofa = LucideIcons.sofa;
+  static const IconData wrench = LucideIcons.wrench;
+  static const IconData tree = LucideIcons.treePine;
+  static const IconData lamp = LucideIcons.lamp;
+
+  // Food & Drink
+  static const IconData pizza = LucideIcons.pizza;
+  static const IconData wine = LucideIcons.wine;
+  static const IconData beer = LucideIcons.beer;
+  static const IconData cake = LucideIcons.cakeSlice;
+  static const IconData salad = LucideIcons.salad;
+
+  // Health & Sports
+  static const IconData activity = LucideIcons.activity;
+  static const IconData pill = LucideIcons.pill;
+  static const IconData syringe = LucideIcons.syringe;
+  static const IconData apple = LucideIcons.apple;
+
+  // Work & Education
+  static const IconData monitor = LucideIcons.monitor;
+  static const IconData code = LucideIcons.code;
+  static const IconData presentation = LucideIcons.presentation;
+  static const IconData pen = LucideIcons.pen;
+
+  // Entertainment
+  static const IconData tv = LucideIcons.tv;
+  static const IconData film = LucideIcons.film;
+  static const IconData headphones = LucideIcons.headphones;
+  static const IconData camera = LucideIcons.camera;
+  static const IconData palette = LucideIcons.palette;
+  static const IconData ticket = LucideIcons.ticket;
+  static const IconData clapperboard = LucideIcons.clapperboard;
 }

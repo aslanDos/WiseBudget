@@ -5,48 +5,20 @@ import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 const _kGridColumns = 6;
 const _kGridSpacing = 10.0;
 
-/// Default icon options available for category creation.
-const kCategoryIconOptions = [
-  'utensils',
-  'shoppingBag',
-  'shoppingCart',
-  'receipt',
-  'car',
-  'bus',
-  'plane',
-  'bike',
-  'home',
-  'building',
-  'briefCase',
-  'wallet',
-  'gamepad',
-  'music',
-  'heart',
-  'star',
-  'coffee',
-  'gift',
-  'book',
-  'graduationCap',
-  'phone',
-  'laptop',
-  'dumbbell',
-  'stethoscope',
-  'zap',
-  'globe',
-];
-
-class CategoryIconGrid extends StatelessWidget {
+class IconGrid extends StatelessWidget {
   final List<String> iconOptions;
   final String selectedIconCode;
   final Color selectedColor;
   final ValueChanged<String> onIconSelected;
+  final bool showAll;
 
-  const CategoryIconGrid({
+  const IconGrid({
     super.key,
     required this.iconOptions,
     required this.selectedIconCode,
     required this.selectedColor,
     required this.onIconSelected,
+    this.showAll = false,
   });
 
   @override
@@ -60,7 +32,9 @@ class CategoryIconGrid extends StatelessWidget {
         mainAxisSpacing: _kGridSpacing,
         crossAxisSpacing: _kGridSpacing,
       ),
-      itemCount: iconOptions.length.clamp(0, _kGridColumns * 2),
+      itemCount: showAll
+          ? iconOptions.length
+          : iconOptions.length.clamp(0, _kGridColumns * 2),
       itemBuilder: (context, index) {
         final iconCode = iconOptions[index];
         final isSelected = iconCode == selectedIconCode;

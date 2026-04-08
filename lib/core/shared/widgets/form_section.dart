@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
-/// A container with a title row and an optional action label, used to
-/// wrap the color and icon pickers inside the category form.
-class CategoryFormSection extends StatelessWidget {
+/// A container card with a title row and an optional action label,
+/// used to wrap pickers (color, icon, etc.) inside forms.
+class FormSection extends StatelessWidget {
   final String title;
   final String? actionLabel;
+  final VoidCallback? onAction;
   final Widget child;
 
-  const CategoryFormSection({
+  const FormSection({
     super.key,
     required this.title,
     this.actionLabel,
+    this.onAction,
     required this.child,
   });
 
@@ -33,7 +35,7 @@ class CategoryFormSection extends StatelessWidget {
               Text(title, style: context.t.titleMedium),
               if (actionLabel != null)
                 TextButton.icon(
-                  onPressed: null,
+                  onPressed: onAction,
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,

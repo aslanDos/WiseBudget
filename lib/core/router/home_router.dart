@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_detail_page.dart';
-import 'package:wisebuget/features/account/presentation/pages/account_form_page.dart';
+import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
 import 'package:wisebuget/features/budget/presentation/pages/budget_list_page.dart';
 import 'package:wisebuget/features/category/presentation/pages/categories_page.dart';
 import 'package:wisebuget/core/app/main_shell.dart';
@@ -28,7 +28,7 @@ class HomeRouter {
       path: AppRoutes.accountForm,
       builder: (context, state) {
         final account = state.extra as AccountEntity?;
-        return AccountFormPage(account: account);
+        return AccountForm(account: account);
       },
     ),
 

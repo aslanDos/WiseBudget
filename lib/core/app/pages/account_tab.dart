@@ -11,6 +11,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_card.dart';
+import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
 import 'package:wisebuget/features/account/presentation/widgets/no_accounts.dart';
 import 'package:wisebuget/features/account/presentation/widgets/total_balance_card.dart';
 
@@ -180,7 +181,7 @@ class _AccountTabState extends State<AccountTab>
   }
 
   Future<void> _showAddAccountDialog(BuildContext context) async {
-    final result = await context.push(AppRoutes.accountForm);
+    final result = await showAccountFormModal(context: context);
     if (result == true && context.mounted) {
       context.read<AccountCubit>().loadAccounts();
     }

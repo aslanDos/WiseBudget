@@ -54,7 +54,7 @@ class PickerField extends StatelessWidget {
     this.onTap,
     this.backgroundColor,
     this.borderRadius = 12,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
     this.trailing,
     this.shrink = true,
   });
@@ -98,6 +98,34 @@ class PickerField extends StatelessWidget {
                     ),
                   ),
                 ),
+              // Value / trailing / chevron
+              if (trailing != null) ...[
+                const SizedBox(width: 8.0),
+                trailing!,
+              ] else if (value != null) ...[
+                const SizedBox(width: 8.0),
+                Text(
+                  value!,
+                  style: (valueStyle ?? context.t.bodyMedium)?.copyWith(
+                    color: context.c.onSurface,
+                  ),
+                ),
+                if (showChevron) ...[
+                  const SizedBox(width: 4.0),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: 16,
+                    color: context.c.onSecondary,
+                  ),
+                ],
+              ] else if (showChevron) ...[
+                const SizedBox(width: 8.0),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: context.c.onSecondary,
+                ),
+              ],
             ],
           ),
         ),
@@ -137,38 +165,26 @@ class PickerFieldGroup extends StatelessWidget {
     super.key,
     required this.children,
     this.backgroundColor,
-    this.borderRadius = 16.0,
+    this.borderRadius = 12.0,
     this.showDividers = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    final effectiveBackgroundColor =
-        backgroundColor ?? colorScheme.surfaceContainerHighest.withAlpha(0x80);
-
     return Container(
       decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
+        color: backgroundColor ?? context.c.secondary,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           for (int i = 0; i < children.length; i++) ...[
             // Override the background color of child PickerFields to transparent
             _PickerFieldWrapper(child: children[i]),
             if (showDividers && i < children.length - 1)
-              Padding(
-                padding: const EdgeInsets.only(left: 52.0),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: colorScheme.outlineVariant.withAlpha(0x40),
-                ),
-              ),
+              Divider(height: 1, thickness: 1, color: context.c.secondary),
           ],
         ],
       ),
@@ -199,6 +215,7 @@ class _PickerFieldWrapper extends StatelessWidget {
         borderRadius: 0,
         padding: pickerField.padding,
         trailing: pickerField.trailing,
+        shrink: pickerField.shrink,
       );
     }
     return child;

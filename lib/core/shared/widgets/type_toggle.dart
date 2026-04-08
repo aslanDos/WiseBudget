@@ -28,7 +28,7 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
       decoration: BoxDecoration(
         color: context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(12.0),

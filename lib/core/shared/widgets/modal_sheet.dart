@@ -238,6 +238,7 @@ Future<String?> showModalInput({
   int? maxLength,
   bool isDismissible = true,
   bool enableDrag = true,
+  TextInputType? keyboardType,
 }) {
   final controller = TextEditingController(text: initialValue);
   final focusNode = FocusNode();
@@ -254,6 +255,7 @@ Future<String?> showModalInput({
       focusNode: focusNode,
       hintText: hintText,
       maxLength: maxLength,
+      keyboardType: keyboardType,
     );
   }
 
@@ -300,12 +302,14 @@ class _ModalInputSheet extends StatelessWidget {
   final FocusNode focusNode;
   final String? hintText;
   final int? maxLength;
+  final TextInputType? keyboardType;
 
   const _ModalInputSheet({
     required this.controller,
     required this.focusNode,
     this.hintText,
     this.maxLength,
+    this.keyboardType,
   });
 
   @override
@@ -358,6 +362,7 @@ class _ModalInputSheet extends StatelessWidget {
                           controller: controller,
                           focusNode: focusNode,
                           maxLength: maxLength,
+                          keyboardType: keyboardType,
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             hintText: hintText ?? 'Enter text...',

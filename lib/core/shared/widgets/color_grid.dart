@@ -4,14 +4,16 @@ import 'package:wisebuget/core/shared/colors/app_palette.dart';
 const _kGridColumns = 6;
 const _kGridSpacing = 10.0;
 
-class CategoryColorGrid extends StatelessWidget {
+class ColorGrid extends StatelessWidget {
   final int selectedColorValue;
   final ValueChanged<int> onColorSelected;
+  final bool showAll;
 
-  const CategoryColorGrid({
+  const ColorGrid({
     super.key,
     required this.selectedColorValue,
     required this.onColorSelected,
+    this.showAll = false,
   });
 
   @override
@@ -25,7 +27,9 @@ class CategoryColorGrid extends StatelessWidget {
         mainAxisSpacing: _kGridSpacing,
         crossAxisSpacing: _kGridSpacing,
       ),
-      itemCount: AppPalette.colors.length.clamp(0, _kGridColumns * 2),
+      itemCount: showAll
+          ? AppPalette.colors.length
+          : AppPalette.colors.length.clamp(0, _kGridColumns * 2),
       itemBuilder: (context, index) {
         final colorValue = AppPalette.colors[index];
         final color = Color(colorValue);
