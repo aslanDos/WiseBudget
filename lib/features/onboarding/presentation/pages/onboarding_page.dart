@@ -9,6 +9,7 @@ import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/onboarding/presentation/widgets/onboarding_content.dart';
 import 'package:wisebuget/features/onboarding/presentation/widgets/page_indicator.dart';
@@ -297,16 +298,16 @@ class _AccountCreationPage extends StatelessWidget {
             // Create account button with listener
             BlocConsumer<AccountCubit, AccountState>(
               listenWhen: (previous, current) =>
-                  previous.status == AccountStatus.loading &&
-                  current.status != AccountStatus.loading,
+                  previous.status == CubitStatus.loading &&
+                  current.status != CubitStatus.loading,
               listener: (context, state) async {
-                if (state.status == AccountStatus.success) {
+                if (state.status == CubitStatus.success) {
                   // Mark onboarding as completed
                   await sl<LocalPreferences>().setCompletedOnboarding(true);
                   if (context.mounted) {
                     context.go(AppRoutes.home);
                   }
-                } else if (state.status == AccountStatus.failure) {
+                } else if (state.status == CubitStatus.failure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -317,7 +318,7 @@ class _AccountCreationPage extends StatelessWidget {
                 }
               },
               builder: (context, state) {
-                final isLoading = state.status == AccountStatus.loading;
+                final isLoading = state.status == CubitStatus.loading;
                 return FilledButton(
                   onPressed: isLoading ? null : onCreateAccount,
                   child: isLoading

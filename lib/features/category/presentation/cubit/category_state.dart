@@ -1,21 +1,20 @@
 import 'package:equatable/equatable.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 
-enum CategoryStatus { initial, loading, success, failure }
-
 class CategoryState extends Equatable {
-  final CategoryStatus status;
+  final CubitStatus status;
   final List<CategoryEntity> categories;
   final String? errorMessage;
 
   const CategoryState({
-    this.status = CategoryStatus.initial,
+    this.status = CubitStatus.initial,
     this.categories = const [],
     this.errorMessage,
   });
 
   CategoryState copyWith({
-    CategoryStatus? status,
+    CubitStatus? status,
     List<CategoryEntity>? categories,
     String? errorMessage,
   }) {

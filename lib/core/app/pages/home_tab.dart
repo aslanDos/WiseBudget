@@ -10,6 +10,7 @@ import 'package:wisebuget/features/category/presentation/cubit/category_state.da
 import 'package:wisebuget/core/shared/widgets/calendar/calendar.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
@@ -102,11 +103,11 @@ class _TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
       builder: (context, transactionState) {
-        if (transactionState.status == TransactionStatus.loading) {
+        if (transactionState.status == CubitStatus.loading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (transactionState.status == TransactionStatus.failure) {
+        if (transactionState.status == CubitStatus.failure) {
           return Center(
             child: Text(
               transactionState.errorMessage ?? 'Failed to load transactions',

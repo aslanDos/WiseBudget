@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
-import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
-import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
@@ -16,6 +13,7 @@ import 'package:wisebuget/features/category/presentation/cubit/category_cubit.da
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/numpad.dart';
@@ -233,12 +231,12 @@ class _TransactionFormState extends State<TransactionForm> {
   Widget _buildSaveButton() {
     return BlocConsumer<TransactionCubit, TransactionState>(
       listenWhen: (prev, curr) =>
-          prev.status == TransactionStatus.loading &&
-          curr.status != TransactionStatus.loading,
+          prev.status == CubitStatus.loading &&
+          curr.status != CubitStatus.loading,
       listener: (context, state) {
-        if (state.status == TransactionStatus.success) {
+        if (state.status == CubitStatus.success) {
           Navigator.pop(context, true);
-        } else if (state.status == TransactionStatus.failure) {
+        } else if (state.status == CubitStatus.failure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
           );
@@ -246,7 +244,7 @@ class _TransactionFormState extends State<TransactionForm> {
       },
       builder: (context, state) => Button(
         label: 'Save',
-        isLoading: state.status == TransactionStatus.loading,
+        isLoading: state.status == CubitStatus.loading,
         onPressed: _form.isValidAmount ? () => _saveTransaction(context) : null,
         width: double.infinity,
       ),

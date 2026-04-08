@@ -8,6 +8,7 @@ import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_card.dart';
 import 'package:wisebuget/features/account/presentation/widgets/no_accounts.dart';
@@ -61,11 +62,11 @@ class _AccountTabState extends State<AccountTab>
         ),
         body: BlocBuilder<AccountCubit, AccountState>(
           builder: (context, state) {
-            if (state.status == AccountStatus.loading) {
+            if (state.status == CubitStatus.loading) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (state.status == AccountStatus.failure) {
+            if (state.status == CubitStatus.failure) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

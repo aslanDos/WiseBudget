@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
-import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/color_picker.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
-import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
+import 'package:wisebuget/features/account/presentation/widgets/account_icon_selector.dart';
+import 'package:wisebuget/features/account/presentation/widgets/account_save_button.dart';
 
 class AccountFormPage extends StatefulWidget {
   final AccountEntity? account;
@@ -62,7 +61,6 @@ class _AccountFormPageState extends State<AccountFormPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return BlocProvider.value(
       value: sl<AccountCubit>(),
@@ -76,51 +74,24 @@ class _AccountFormPageState extends State<AccountFormPage> {
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
-              // Icon selector
               Text('Icon', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8.0),
-              Wrap(
-                spacing: 12.0,
-                runSpacing: 12.0,
-                children: _iconOptions.map((iconCode) {
-                  final isSelected = iconCode == _selectedIconCode;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedIconCode = iconCode),
-                    child: Container(
-                      width: 56.0,
-                      height: 56.0,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? colorScheme.primaryContainer
-                            : colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: isSelected
-                            ? Border.all(color: colorScheme.primary, width: 2)
-                            : null,
-                      ),
-                      child: Icon(
-                        AppIcons.fromCode(iconCode),
-                        color: isSelected
-                            ? colorScheme.onPrimaryContainer
-                            : colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  );
-                }).toList(),
+              AccountIconSelector(
+                iconOptions: _iconOptions,
+                selectedIconCode: _selectedIconCode,
+                onSelected: (code) => setState(() => _selectedIconCode = code),
               ),
               const SizedBox(height: 24.0),
 
-              // Color selector
               Text('Color', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8.0),
               ColorPicker(
                 selectedColorValue: _selectedColorValue,
-                onColorSelected: (colorValue) =>
-                    setState(() => _selectedColorValue = colorValue),
+                onColorSelected: (value) =>
+                    setState(() => _selectedColorValue = value),
               ),
               const SizedBox(height: 24.0),
 
-              // Name field
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -141,7 +112,6 @@ class _AccountFormPageState extends State<AccountFormPage> {
               ),
               const SizedBox(height: 16.0),
 
-              // Currency selector
               DropdownButtonFormField<String>(
                 initialValue: _selectedCurrency,
                 decoration: const InputDecoration(
@@ -152,14 +122,11 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
                 onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedCurrency = value);
-                  }
+                  if (value != null) setState(() => _selectedCurrency = value);
                 },
               ),
               const SizedBox(height: 16.0),
 
-              // Balance field
               TextFormField(
                 controller: _balanceController,
                 decoration: const InputDecoration(
@@ -181,35 +148,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
               ),
               const SizedBox(height: 32.0),
 
-              // Save button
-              BlocConsumer<AccountCubit, AccountState>(
-                listenWhen: (previous, current) =>
-                    previous.status == AccountStatus.loading &&
-                    current.status != AccountStatus.loading,
-                listener: (context, state) {
-                  if (state.status == AccountStatus.success) {
-                    context.pop(true);
-                  } else if (state.status == AccountStatus.failure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.errorMessage ?? 'Failed to save'),
-                      ),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  final isLoading = state.status == AccountStatus.loading;
-                  return FilledButton(
-                    onPressed: isLoading ? null : () => _saveAccount(context),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(widget.isEditing ? 'Save Changes' : 'Create Account'),
-                  );
-                },
+              AccountSaveButton(
+                isEditing: widget.isEditing,
+                onSave: () => _saveAccount(context),
               ),
             ],
           ),
@@ -225,25 +166,27 @@ class _AccountFormPageState extends State<AccountFormPage> {
     final balance = double.parse(_balanceController.text);
 
     if (widget.isEditing) {
-      final updated = widget.account!.copyWith(
-        name: _nameController.text.trim(),
-        currency: _selectedCurrency,
-        balance: balance,
-        iconCode: _selectedIconCode,
-        colorValue: _selectedColorValue,
+      cubit.editAccount(
+        widget.account!.copyWith(
+          name: _nameController.text.trim(),
+          currency: _selectedCurrency,
+          balance: balance,
+          iconCode: _selectedIconCode,
+          colorValue: _selectedColorValue,
+        ),
       );
-      cubit.editAccount(updated);
     } else {
-      final newAccount = AccountEntity(
-        uuid: const Uuid().v4(),
-        name: _nameController.text.trim(),
-        currency: _selectedCurrency,
-        balance: balance,
-        iconCode: _selectedIconCode,
-        createdDate: DateTime.now(),
-        colorValue: _selectedColorValue,
+      cubit.addAccount(
+        AccountEntity(
+          uuid: const Uuid().v4(),
+          name: _nameController.text.trim(),
+          currency: _selectedCurrency,
+          balance: balance,
+          iconCode: _selectedIconCode,
+          createdDate: DateTime.now(),
+          colorValue: _selectedColorValue,
+        ),
       );
-      cubit.addAccount(newAccount);
     }
   }
 }

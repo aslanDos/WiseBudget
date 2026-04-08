@@ -1,21 +1,20 @@
 import 'package:equatable/equatable.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
-enum AccountStatus { initial, loading, success, failure }
-
 class AccountState extends Equatable {
-  final AccountStatus status;
+  final CubitStatus status;
   final List<AccountEntity> accounts;
   final String? errorMessage;
 
   const AccountState({
-    this.status = AccountStatus.initial,
+    this.status = CubitStatus.initial,
     this.accounts = const [],
     this.errorMessage,
   });
 
   AccountState copyWith({
-    AccountStatus? status,
+    CubitStatus? status,
     List<AccountEntity>? accounts,
     String? errorMessage,
   }) {

@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
-import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 import 'package:wisebuget/features/category/presentation/pages/category_form.dart';
-import 'package:wisebuget/features/category/presentation/widgets/category_card.dart';
+import 'package:wisebuget/features/category/presentation/widgets/categories_list.dart';
+import 'package:wisebuget/features/category/presentation/widgets/category_sheet_header.dart';
 
 Future<void> showCategoriesModal({required BuildContext context}) {
   return showCupertinoModalBottomSheet(
@@ -45,15 +45,18 @@ class _CategoriesPageState extends State<CategoriesPage> {
       child: Material(
         child: Column(
           children: [
-            _CategoriesHeader(
+            CategorySheetHeader(
               selectedType: _selectedType,
               onTypeChanged: (type) => setState(() => _selectedType = type),
-              onAdd: () => _navigateToCategoryForm(context),
+              trailing: CircleIconButton(
+                icon: AppIcons.add,
+                onTap: () => _navigateToCategoryForm(context),
+              ),
             ),
             Expanded(
               child: BlocBuilder<CategoryCubit, CategoryState>(
                 builder: (context, state) {
-                  if (state.status == CategoryStatus.loading) {
+                  if (state.status == CubitStatus.loading) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
@@ -86,7 +89,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     );
                   }
 
-                  return _CategoriesList(
+                  return CategoriesList(
                     categories: categories,
                     onReorder: (oldIndex, newIndex) =>
                         _handleReorder(context, categories, oldIndex, newIndex),
@@ -168,114 +171,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void _handleToggleVisibility(BuildContext context, CategoryEntity category) {
     context.read<CategoryCubit>().editCategory(
       category.copyWith(visible: !category.visible),
-    );
-  }
-}
-
-class _CategoriesHeader extends StatelessWidget {
-  final TransactionType selectedType;
-  final ValueChanged<TransactionType> onTypeChanged;
-  final VoidCallback onAdd;
-
-  const _CategoriesHeader({
-    required this.selectedType,
-    required this.onTypeChanged,
-    required this.onAdd,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: context.c.onSurface.withValues(alpha: 0.1),
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            CircleIconButton(
-              icon: AppIcons.close,
-              onTap: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 220),
-                  child: TypeToggle<TransactionType>(
-                    items: TransactionType.values
-                        .where((t) => t != TransactionType.transfer)
-                        .map(
-                          (t) => TypeToggleItem(
-                            value: t,
-                            label: t.label,
-                            icon: t.icon,
-                            selectedBackgroundColor: t.actionBackgroundColor(
-                              context,
-                            ),
-                            selectedForegroundColor: t.actionColor(context),
-                          ),
-                        )
-                        .toList(),
-                    selected: selectedType,
-                    onChanged: onTypeChanged,
-                  ),
-                ),
-              ),
-            ),
-            CircleIconButton(icon: AppIcons.add, onTap: onAdd),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoriesList extends StatelessWidget {
-  final List<CategoryEntity> categories;
-  final void Function(int oldIndex, int newIndex) onReorder;
-  final void Function(CategoryEntity category) onDelete;
-  final void Function(CategoryEntity category) onEdit;
-  final void Function(CategoryEntity category) onToggleVisibility;
-
-  const _CategoriesList({
-    required this.categories,
-    required this.onReorder,
-    required this.onDelete,
-    required this.onEdit,
-    required this.onToggleVisibility,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ReorderableListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      itemCount: categories.length,
-      onReorder: onReorder,
-      proxyDecorator: (child, index, animation) => AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) => Material(
-          elevation: Tween<double>(begin: 0, end: 4).animate(animation).value,
-          borderRadius: BorderRadius.circular(12.0),
-          child: child,
-        ),
-        child: child,
-      ),
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        return CategoryCard(
-          key: ValueKey(category.uuid),
-          category: category,
-          onTap: () => onEdit(category),
-          onDelete: () => onDelete(category),
-          onToggleVisibility: () => onToggleVisibility(category),
-        );
-      },
     );
   }
 }

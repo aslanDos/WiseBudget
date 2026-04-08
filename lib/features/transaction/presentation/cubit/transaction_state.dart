@@ -1,21 +1,20 @@
 import 'package:equatable/equatable.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
-enum TransactionStatus { initial, loading, success, failure }
-
 class TransactionState extends Equatable {
-  final TransactionStatus status;
+  final CubitStatus status;
   final List<TransactionEntity> transactions;
   final String? errorMessage;
 
   const TransactionState({
-    this.status = TransactionStatus.initial,
+    this.status = CubitStatus.initial,
     this.transactions = const [],
     this.errorMessage,
   });
 
   TransactionState copyWith({
-    TransactionStatus? status,
+    CubitStatus? status,
     List<TransactionEntity>? transactions,
     String? errorMessage,
   }) {

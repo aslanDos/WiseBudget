@@ -4,6 +4,7 @@ import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/domain/services/balance_service.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
@@ -37,47 +38,47 @@ class AccountCubit extends Cubit<AccountState> {
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> loadAccounts() async {
-    emit(state.copyWith(status: AccountStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _getAccounts(const NoParams());
 
     result.fold(
       (failure) => emit(state.copyWith(
-        status: AccountStatus.failure,
+        status: CubitStatus.failure,
         errorMessage: failure.message,
       )),
       (accounts) => emit(state.copyWith(
-        status: AccountStatus.success,
+        status: CubitStatus.success,
         accounts: accounts,
       )),
     );
   }
 
   Future<void> addAccount(AccountEntity account) async {
-    emit(state.copyWith(status: AccountStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _createAccount(CreateAccountParams(account: account));
 
     result.fold(
       (failure) => emit(state.copyWith(
-        status: AccountStatus.failure,
+        status: CubitStatus.failure,
         errorMessage: failure.message,
       )),
       (created) => emit(state.copyWith(
-        status: AccountStatus.success,
+        status: CubitStatus.success,
         accounts: [...state.accounts, created],
       )),
     );
   }
 
   Future<void> editAccount(AccountEntity account) async {
-    emit(state.copyWith(status: AccountStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _updateAccount(UpdateAccountParams(account: account));
 
     result.fold(
       (failure) => emit(state.copyWith(
-        status: AccountStatus.failure,
+        status: CubitStatus.failure,
         errorMessage: failure.message,
       )),
       (updated) {
@@ -85,7 +86,7 @@ class AccountCubit extends Cubit<AccountState> {
           return a.uuid == updated.uuid ? updated : a;
         }).toList();
         emit(state.copyWith(
-          status: AccountStatus.success,
+          status: CubitStatus.success,
           accounts: updatedList,
         ));
       },
@@ -93,19 +94,19 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> removeAccount(String uuid) async {
-    emit(state.copyWith(status: AccountStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _deleteAccount(DeleteAccountParams(uuid: uuid));
 
     result.fold(
       (failure) => emit(state.copyWith(
-        status: AccountStatus.failure,
+        status: CubitStatus.failure,
         errorMessage: failure.message,
       )),
       (_) {
         final updatedList = state.accounts.where((a) => a.uuid != uuid).toList();
         emit(state.copyWith(
-          status: AccountStatus.success,
+          status: CubitStatus.success,
           accounts: updatedList,
         ));
       },
@@ -161,7 +162,7 @@ class AccountCubit extends Cubit<AccountState> {
 
   /// Recalculates all account balances based on the provided transactions.
   Future<void> recalculateBalances(List<TransactionEntity> transactions) async {
-    if (state.accounts.isEmpty && state.status != AccountStatus.loading) {
+    if (state.accounts.isEmpty && state.status != CubitStatus.loading) {
       await loadAccounts();
     }
 
@@ -203,7 +204,7 @@ class AccountCubit extends Cubit<AccountState> {
     }
 
     emit(state.copyWith(
-      status: AccountStatus.success,
+      status: CubitStatus.success,
       accounts: updatedAccounts,
     ));
   }

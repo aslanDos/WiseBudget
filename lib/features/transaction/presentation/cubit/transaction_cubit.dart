@@ -4,6 +4,7 @@ import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 
 final _log = Logger('TransactionCubit');
@@ -39,7 +40,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> loadTransactions({bool recalculateBalances = false}) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _getTransactions(const NoParams());
 
@@ -47,7 +48,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       (failure) => _emitFailure('Failed to load transactions', failure.message),
       (transactions) {
         emit(state.copyWith(
-          status: TransactionStatus.success,
+          status: CubitStatus.success,
           transactions: transactions,
         ));
         if (recalculateBalances) {
@@ -58,7 +59,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> loadTransactionsByAccount(String accountUuid) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _getTransactionsByAccount(
       GetTransactionsByAccountParams(accountUuid: accountUuid),
@@ -67,14 +68,14 @@ class TransactionCubit extends Cubit<TransactionState> {
     result.fold(
       (failure) => _emitFailure('Failed to load by account', failure.message),
       (transactions) => emit(state.copyWith(
-        status: TransactionStatus.success,
+        status: CubitStatus.success,
         transactions: transactions,
       )),
     );
   }
 
   Future<void> loadTransactionsByCategory(String categoryUuid) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _getTransactionsByCategory(
       GetTransactionsByCategoryParams(categoryUuid: categoryUuid),
@@ -83,7 +84,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     result.fold(
       (failure) => _emitFailure('Failed to load by category', failure.message),
       (transactions) => emit(state.copyWith(
-        status: TransactionStatus.success,
+        status: CubitStatus.success,
         transactions: transactions,
       )),
     );
@@ -94,7 +95,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> addTransaction(TransactionEntity transaction) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _createTransaction(
       CreateTransactionParams(transaction: transaction),
@@ -104,7 +105,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       (failure) => _emitFailure('Failed to create transaction', failure.message),
       (created) {
         emit(state.copyWith(
-          status: TransactionStatus.success,
+          status: CubitStatus.success,
           transactions: [created, ...state.transactions],
         ));
         _accountCubit.applyTransactionEffect(created);
@@ -113,7 +114,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> editTransaction(TransactionEntity transaction) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final oldTransaction = _findTransaction(transaction.uuid);
 
@@ -129,7 +130,7 @@ class TransactionCubit extends Cubit<TransactionState> {
             .toList();
 
         emit(state.copyWith(
-          status: TransactionStatus.success,
+          status: CubitStatus.success,
           transactions: updatedList,
         ));
 
@@ -143,7 +144,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> removeTransaction(String uuid) async {
-    emit(state.copyWith(status: TransactionStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final transaction = _findTransaction(uuid);
 
@@ -157,7 +158,7 @@ class TransactionCubit extends Cubit<TransactionState> {
             .toList();
 
         emit(state.copyWith(
-          status: TransactionStatus.success,
+          status: CubitStatus.success,
           transactions: updatedList,
         ));
 
@@ -179,7 +180,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   void _emitFailure(String context, String message) {
     _log.warning('$context: $message');
     emit(state.copyWith(
-      status: TransactionStatus.failure,
+      status: CubitStatus.failure,
       errorMessage: message,
     ));
   }
