@@ -13,6 +13,7 @@ class TransactionCard extends StatelessWidget {
   final TransactionEntity transaction;
   final CategoryEntity? category;
   final AccountEntity? account;
+  final AccountEntity? toAccount;
   final VoidCallback? onTap;
 
   const TransactionCard({
@@ -20,16 +21,19 @@ class TransactionCard extends StatelessWidget {
     required this.transaction,
     this.category,
     this.account,
+    this.toAccount,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final categoryColor = AppPalette.fromValue(
-      category?.colorValue,
-      defaultColor: colorScheme.primary,
-    );
+    final isTransfer = transaction.isTransfer;
+    final categoryColor = isTransfer
+        ? AppColors.blue
+        : AppPalette.fromValue(
+            category?.colorValue,
+            defaultColor: context.c.primary,
+          );
 
     return Material(
       color: context.c.surfaceContainer,
@@ -42,22 +46,88 @@ class TransactionCard extends StatelessWidget {
           child: Row(
             children: [
               ColoredIconBox(
-                icon: category?.icon ?? AppIcons.empty,
+                size: 24,
+                icon: isTransfer
+                    ? AppIcons.arrowUpDown
+                    : (category?.icon ?? AppIcons.empty),
                 color: categoryColor,
               ),
               const SizedBox(width: 12.0),
               Expanded(
-                child: _TransactionDetails(
-                  categoryName: category?.name ?? 'Unknown',
-                  accountName: account?.name,
-                  note: transaction.note,
-                ),
+                child: isTransfer
+                    ? _TransferDetails(
+                        fromAccount: account,
+                        toAccount: toAccount,
+                      )
+                    : _TransactionDetails(
+                        categoryName: category?.name ?? 'Unknown',
+                        accountName: account?.name,
+                        note: transaction.note,
+                      ),
               ),
               _TransactionAmount(transaction: transaction),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TransferDetails extends StatelessWidget {
+  final AccountEntity? fromAccount;
+  final AccountEntity? toAccount;
+
+  const _TransferDetails({
+    required this.fromAccount,
+    required this.toAccount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fromName = fromAccount?.name ?? '?';
+    final toName = toAccount?.name ?? '?';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Transfer',
+          style: context.t.titleMedium,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            Flexible(
+              child: Text(
+                fromName,
+                style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Icon(
+                AppIcons.chevronRight,
+                size: 12,
+                color: context.c.onSecondary,
+              ),
+            ),
+            Flexible(
+              child: Text(
+                toName,
+                style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

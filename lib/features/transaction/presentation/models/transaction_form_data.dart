@@ -30,10 +30,16 @@ class TransactionFormData {
   /// Creates form data from an existing transaction (for editing).
   factory TransactionFormData.fromTransaction(
     TransactionEntity? tx,
-    TransactionType initialType,
-  ) {
+    TransactionType initialType, {
+    String? initialAccountUuid,
+    DateTime? initialDate,
+  }) {
     if (tx == null) {
-      return TransactionFormData(type: initialType);
+      return TransactionFormData(
+        type: initialType,
+        accountUuid: initialAccountUuid,
+        date: initialDate,
+      );
     }
 
     return TransactionFormData(

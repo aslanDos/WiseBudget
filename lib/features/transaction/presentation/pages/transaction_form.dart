@@ -26,24 +26,34 @@ Future<bool?> showTransactionFormModal({
   required BuildContext context,
   TransactionType initialType = TransactionType.expense,
   TransactionEntity? transaction,
+  String? initialAccountUuid,
+  DateTime? initialDate,
 }) {
   return showCupertinoModalBottomSheet<bool>(
     context: context,
     expand: false,
     barrierColor: Colors.black54,
-    builder: (context) =>
-        TransactionForm(initialType: initialType, transaction: transaction),
+    builder: (context) => TransactionForm(
+      initialType: initialType,
+      transaction: transaction,
+      initialAccountUuid: initialAccountUuid,
+      initialDate: initialDate,
+    ),
   );
 }
 
 class TransactionForm extends StatefulWidget {
   final TransactionType initialType;
   final TransactionEntity? transaction;
+  final String? initialAccountUuid;
+  final DateTime? initialDate;
 
   const TransactionForm({
     super.key,
     required this.initialType,
     this.transaction,
+    this.initialAccountUuid,
+    this.initialDate,
   });
 
   bool get isEditing => transaction != null;
@@ -64,6 +74,8 @@ class _TransactionFormState extends State<TransactionForm> {
     _form = TransactionFormData.fromTransaction(
       widget.transaction,
       widget.initialType,
+      initialAccountUuid: widget.initialAccountUuid,
+      initialDate: widget.initialDate,
     );
     if (_form.amount > 0) {
       _amountString = _form.amount
@@ -153,7 +165,7 @@ class _TransactionFormState extends State<TransactionForm> {
                   _builTransactionDetails(),
                   SizedBox(height: 8),
                   _buildSaveButton(),
-                  SizedBox(height: MediaQuery.of(context).padding.bottom),
+                  SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
                 ],
               ),
             ),

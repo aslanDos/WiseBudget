@@ -207,7 +207,7 @@ class _CategoryFormState extends State<CategoryForm> {
                     width: double.infinity,
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom),
+                SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
               ],
             ),
           );

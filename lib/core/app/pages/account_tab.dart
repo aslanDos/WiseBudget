@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/frame.dart';
 import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
@@ -233,11 +232,11 @@ class _AccountsContent extends StatelessWidget {
               .where((a) => a.name.toLowerCase().contains(searchQuery))
               .toList();
 
-    return Column(
-      children: [
-        Frame(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Column(
             children: [
               TotalBalanceCard(accounts: accounts, lowOpacity: reordering),
               if (hasSearchBar && !reordering) ...[
@@ -265,21 +264,23 @@ class _AccountsContent extends StatelessWidget {
               ],
             ],
           ),
-        ),
-        Expanded(
-          child: reordering
-              ? _ReorderableAccountList(
-                  accounts: filteredAccounts,
-                  onReorder: onReorder,
-                )
-              : _AccountList(
-                  accounts: filteredAccounts,
-                  onDeleteAccount: onDeleteAccount,
-                  onAddAccount: onAddAccount,
-                  onAccountTap: onAccountTap,
-                ),
-        ),
-      ],
+
+          const SizedBox(height: 16),
+          Expanded(
+            child: reordering
+                ? _ReorderableAccountList(
+                    accounts: filteredAccounts,
+                    onReorder: onReorder,
+                  )
+                : _AccountList(
+                    accounts: filteredAccounts,
+                    onDeleteAccount: onDeleteAccount,
+                    onAddAccount: onAddAccount,
+                    onAccountTap: onAccountTap,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -303,8 +304,11 @@ class _AccountList extends StatelessWidget {
       itemCount: accounts.length,
       itemBuilder: (context, index) {
         final account = accounts[index];
+
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
+          padding: EdgeInsets.only(
+            bottom: index == accounts.length - 1 ? 0 : 12,
+          ),
           child: AccountCard(
             account: account,
             onTap: () => onAccountTap(account),
@@ -328,6 +332,7 @@ class _ReorderableAccountList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
+      padding: EdgeInsets.zero,
       itemCount: accounts.length,
       onReorder: onReorder,
       proxyDecorator: (child, index, animation) {
@@ -338,9 +343,10 @@ class _ReorderableAccountList extends StatelessWidget {
               begin: 0,
               end: 4,
             ).animate(animation);
+
             return Material(
               elevation: elevation.value,
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(12.0),
               child: child,
             );
           },
@@ -349,9 +355,12 @@ class _ReorderableAccountList extends StatelessWidget {
       },
       itemBuilder: (context, index) {
         final account = accounts[index];
-        return Padding(
+
+        return Container(
           key: ValueKey(account.uuid),
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
+          margin: EdgeInsets.only(
+            bottom: index == accounts.length - 1 ? 0 : 12,
+          ),
           child: AccountCard(account: account),
         );
       },

@@ -11,35 +11,56 @@ class AccountChip extends StatelessWidget {
   final List<AccountEntity> accounts;
   final ValueChanged<String> onSelected;
 
+  /// When provided, an "All Accounts" option is shown at the top of the picker.
+  /// Called when the user selects it.
+  final VoidCallback? onAllSelected;
+
+  /// Whether "All Accounts" is currently the active selection.
+  final bool allSelected;
+
   const AccountChip({
     super.key,
     required this.account,
     required this.accounts,
     required this.onSelected,
+    this.onAllSelected,
+    this.allSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final icon = account != null
-        ? AppIcons.fromCode(account!.iconCode)
-        : AppIcons.wallet;
+    final showAll = onAllSelected != null;
 
-    final iconColor = AppPalette.fromValue(
-      account?.colorValue,
-      defaultColor: context.c.primary,
-    );
+    final IconData icon;
+    final Color iconColor;
+    final String label;
+
+    if (showAll && allSelected) {
+      icon = AppIcons.wallet;
+      iconColor = context.c.primary;
+      label = 'All Accounts';
+    } else {
+      icon = account != null
+          ? AppIcons.fromCode(account!.iconCode)
+          : AppIcons.wallet;
+      iconColor = AppPalette.fromValue(
+        account?.colorValue,
+        defaultColor: context.c.primary,
+      );
+      label = account?.name ?? 'Select an account';
+    }
 
     return GestureDetector(
       onTap: () => showAccountPicker(
         context: context,
         accounts: accounts,
-        selectedAccountUuid: account?.uuid,
+        selectedAccountUuid: allSelected ? null : account?.uuid,
         onSelected: onSelected,
+        onAllSelected: onAllSelected,
       ),
       child: Container(
-        // To make as high as header buttons
         height: 48,
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: context.c.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
@@ -49,10 +70,7 @@ class AccountChip extends StatelessWidget {
           children: [
             Icon(icon, size: 16, color: iconColor),
             const SizedBox(width: 8),
-            Text(
-              account?.name ?? 'Select an account',
-              style: context.t.titleSmall,
-            ),
+            Text(label, style: context.t.titleSmall),
             const SizedBox(width: 4),
             Icon(Icons.keyboard_arrow_down_rounded, size: 16),
           ],
@@ -67,6 +85,7 @@ void showAccountPicker({
   required List<AccountEntity> accounts,
   required String? selectedAccountUuid,
   required ValueChanged<String> onSelected,
+  VoidCallback? onAllSelected,
   String title = 'Select Account',
 }) {
   if (accounts.isEmpty) return;
@@ -77,9 +96,25 @@ void showAccountPicker({
       title: Text(title, style: context.t.titleMedium),
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: accounts.length,
+        itemCount: accounts.length + (onAllSelected != null ? 1 : 0),
         itemBuilder: (context, index) {
-          final account = accounts[index];
+          if (onAllSelected != null && index == 0) {
+            return PickerListTile(
+              icon: AppIcons.wallet,
+              iconColor: Theme.of(context).colorScheme.primary,
+              iconBackgroundColor:
+                  Theme.of(context).colorScheme.primary.withAlpha(0x33),
+              title: 'All Accounts',
+              isSelected: selectedAccountUuid == null,
+              onTap: () {
+                onAllSelected();
+                Navigator.pop(context);
+              },
+            );
+          }
+
+          final accountIndex = onAllSelected != null ? index - 1 : index;
+          final account = accounts[accountIndex];
           final isSelected = account.uuid == selectedAccountUuid;
           final color = AppPalette.fromValue(
             account.colorValue,

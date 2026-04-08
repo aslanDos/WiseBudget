@@ -22,6 +22,8 @@ class _MainShellState extends State<MainShell>
   late final TabController _tabController;
   final ScrollController _homeTabScrollController = ScrollController();
   late int _currentIndex;
+  String? _selectedAccountUuid;
+  DateTime _selectedDate = DateTime.now();
   @override
   void initState() {
     super.initState();
@@ -54,7 +56,14 @@ class _MainShellState extends State<MainShell>
           physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: [
-            HomeTab(scrollController: _homeTabScrollController),
+            HomeTab(
+              scrollController: _homeTabScrollController,
+              selectedAccountUuid: _selectedAccountUuid,
+              onAccountChanged: (uuid) =>
+                  setState(() => _selectedAccountUuid = uuid),
+              selectedDate: _selectedDate,
+              onDateChanged: (date) => setState(() => _selectedDate = date),
+            ),
             const AccountTab(),
             const AnalyticsTab(),
             const ToolsTab(),
@@ -103,6 +112,11 @@ class _MainShellState extends State<MainShell>
   }
 
   void _onNewTransaction(TransactionType type) {
-    showTransactionFormModal(context: context, initialType: type);
+    showTransactionFormModal(
+      context: context,
+      initialType: type,
+      initialAccountUuid: _selectedAccountUuid,
+      initialDate: _selectedDate,
+    );
   }
 }

@@ -224,7 +224,7 @@ class _AccountFormState extends State<AccountForm> {
                     width: double.infinity,
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom),
+                SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
               ],
             ),
           );

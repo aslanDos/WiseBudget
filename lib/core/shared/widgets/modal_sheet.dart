@@ -240,29 +240,17 @@ Future<String?> showModalInput({
   bool enableDrag = true,
   TextInputType? keyboardType,
 }) {
-  final controller = TextEditingController(text: initialValue);
-  final focusNode = FocusNode();
   final colorScheme = Theme.of(context).colorScheme;
 
-  Widget buildSheet(BuildContext context) {
-    // Request focus after the modal is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      focusNode.requestFocus();
-    });
-
-    return _ModalInputSheet(
-      controller: controller,
-      focusNode: focusNode,
-      hintText: hintText,
-      maxLength: maxLength,
-      keyboardType: keyboardType,
-    );
-  }
-
-  Future<String?> result;
+  Widget buildSheet(BuildContext context) => _ModalInputSheet(
+        initialValue: initialValue,
+        hintText: hintText,
+        maxLength: maxLength,
+        keyboardType: keyboardType,
+      );
 
   if (_isTablet(context)) {
-    result = showDialog<String>(
+    return showDialog<String>(
       context: context,
       barrierDismissible: isDismissible,
       builder: (context) => Dialog(
@@ -276,41 +264,58 @@ Future<String?> showModalInput({
         ),
       ),
     );
-  } else {
-    // Use standard modal bottom sheet (no push-back scaling effect)
-    result = showModalBottomSheet<String>(
-      context: context,
-      isDismissible: isDismissible,
-      enableDrag: enableDrag,
-      isScrollControlled: true,
-      backgroundColor: colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-      ),
-      builder: buildSheet,
-    );
   }
 
-  return result.whenComplete(() {
-    focusNode.dispose();
-    controller.dispose();
-  });
+  return showModalBottomSheet<String>(
+    context: context,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    isScrollControlled: true,
+    backgroundColor: colorScheme.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+    ),
+    builder: buildSheet,
+  );
 }
 
-class _ModalInputSheet extends StatelessWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
+class _ModalInputSheet extends StatefulWidget {
+  final String? initialValue;
   final String? hintText;
   final int? maxLength;
   final TextInputType? keyboardType;
 
   const _ModalInputSheet({
-    required this.controller,
-    required this.focusNode,
+    this.initialValue,
     this.hintText,
     this.maxLength,
     this.keyboardType,
   });
+
+  @override
+  State<_ModalInputSheet> createState() => _ModalInputSheetState();
+}
+
+class _ModalInputSheetState extends State<_ModalInputSheet> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+    _focusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -359,13 +364,13 @@ class _ModalInputSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(24.0),
                         ),
                         child: TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          maxLength: maxLength,
-                          keyboardType: keyboardType,
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          maxLength: widget.maxLength,
+                          keyboardType: widget.keyboardType,
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
-                            hintText: hintText ?? 'Enter text...',
+                            hintText: widget.hintText ?? 'Enter text...',
                             hintStyle: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -393,7 +398,7 @@ class _ModalInputSheet extends StatelessWidget {
                       ),
                       child: IconButton(
                         onPressed: () {
-                          Navigator.pop(context, controller.text.trim());
+                          Navigator.pop(context, _controller.text.trim());
                         },
                         icon: Icon(
                           Icons.arrow_upward_rounded,
