@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
@@ -16,7 +16,7 @@ import 'package:wisebuget/features/category/presentation/widgets/category_sheet_
 Future<void> showCategoriesModal({required BuildContext context}) {
   return showCupertinoModalBottomSheet(
     context: context,
-    expand: true,
+    expand: false,
     barrierColor: Colors.black54,
     builder: (context) => const CategoriesPage(),
   );
@@ -48,10 +48,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
             CategorySheetHeader(
               selectedType: _selectedType,
               onTypeChanged: (type) => setState(() => _selectedType = type),
-              trailing: CircleIconButton(
-                icon: AppIcons.add,
-                onTap: () => _navigateToCategoryForm(context),
-              ),
+              onDelete: () => _openCategoryForm(context),
+              isEditing: true,
             ),
             Expanded(
               child: BlocBuilder<CategoryCubit, CategoryState>(
@@ -78,7 +76,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           ),
                           const SizedBox(height: 16.0),
                           Text(
-                            'No ${_selectedType.value} categories',
+                            'No ${_selectedType.label} categories',
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.outline,
@@ -95,7 +93,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         _handleReorder(context, categories, oldIndex, newIndex),
                     onDelete: (category) => _handleDelete(context, category),
                     onEdit: (category) =>
-                        _navigateToCategoryForm(context, category: category),
+                        _openCategoryForm(context, category: category),
                     onToggleVisibility: (category) =>
                         _handleToggleVisibility(context, category),
                   );
@@ -108,7 +106,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
   }
 
-  Future<void> _navigateToCategoryForm(
+  Future<void> _openCategoryForm(
     BuildContext context, {
     CategoryEntity? category,
   }) async {

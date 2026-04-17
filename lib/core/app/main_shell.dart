@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:pie_menu/pie_menu.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/navbar.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/new_transaction_button.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/core/app/pages/account_tab.dart';
-import 'package:wisebuget/core/app/pages/home_tab.dart';
 import 'package:wisebuget/core/app/pages/analytics_tab.dart';
-import 'package:wisebuget/core/app/pages/tools_tab.dart';
+import 'package:wisebuget/core/app/pages/home_tab.dart';
+import 'package:wisebuget/core/app/pages/budget_tab.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -27,7 +29,7 @@ class _MainShellState extends State<MainShell>
   @override
   void initState() {
     super.initState();
-    _currentIndex = 0;
+    _currentIndex = _launchPageIndex(sl<SettingsCubit>().state.launchPage);
     _tabController = TabController(
       vsync: this,
       length: 4,
@@ -66,7 +68,7 @@ class _MainShellState extends State<MainShell>
             ),
             const AccountTab(),
             const AnalyticsTab(),
-            const ToolsTab(),
+            const BudgetTab(),
           ],
         ),
         bottomNavigationBar: Builder(
@@ -105,6 +107,13 @@ class _MainShellState extends State<MainShell>
       ),
     );
   }
+
+  int _launchPageIndex(String page) => switch (page) {
+    'accounts' => 1,
+    'analytics' => 2,
+    'tools' => 3,
+    _ => 0,
+  };
 
   void _navigateTo(int index) {
     if (index == _tabController.index) {}

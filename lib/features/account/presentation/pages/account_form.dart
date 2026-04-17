@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wisebuget/core/constants/icons_constants.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
-import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
-import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
+import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
+import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
@@ -25,21 +27,6 @@ import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
 import 'package:wisebuget/core/shared/widgets/form_section.dart';
 import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
 import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
-
-const kAccountIconOptions = [
-  'wallet',
-  'briefCase',
-  'building',
-  'home',
-  'shoppingBag',
-  'car',
-  'plane',
-  'globe',
-  'receipt',
-  'gift',
-  'star',
-  'laptop',
-];
 
 const _currencies = ['KZT', 'USD', 'EUR', 'RUB'];
 
@@ -72,6 +59,7 @@ class _AccountFormState extends State<AccountForm> {
   late int _selectedColorValue;
   late String _selectedCurrency;
   late String _balance;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -80,7 +68,7 @@ class _AccountFormState extends State<AccountForm> {
     _name = widget.account?.name ?? '';
     _selectedIconCode =
         widget.account?.iconCode ??
-        kAccountIconOptions[rng.nextInt(kAccountIconOptions.length)];
+        iconOptions[rng.nextInt(iconOptions.length)];
     _selectedColorValue =
         widget.account?.colorValue ??
         AppPalette.colors[rng.nextInt(AppPalette.colors.length)];
@@ -98,12 +86,15 @@ class _AccountFormState extends State<AccountForm> {
       value: sl<AccountCubit>(),
       child: BlocConsumer<AccountCubit, AccountState>(
         listenWhen: (previous, current) =>
+            _isSaving &&
             previous.status == CubitStatus.loading &&
             current.status != CubitStatus.loading,
         listener: (context, state) {
           if (state.status == CubitStatus.success) {
+            _isSaving = false;
             Navigator.pop(context, true);
           } else if (state.status == CubitStatus.failure) {
+            _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
             );
@@ -124,13 +115,8 @@ class _AccountFormState extends State<AccountForm> {
                   title: widget.isEditing
                       ? widget.account!.name
                       : 'New account',
-                  trailing: widget.isEditing
-                      ? CircleIconButton(
-                          icon: AppIcons.trash,
-                          onTap: () => _confirmDelete(context),
-                          iconColor: Theme.of(context).colorScheme.error,
-                        )
-                      : const SizedBox(width: 48),
+                  onDelete: () => _showDeleteDialog(context),
+                  isEditing: widget.isEditing,
                 ),
                 Flexible(
                   child: SingleChildScrollView(
@@ -138,8 +124,8 @@ class _AccountFormState extends State<AccountForm> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 16.0),
-                        Center(
+                        const SizedBox(height: 20.0),
+                        Pressable(
                           child: ColoredIconBox(
                             icon: AppIcons.fromCode(_selectedIconCode),
                             color: selectedColor,
@@ -201,7 +187,7 @@ class _AccountFormState extends State<AccountForm> {
                                 setState(() => _selectedIconCode = code),
                           ),
                           child: IconGrid(
-                            iconOptions: kAccountIconOptions,
+                            iconOptions: iconOptions,
                             selectedIconCode: _selectedIconCode,
                             selectedColor: selectedColor,
                             onIconSelected: (code) =>
@@ -214,7 +200,7 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Button(
                     label: 'Save',
                     isLoading: isLoading,
@@ -273,33 +259,18 @@ class _AccountFormState extends State<AccountForm> {
     }
   }
 
-  void _confirmDelete(BuildContext context) {
-    showDialog(
+  Future<void> _showDeleteDialog(BuildContext context) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: Text(
-          'Are you sure you want to delete "${widget.account!.name}"?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<AccountCubit>().removeAccount(widget.account!.uuid);
-              Navigator.pop(context, true);
-            },
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
+      title: 'Delete Transaction',
+      message: 'Are you sure you want to delete this transaction?',
+      confirmText: 'Delete',
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      sl<AccountCubit>().removeAccount(widget.account!.uuid);
+    }
   }
 
   void _saveAccount(BuildContext context) {
@@ -313,6 +284,7 @@ class _AccountFormState extends State<AccountForm> {
 
     final balance = double.tryParse(_balance) ?? 0.0;
     final cubit = context.read<AccountCubit>();
+    setState(() => _isSaving = true);
 
     if (widget.isEditing) {
       cubit.editAccount(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
@@ -15,6 +16,8 @@ class TotalBalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     // Group balances by currency
     final balancesByCurrency = <String, double>{};
     for (final account in accounts) {
@@ -49,7 +52,7 @@ class TotalBalanceCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Balance for all accounts',
+              l10n.balance,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onPrimary,
               ),

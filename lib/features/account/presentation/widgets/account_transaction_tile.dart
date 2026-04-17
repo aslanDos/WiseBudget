@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
@@ -39,7 +40,7 @@ class AccountTransactionTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          transaction.note ?? transaction.type.value,
+          transaction.note ?? transaction.type.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

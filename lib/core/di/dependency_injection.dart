@@ -13,6 +13,8 @@ import 'package:wisebuget/features/budget/data/data_source/budget_local_datasour
 import 'package:wisebuget/features/budget/data/repository/budget_repository_impl.dart';
 import 'package:wisebuget/features/budget/domain/repository/budget_repository.dart';
 import 'package:wisebuget/features/budget/domain/usecases/budget_usecases.dart';
+import 'package:wisebuget/features/analytics/presentation/cubit/analytics_cubit.dart';
+import 'package:wisebuget/features/analytics/presentation/cubit/category_detail_cubit.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource_impl.dart';
@@ -25,6 +27,8 @@ import 'package:wisebuget/features/transaction/data/data_source/transaction_loca
 import 'package:wisebuget/features/transaction/data/repository/transaction_repository_impl.dart';
 import 'package:wisebuget/features/transaction/domain/repository/transaction_repository.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
+import 'package:wisebuget/core/usecases/clear_all_data.dart';
+import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
 final sl = GetIt.instance;
@@ -40,11 +44,25 @@ Future<void> init() async {
   // Preferences
   sl.registerSingleton(LocalPreferences(prefs: sl()));
 
+  // Settings
+  sl.registerLazySingleton(() => ClearAllData(sl()));
+  sl.registerLazySingleton(() => SettingsCubit(sl(), sl()));
+
   // Features
   _initAccountFeature();
   _initCategoryFeature();
   _initTransactionFeature();
   _initBudgetFeature();
+  _initAnalyticsFeature();
+}
+
+void _initAnalyticsFeature() {
+  sl.registerLazySingleton(
+    () => AnalyticsCubit(transactionCubit: sl(), categoryCubit: sl()),
+  );
+  sl.registerFactory(
+    () => CategoryDetailCubit(getTransactionsByCategory: sl()),
+  );
 }
 
 void _initAccountFeature() {

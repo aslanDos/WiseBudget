@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 class AmountDisplay extends StatelessWidget {
@@ -22,9 +23,7 @@ class AmountDisplay extends StatelessWidget {
           '$amount ₸',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: context.t.headlineLarge?.copyWith(
-            color: type.actionBackgroundColor(context),
-          ),
+          style: context.t.headlineLarge?.copyWith(color: type.backgroundColor),
         ),
       ),
     );

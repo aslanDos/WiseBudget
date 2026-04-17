@@ -1,4 +1,3 @@
-import 'package:objectbox/objectbox.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
 import 'package:wisebuget/features/category/data/model/category_model.dart';
 import 'package:wisebuget/objectbox.g.dart';

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
+import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
+import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
 class AccountChip extends StatelessWidget {
   final AccountEntity? account;
+  final Color? backgroundColor;
   final List<AccountEntity> accounts;
   final ValueChanged<String> onSelected;
 
@@ -21,6 +23,7 @@ class AccountChip extends StatelessWidget {
   const AccountChip({
     super.key,
     required this.account,
+    this.backgroundColor,
     required this.accounts,
     required this.onSelected,
     this.onAllSelected,
@@ -50,7 +53,7 @@ class AccountChip extends StatelessWidget {
       label = account?.name ?? 'Select an account';
     }
 
-    return GestureDetector(
+    return Pressable(
       onTap: () => showAccountPicker(
         context: context,
         accounts: accounts,
@@ -62,17 +65,17 @@ class AccountChip extends StatelessWidget {
         height: 48,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: context.c.surfaceContainer,
+          color: backgroundColor ?? context.c.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: iconColor),
+            Icon(icon, size: 20, color: iconColor),
             const SizedBox(width: 8),
-            Text(label, style: context.t.titleSmall),
+            Text(label, style: context.t.titleMedium),
             const SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 16),
+            Icon(Icons.keyboard_arrow_down_rounded, size: 20),
           ],
         ),
       ),
@@ -92,49 +95,64 @@ void showAccountPicker({
 
   showModal(
     context: context,
-    builder: (context) => ModalSheet.scrollable(
-      title: Text(title, style: context.t.titleMedium),
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: accounts.length + (onAllSelected != null ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (onAllSelected != null && index == 0) {
+    builder: (context) {
+      final isAllSelected = selectedAccountUuid == null;
+      return ModalSheet.scrollable(
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: context.t.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (onAllSelected != null)
+              GestureDetector(
+                onTap: () {
+                  onAllSelected();
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'All',
+                  style: context.t.titleMedium?.copyWith(
+                    color: isAllSelected
+                        ? context.c.primary
+                        : context.c.onSecondary,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: accounts.length,
+          itemBuilder: (context, index) {
+            final account = accounts[index];
+            final isSelected = account.uuid == selectedAccountUuid;
+            final isMarked = isAllSelected || isSelected;
+            final color = AppPalette.fromValue(
+              account.colorValue,
+              defaultColor: Theme.of(context).colorScheme.primary,
+            );
+
             return PickerListTile(
-              icon: AppIcons.wallet,
-              iconColor: Theme.of(context).colorScheme.primary,
-              iconBackgroundColor:
-                  Theme.of(context).colorScheme.primary.withAlpha(0x33),
-              title: 'All Accounts',
-              isSelected: selectedAccountUuid == null,
+              icon: AppIcons.fromCode(account.iconCode),
+              iconColor: color,
+              iconBackgroundColor: color.withAlpha(0x33),
+              title: account.name,
+              subtitle: account.money.formatted,
+              isSelected: isSelected,
+              isMarked: isMarked,
               onTap: () {
-                onAllSelected();
+                onSelected(account.uuid);
                 Navigator.pop(context);
               },
             );
-          }
-
-          final accountIndex = onAllSelected != null ? index - 1 : index;
-          final account = accounts[accountIndex];
-          final isSelected = account.uuid == selectedAccountUuid;
-          final color = AppPalette.fromValue(
-            account.colorValue,
-            defaultColor: Theme.of(context).colorScheme.primary,
-          );
-
-          return PickerListTile(
-            icon: AppIcons.fromCode(account.iconCode),
-            iconColor: color,
-            iconBackgroundColor: color.withAlpha(0x33),
-            title: account.name,
-            subtitle: account.money.formatted,
-            isSelected: isSelected,
-            onTap: () {
-              onSelected(account.uuid);
-              Navigator.pop(context);
-            },
-          );
-        },
-      ),
-    ),
+          },
+        ),
+      );
+    },
   );
 }

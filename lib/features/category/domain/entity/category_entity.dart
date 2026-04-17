@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 
 class CategoryEntity extends Equatable {

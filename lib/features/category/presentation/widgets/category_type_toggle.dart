@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 
 class CategoryTypeToggle extends StatelessWidget {
   final TransactionType selectedType;
@@ -71,11 +71,11 @@ class _ToggleButton extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ),
       ),

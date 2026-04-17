@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_category_picker.dart';

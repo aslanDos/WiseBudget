@@ -1,4 +1,4 @@
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
 /// Domain service for calculating account balance changes.
@@ -88,7 +88,10 @@ class BalanceService {
     TransactionEntity oldTransaction,
     TransactionEntity newTransaction,
   ) {
-    final reverseOld = calculateAllBalanceChanges(oldTransaction, reverse: true);
+    final reverseOld = calculateAllBalanceChanges(
+      oldTransaction,
+      reverse: true,
+    );
     final applyNew = calculateAllBalanceChanges(newTransaction);
 
     // Merge the changes

@@ -84,7 +84,7 @@ class _CalendarState extends State<Calendar>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              height: _isExpanded ? 280.0 : 52.0,
+              height: _isExpanded ? 220.0 : 56.0,
               child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: _onPageChanged,

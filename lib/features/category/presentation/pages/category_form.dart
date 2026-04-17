@@ -4,53 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/constants/icons_constants.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
-import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
 import 'package:wisebuget/core/shared/widgets/color_grid.dart';
 import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/widgets/form_section.dart';
 import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
 import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 import 'package:wisebuget/features/category/presentation/widgets/category_name_field.dart';
 import 'package:wisebuget/features/category/presentation/widgets/category_sheet_header.dart';
-
-const kCategoryIconOptions = [
-  'utensils',
-  'shoppingBag',
-  'shoppingCart',
-  'receipt',
-  'car',
-  'bus',
-  'plane',
-  'bike',
-  'home',
-  'building',
-  'briefCase',
-  'wallet',
-  'gamepad',
-  'music',
-  'heart',
-  'star',
-  'coffee',
-  'gift',
-  'book',
-  'graduationCap',
-  'phone',
-  'laptop',
-  'dumbbell',
-  'stethoscope',
-  'zap',
-  'globe',
-];
 
 Future<bool?> showCategoryFormModal({
   required BuildContext context,
@@ -88,7 +61,7 @@ class _CategoryFormState extends State<CategoryForm> {
     _name = widget.category?.name ?? '';
     _selectedIconCode =
         widget.category?.iconCode ??
-        kCategoryIconOptions[rng.nextInt(kCategoryIconOptions.length)];
+        iconOptions[rng.nextInt(iconOptions.length)];
     _selectedColorValue =
         widget.category?.colorValue ??
         AppPalette.colors[rng.nextInt(AppPalette.colors.length)];
@@ -119,21 +92,17 @@ class _CategoryFormState extends State<CategoryForm> {
 
           return Material(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24.0)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24.0),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CategorySheetHeader(
                   selectedType: _selectedType,
                   onTypeChanged: (type) => setState(() => _selectedType = type),
-                  trailing: widget.isEditing
-                      ? CircleIconButton(
-                          icon: AppIcons.trash,
-                          onTap: () => _confirmDelete(context),
-                          iconColor: Theme.of(context).colorScheme.error,
-                        )
-                      : const SizedBox(width: 48),
+                  isEditing: widget.isEditing,
+                  onDelete: () => _showDeleteDialog(context),
                 ),
                 Flexible(
                   child: SingleChildScrollView(
@@ -142,7 +111,7 @@ class _CategoryFormState extends State<CategoryForm> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(height: 16.0),
-                        Center(
+                        Pressable(
                           child: ColoredIconBox(
                             icon: AppIcons.fromCode(_selectedIconCode),
                             color: selectedColor,
@@ -184,7 +153,7 @@ class _CategoryFormState extends State<CategoryForm> {
                                 setState(() => _selectedIconCode = code),
                           ),
                           child: IconGrid(
-                            iconOptions: kCategoryIconOptions,
+                            iconOptions: iconOptions,
                             selectedIconCode: _selectedIconCode,
                             selectedColor: selectedColor,
                             onIconSelected: (code) =>
@@ -197,9 +166,9 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Button(
-                    label: widget.isEditing ? 'Save Changes' : 'Save',
+                    label: 'Save',
                     isLoading: isLoading,
                     onPressed: isLoading || _name.trim().isEmpty
                         ? null
@@ -216,35 +185,18 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  void _confirmDelete(BuildContext context) {
-    showDialog(
+  Future<void> _showDeleteDialog(BuildContext context) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Category'),
-        content: Text(
-          'Are you sure you want to delete "${widget.category!.name}"?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<CategoryCubit>().removeCategory(
-                widget.category!.uuid,
-              );
-              Navigator.pop(context, true);
-            },
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
+      title: 'Delete Category',
+      message: 'Are you sure you want to delete this category?',
+      confirmText: 'Delete',
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      sl<CategoryCubit>().removeCategory(widget.category!.uuid);
+    }
   }
 
   void _saveCategory(BuildContext context) {

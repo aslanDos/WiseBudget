@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
-import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
+import 'package:wisebuget/core/shared/widgets/action_button.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
@@ -42,9 +42,12 @@ class _AccountTabState extends State<AccountTab>
       create: (_) => sl<AccountCubit>()..loadAccounts(),
       child: Scaffold(
         appBar: AppBar(
+          titleSpacing: 16,
+          centerTitle: false,
+          title: Text('Accounts', style: context.t.headlineMedium),
           actionsPadding: EdgeInsets.only(right: 16),
           actions: [
-            CircleIconButton(
+            ActionButton(
               icon: AppIcons.add,
               onTap: () => _showAddAccountDialog(context),
             ),
@@ -52,7 +55,7 @@ class _AccountTabState extends State<AccountTab>
             BlocBuilder<AccountCubit, AccountState>(
               builder: (context, state) {
                 if (state.accounts.isEmpty) return const SizedBox.shrink();
-                return CircleIconButton(
+                return ActionButton(
                   icon: _reordering ? AppIcons.check : AppIcons.chevronUpDown,
                   onTap: _toggleReorderMode,
                 );
@@ -112,8 +115,7 @@ class _AccountTabState extends State<AccountTab>
               },
               onDeleteAccount: (account) => _handleDelete(context, account),
               onAddAccount: () => _showAddAccountDialog(context),
-              onAccountTap: (account) =>
-                  _navigateToAccountDetail(context, account),
+              onAccountTap: (account) => _navigateToEdit(context, account),
             );
           },
         ),
@@ -181,18 +183,21 @@ class _AccountTabState extends State<AccountTab>
 
   Future<void> _showAddAccountDialog(BuildContext context) async {
     final result = await showAccountFormModal(context: context);
-    if (result == true && context.mounted) {
-      context.read<AccountCubit>().loadAccounts();
+    if (result == true) {
+      sl<AccountCubit>().loadAccounts();
     }
   }
 
-  Future<void> _navigateToAccountDetail(
+  Future<void> _navigateToEdit(
     BuildContext context,
     AccountEntity account,
   ) async {
-    final result = await context.push(AppRoutes.accountDetail, extra: account);
+    final result = await showAccountFormModal(
+      context: context,
+      account: account,
+    );
     if (result == true && context.mounted) {
-      context.read<AccountCubit>().loadAccounts();
+      context.pop(true);
     }
   }
 

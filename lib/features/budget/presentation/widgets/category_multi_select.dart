@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
+import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 
 /// Shows a multi-select modal for categories
@@ -101,10 +101,7 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
         children: [
           // Select all option
           ListTile(
-            leading: Icon(
-              Icons.select_all_rounded,
-              color: colors.primary,
-            ),
+            leading: Icon(Icons.select_all_rounded, color: colors.primary),
             title: const Text('Select All'),
             onTap: _selectAll,
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -117,39 +114,39 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
               shrinkWrap: true,
               itemCount: widget.categories.length,
               itemBuilder: (context, index) {
-              final category = widget.categories[index];
-              final isSelected = _selected.contains(category.uuid);
-              final color = AppPalette.fromValue(
-                category.colorValue,
-                defaultColor: colors.primary,
-              );
+                final category = widget.categories[index];
+                final isSelected = _selected.contains(category.uuid);
+                final color = AppPalette.fromValue(
+                  category.colorValue,
+                  defaultColor: colors.primary,
+                );
 
-              return ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color.withAlpha(0x26),
-                    borderRadius: BorderRadius.circular(10),
+                return ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color.withAlpha(0x26),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      AppIcons.fromCode(category.iconCode),
+                      color: color,
+                      size: 22,
+                    ),
                   ),
-                  child: Icon(
-                    AppIcons.fromCode(category.iconCode),
-                    color: color,
-                    size: 22,
+                  title: Text(category.name),
+                  trailing: Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => _toggleCategory(category.uuid),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
-                ),
-                title: Text(category.name),
-                trailing: Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => _toggleCategory(category.uuid),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                onTap: () => _toggleCategory(category.uuid),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              );
-            },
+                  onTap: () => _toggleCategory(category.uuid),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),

@@ -8,7 +8,7 @@ class NavbarTheme extends ThemeExtension<NavbarTheme> {
   final Color transactionButtonForegroundColor;
 
   /// Size constants for the navbar layout
-  static const double height = 48.0;
+  static const double height = 62.0;
   static const double centerButtonSize = 64.0;
   static const double centerGapWidth = 72.0;
 

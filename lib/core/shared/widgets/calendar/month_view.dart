@@ -27,7 +27,7 @@ class MonthView extends StatelessWidget {
     );
 
     // Total days to show (6 weeks)
-    const totalDays = 42;
+    const totalDays = 35;
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),

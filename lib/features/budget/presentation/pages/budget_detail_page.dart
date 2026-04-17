@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
@@ -193,7 +193,9 @@ class _BudgetDetailContent extends StatelessWidget {
                   label: 'Your average',
                   value: '\$${dailyAverage.toStringAsFixed(2)}',
                   icon: Icons.trending_up,
-                  iconColor: isOverPace ? colors.error : const Color(0xFF22C55E),
+                  iconColor: isOverPace
+                      ? colors.error
+                      : const Color(0xFF22C55E),
                 ),
               ),
             ],
@@ -208,11 +210,7 @@ class _BudgetDetailContent extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.trending_up,
-                    size: 18,
-                    color: colors.error,
-                  ),
+                  Icon(Icons.trending_up, size: 18, color: colors.error),
                   const SizedBox(width: 8),
                   Text(
                     'Spending ${((dailyAverage / dailyBudget - 1) * 100).toStringAsFixed(0)}% above daily pace',
@@ -243,7 +241,9 @@ class _BudgetDetailContent extends StatelessWidget {
         // Filter transactions matching budget criteria
         final matchingTransactions = transactions.where((t) {
           if (t.type != TransactionType.expense) return false;
-          if (t.date.isBefore(startDate) || t.date.isAfter(endDate)) return false;
+          if (t.date.isBefore(startDate) || t.date.isAfter(endDate)) {
+            return false;
+          }
           if (budget.categoryUuids.isNotEmpty) {
             if (!budget.categoryUuids.contains(t.categoryUuid)) return false;
           }
@@ -384,7 +384,10 @@ class _TransactionItem extends StatelessWidget {
         .firstOrNull;
 
     final categoryColor = category != null
-        ? AppPalette.fromValue(category.colorValue, defaultColor: colors.primary)
+        ? AppPalette.fromValue(
+            category.colorValue,
+            defaultColor: colors.primary,
+          )
         : colors.primary;
 
     return ListTile(
@@ -427,8 +430,18 @@ class _TransactionItem extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}';
   }

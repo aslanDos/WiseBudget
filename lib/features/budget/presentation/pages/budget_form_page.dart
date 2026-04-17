@@ -1,35 +1,70 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
+import 'package:wisebuget/core/shared/widgets/action_button.dart';
+import 'package:wisebuget/core/shared/widgets/color_grid.dart';
+import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
+import 'package:wisebuget/core/shared/widgets/form_section.dart';
+import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
+import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
 import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
+import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
-import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
+import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
+import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
-import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
-import 'package:wisebuget/features/budget/presentation/widgets/account_multi_select.dart';
 import 'package:wisebuget/features/budget/presentation/widgets/category_multi_select.dart';
+import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 
-/// Shows the budget form as a modal bottom sheet.
-///
-/// Returns `true` if a budget was created/updated, `null` if dismissed.
+const _kBudgetIconOptions = [
+  'piggyBank',
+  'wallet',
+  'coins',
+  'creditCard',
+  'banknote',
+  'trendingUp',
+  'utensils',
+  'shoppingBag',
+  'shoppingCart',
+  'car',
+  'home',
+  'dumbbell',
+  'music',
+  'heart',
+  'coffee',
+  'plane',
+  'gift',
+  'book',
+  'stethoscope',
+  'star',
+  'receipt',
+  'globe',
+  'laptop',
+  'briefCase',
+];
+
 Future<bool?> showBudgetFormModal({
   required BuildContext context,
   String? budgetUuid,
 }) {
   return showCupertinoModalBottomSheet<bool>(
     context: context,
-    expand: true,
+    expand: false,
+    barrierColor: Colors.black54,
     builder: (context) => BudgetFormSheet(budgetUuid: budgetUuid),
   );
 }
@@ -46,433 +81,281 @@ class BudgetFormSheet extends StatefulWidget {
 }
 
 class _BudgetFormSheetState extends State<BudgetFormSheet> {
-  final _nameController = TextEditingController();
-
-  double _amount = 0;
-  BudgetPeriod _selectedPeriod = BudgetPeriod.monthly;
-  List<String> _selectedCategoryUuids = [];
-  List<String> _selectedAccountUuids = [];
-  String _iconCode = 'pie_chart';
-  int _colorValue = AppPalette.colors.first;
+  late String _name;
+  late double _amount;
+  late BudgetPeriod _period;
+  late String _iconCode;
+  late int _selectedColorValue;
+  late List<String> _selectedCategoryUuids;
+  late DateTime? _customStart;
+  late DateTime? _customEnd;
 
   BudgetEntity? _existingBudget;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-    if (widget.isEditing) {
-      _loadExistingBudget();
-    }
-  }
-
-  void _loadData() {
+    final rng = Random();
     sl<AccountCubit>().loadAccounts();
     sl<CategoryCubit>().loadCategories();
-  }
 
-  void _loadExistingBudget() {
-    final budgetState = sl<BudgetCubit>().state;
-    final budgetProgress = budgetState.budgets
-        .where((b) => b.budget.uuid == widget.budgetUuid)
-        .firstOrNull;
-
-    if (budgetProgress != null) {
-      final budget = budgetProgress.budget;
-      _existingBudget = budget;
-      _nameController.text = budget.name;
-      _amount = budget.limit;
-      _selectedPeriod = budget.period;
-      _selectedCategoryUuids = List.from(budget.categoryUuids);
-      _selectedAccountUuids = List.from(budget.accountUuids);
-      _iconCode = budget.iconCode;
-      _colorValue = budget.colorValue;
-      setState(() {});
+    if (widget.isEditing) {
+      _loadExisting();
+    } else {
+      _name = '';
+      _amount = 0;
+      _period = BudgetPeriod.monthly;
+      _iconCode = _kBudgetIconOptions[rng.nextInt(_kBudgetIconOptions.length)];
+      _selectedColorValue =
+          AppPalette.colors[rng.nextInt(AppPalette.colors.length)];
+      _selectedCategoryUuids = [];
+      _customStart = null;
+      _customEnd = null;
     }
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void _loadExisting() {
+    final budget = sl<BudgetCubit>().state.budgets
+        .where((b) => b.budget.uuid == widget.budgetUuid)
+        .firstOrNull
+        ?.budget;
+
+    if (budget != null) {
+      _existingBudget = budget;
+      _name = budget.name;
+      _amount = budget.limit;
+      _period = budget.period;
+      _iconCode = budget.iconCode;
+      _selectedColorValue = budget.colorValue;
+      _selectedCategoryUuids = List.from(budget.categoryUuids);
+      _customStart = budget.startDate;
+      _customEnd = budget.endDate;
+    } else {
+      final rng = Random();
+      _name = '';
+      _amount = 0;
+      _period = BudgetPeriod.monthly;
+      _iconCode = _kBudgetIconOptions[rng.nextInt(_kBudgetIconOptions.length)];
+      _selectedColorValue =
+          AppPalette.colors[rng.nextInt(AppPalette.colors.length)];
+      _selectedCategoryUuids = [];
+      _customStart = null;
+      _customEnd = null;
+    }
   }
 
-  String get _displayAmount {
+  bool get _isValid => _name.trim().isNotEmpty && _amount > 0;
+
+  String get _amountDisplay {
     if (_amount == 0) return '0';
-    if (_amount == _amount.truncate()) {
+    if (_amount == _amount.truncateToDouble()) {
       return _amount.truncate().toString();
     }
-    return _amount.toStringAsFixed(2).replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
+    return _amount
+        .toStringAsFixed(2)
+        .replaceAll(RegExp(r'0+$'), '')
+        .replaceAll(RegExp(r'\.$'), '');
   }
 
-  bool get _isValidAmount => _amount > 0;
+  String get _periodLabel {
+    return switch (_period) {
+      BudgetPeriod.weekly => 'Weekly',
+      BudgetPeriod.monthly => 'Monthly',
+      BudgetPeriod.custom =>
+        _customStart != null && _customEnd != null
+            ? '${_fmt(_customStart!)} – ${_fmt(_customEnd!)}'
+            : 'Custom',
+    };
+  }
+
+  String _fmt(DateTime d) {
+    const m = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${d.day} ${m[d.month - 1]}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final selectedColor = Color(_selectedColorValue);
 
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: sl<BudgetCubit>()),
-        BlocProvider.value(value: sl<AccountCubit>()),
         BlocProvider.value(value: sl<CategoryCubit>()),
+        BlocProvider.value(value: sl<AccountCubit>()),
       ],
-      child: Material(
-        color: colorScheme.surface,
-        child: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildNameField(),
-                      const SizedBox(height: 24.0),
-                      _buildAmountSection(),
-                      const SizedBox(height: 24.0),
-                      _buildPeriodSelector(),
-                      const SizedBox(height: 24.0),
-                      _buildCategoriesSection(),
-                      const SizedBox(height: 16.0),
-                      _buildAccountsSection(),
-                    ],
-                  ),
-                ),
-              ),
-              _buildSaveButton(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 8.0),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant.withAlpha(0x40),
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(AppIcons.close),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  widget.isEditing ? 'Edit Budget' : 'New Budget',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            if (widget.isEditing)
-              IconButton(
-                onPressed: () => _showDeleteDialog(context),
-                icon: Icon(AppIcons.trash, color: colorScheme.error),
-              )
-            else
-              const SizedBox(width: 48),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNameField() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final color = AppPalette.fromValue(_colorValue, defaultColor: colorScheme.primary);
-
-    return Row(
-      children: [
-        // Icon picker
-        GestureDetector(
-          onTap: _showIconPicker,
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color.withAlpha(0x26),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              AppIcons.fromCode(_iconCode),
-              size: 28,
-              color: color,
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        // Name field
-        Expanded(
-          child: TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              hintText: 'Budget name',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.withAlpha(0x80),
-            ),
-            style: theme.textTheme.titleMedium,
-            maxLength: BudgetEntity.maxNameLength,
-            buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAmountSection() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Spending Limit',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 12),
-        GestureDetector(
-          onTap: _showAmountInput,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withAlpha(0x80),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Text(
-                '\$$_displayAmount',
-                style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPeriodSelector() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Period',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 12),
-        TypeToggle<BudgetPeriod>(
-          items: [
-            TypeToggleItem(
-              value: BudgetPeriod.monthly,
-              label: 'Monthly',
-              icon: Icons.calendar_month,
-            ),
-            TypeToggleItem(
-              value: BudgetPeriod.weekly,
-              label: 'Weekly',
-              icon: Icons.calendar_view_week,
-            ),
-          ],
-          selected: _selectedPeriod,
-          onChanged: (period) => setState(() => _selectedPeriod = period),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCategoriesSection() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return BlocBuilder<CategoryCubit, CategoryState>(
-      builder: (context, state) {
-        // Only expense categories for budgets
-        final expenseCategories = state.categories
-            .where((c) => c.type == TransactionType.expense && c.visible)
-            .toList();
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Categories',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  _selectedCategoryUuids.isEmpty
-                      ? 'All categories'
-                      : '${_selectedCategoryUuids.length} selected',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            CategoryChips(
-              categories: expenseCategories,
-              selectedUuids: _selectedCategoryUuids,
-              onTap: () => _showCategoryPicker(expenseCategories),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildAccountsSection() {
-    return BlocBuilder<AccountCubit, AccountState>(
-      builder: (context, state) {
-        return PickerFieldGroup(
-          children: [
-            PickerField(
-              icon: Icons.account_balance_wallet_outlined,
-              label: 'Accounts',
-              value: _selectedAccountUuids.isEmpty
-                  ? 'All accounts'
-                  : '${_selectedAccountUuids.length} selected',
-              padding: const EdgeInsets.all(16),
-              onTap: () => _showAccountPicker(state.accounts),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showAmountInput() async {
-    final result = await showInputAmountSheet(
-      context: context,
-      initialAmount: _amount,
-      title: 'Budget Limit',
-    );
-    if (result != null) {
-      setState(() => _amount = result);
-    }
-  }
-
-  Widget _buildSaveButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
       child: BlocConsumer<BudgetCubit, BudgetState>(
-        listenWhen: (previous, current) =>
-            previous.status == BudgetStatus.loading &&
-            current.status != BudgetStatus.loading,
+        listenWhen: (prev, cur) =>
+            _isSaving &&
+            prev.status == BudgetStatus.loading &&
+            cur.status != BudgetStatus.loading,
         listener: (context, state) {
           if (state.status == BudgetStatus.success) {
+            _isSaving = false;
             Navigator.pop(context, true);
           } else if (state.status == BudgetStatus.failure) {
+            _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
             );
           }
         },
-        builder: (context, state) => Button(
-          label: widget.isEditing ? 'Save Changes' : 'Create Budget',
-          isLoading: state.status == BudgetStatus.loading,
-          onPressed: _isValidAmount && _nameController.text.isNotEmpty
-              ? () => _saveBudget(context)
-              : null,
-          width: double.infinity,
-        ),
-      ),
-    );
-  }
+        builder: (context, state) {
+          final isLoading = state.status == BudgetStatus.loading;
 
-  // Pickers
-  void _showIconPicker() {
-    // Simple implementation - could be expanded
-    final icons = [
-      'pie_chart',
-      'restaurant',
-      'local_cafe',
-      'directions_car',
-      'shopping_cart',
-      'home',
-      'flight',
-      'movie',
-      'fitness_center',
-      'school',
-      'medical_services',
-      'pets',
-    ];
+          return Material(
+            color: context.c.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _Header(
+                  isEditing: widget.isEditing,
+                  onDelete: widget.isEditing
+                      ? () => _confirmDelete(context)
+                      : null,
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 20),
+                        Center(
+                          child: ColoredIconBox(
+                            icon: AppIcons.fromCode(_iconCode),
+                            color: selectedColor,
+                            size: 56,
+                            padding: 20,
+                            borderRadius: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _NameField(
+                          name: _name,
+                          onChanged: (v) => setState(() => _name = v),
+                        ),
+                        const SizedBox(height: 12),
+                        PickerFieldGroup(
+                          backgroundColor: context.c.surfaceContainer,
+                          children: [
+                            PickerField(
+                              icon: Icons.account_balance_wallet_outlined,
+                              label: 'Budget limit',
+                              value: _amountDisplay,
+                              shrink: false,
+                              onTap: () => _showAmountInput(context),
+                            ),
+                            PickerField(
+                              icon: AppIcons.calendar,
+                              label: 'Period',
+                              value: _periodLabel,
+                              shrink: false,
+                              onTap: () => _showPeriodPicker(context),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        BlocBuilder<CategoryCubit, CategoryState>(
+                          builder: (context, catState) {
+                            final expenseCategories = catState.categories
+                                .where(
+                                  (c) =>
+                                      c.type == TransactionType.expense &&
+                                      c.visible,
+                                )
+                                .toList();
+                            final selectedCategories = expenseCategories
+                                .where(
+                                  (c) =>
+                                      _selectedCategoryUuids.contains(c.uuid),
+                                )
+                                .toList();
+                            final String? categoryValue =
+                                selectedCategories.isEmpty
+                                ? null
+                                : selectedCategories.length == 1
+                                ? selectedCategories.first.name
+                                : '${selectedCategories.first.name} +(${selectedCategories.length - 1})';
 
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => GridView.builder(
-        padding: const EdgeInsets.all(16),
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-        ),
-        itemCount: icons.length,
-        itemBuilder: (context, index) {
-          final iconCode = icons[index];
-          final isSelected = iconCode == _iconCode;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() => _iconCode = iconCode);
-              Navigator.pop(context);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                AppIcons.fromCode(iconCode),
-                color: isSelected
-                    ? Theme.of(context).colorScheme.onPrimaryContainer
-                    : null,
-              ),
+                            return PickerField(
+                              backgroundColor: context.c.surfaceContainer,
+                              icon: AppIcons.grid,
+                              label: 'Categories',
+                              value: categoryValue,
+                              shrink: false,
+                              onTap: () => _showCategoryPicker(
+                                context,
+                                expenseCategories,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        FormSection(
+                          title: 'Color',
+                          actionLabel: 'More colors',
+                          onAction: () => showColorPickerModal(
+                            context: context,
+                            selectedColorValue: _selectedColorValue,
+                            onColorSelected: (v) =>
+                                setState(() => _selectedColorValue = v),
+                          ),
+                          child: ColorGrid(
+                            selectedColorValue: _selectedColorValue,
+                            onColorSelected: (v) =>
+                                setState(() => _selectedColorValue = v),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FormSection(
+                          title: 'Icon',
+                          actionLabel: 'More icons',
+                          onAction: () => showIconPickerModal(
+                            context: context,
+                            selectedIconCode: _iconCode,
+                            selectedColor: selectedColor,
+                            onIconSelected: (code) =>
+                                setState(() => _iconCode = code),
+                          ),
+                          child: IconGrid(
+                            iconOptions: _kBudgetIconOptions,
+                            selectedIconCode: _iconCode,
+                            selectedColor: selectedColor,
+                            onIconSelected: (code) =>
+                                setState(() => _iconCode = code),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: Button(
+                    label: 'Save',
+                    isLoading: isLoading,
+                    onPressed: _isValid ? () => _save(context) : null,
+                    width: double.infinity,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
+              ],
             ),
           );
         },
@@ -480,60 +363,66 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
     );
   }
 
-  Future<void> _showCategoryPicker(List categories) async {
+  // ── Pickers ──────────────────────────────────────────────────────────────
+
+  Future<void> _showAmountInput(BuildContext context) async {
+    final result = await showInputAmountSheet(
+      context: context,
+      initialAmount: _amount,
+      title: 'Budget Limit',
+    );
+    if (result != null) setState(() => _amount = result);
+  }
+
+  Future<void> _showPeriodPicker(BuildContext context) async {
+    final result = await showModal<(BudgetPeriod, DateTime?, DateTime?)>(
+      context: context,
+      builder: (ctx) => _PeriodPickerSheet(
+        selected: _period,
+        customStart: _customStart,
+        customEnd: _customEnd,
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        _period = result.$1;
+        _customStart = result.$2;
+        _customEnd = result.$3;
+      });
+    }
+  }
+
+  Future<void> _showCategoryPicker(
+    BuildContext context,
+    List<CategoryEntity> categories,
+  ) async {
     final result = await showCategoryMultiSelect(
       context: context,
-      categories: categories.cast(),
+      categories: categories,
       selectedUuids: _selectedCategoryUuids,
+      title: 'Categories',
     );
-
     if (result != null) {
       setState(() => _selectedCategoryUuids = result);
-
-      // Auto-set name and icon from first category if single selection
-      if (result.length == 1 && _nameController.text.isEmpty) {
-        final category = categories.firstWhere((c) => c.uuid == result.first);
-        _nameController.text = category.name;
-        _iconCode = category.iconCode;
-        _colorValue = category.colorValue ?? _colorValue;
-        setState(() {});
-      }
     }
   }
 
-  Future<void> _showAccountPicker(List accounts) async {
-    final result = await showAccountMultiSelect(
-      context: context,
-      accounts: accounts.cast(),
-      selectedUuids: _selectedAccountUuids,
-    );
-
-    if (result != null) {
-      setState(() => _selectedAccountUuids = result);
-    }
-  }
-
-  void _showDeleteDialog(BuildContext context) {
+  void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dlg) => AlertDialog(
         title: const Text('Delete Budget'),
-        content: const Text(
-          'Are you sure you want to delete this budget?',
-        ),
+        content: const Text('Are you sure you want to delete this budget?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(dlg),
             child: const Text('Cancel'),
           ),
           TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
+            style: TextButton.styleFrom(foregroundColor: context.c.error),
             onPressed: () {
-              Navigator.pop(dialogContext);
+              Navigator.pop(dlg);
               sl<BudgetCubit>().deleteBudget(widget.budgetUuid!);
-              Navigator.pop(context, true);
             },
             child: const Text('Delete'),
           ),
@@ -542,61 +431,236 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
     );
   }
 
-  void _saveBudget(BuildContext context) {
-    final error = _validateForm();
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error)),
-      );
-      return;
-    }
-
+  void _save(BuildContext context) {
     final accountState = sl<AccountCubit>().state;
     final currency = accountState.accounts.isNotEmpty
         ? accountState.accounts.first.currency
         : 'USD';
 
     final cubit = sl<BudgetCubit>();
+    final now = DateTime.now();
+
+    setState(() => _isSaving = true);
 
     if (widget.isEditing && _existingBudget != null) {
       cubit.editBudget(
         _existingBudget!.copyWith(
-          name: _nameController.text.trim(),
+          name: _name.trim(),
           limit: _amount,
           currency: currency,
-          period: _selectedPeriod,
+          period: _period,
+          startDate: _period == BudgetPeriod.custom
+              ? (_customStart ?? now)
+              : now,
+          endDate: _period == BudgetPeriod.custom ? _customEnd : null,
           categoryUuids: _selectedCategoryUuids,
-          accountUuids: _selectedAccountUuids,
           iconCode: _iconCode,
-          colorValue: _colorValue,
+          colorValue: _selectedColorValue,
         ),
       );
     } else {
       cubit.addBudget(
         BudgetEntity(
           uuid: const Uuid().v4(),
-          name: _nameController.text.trim(),
+          name: _name.trim(),
           limit: _amount,
           currency: currency,
-          period: _selectedPeriod,
-          startDate: DateTime.now(),
+          period: _period,
+          startDate: _period == BudgetPeriod.custom
+              ? (_customStart ?? now)
+              : now,
+          endDate: _period == BudgetPeriod.custom ? _customEnd : null,
           categoryUuids: _selectedCategoryUuids,
-          accountUuids: _selectedAccountUuids,
+          accountUuids: const [],
           iconCode: _iconCode,
-          colorValue: _colorValue,
-          createdDate: DateTime.now(),
+          colorValue: _selectedColorValue,
+          createdDate: now,
         ),
       );
     }
   }
+}
 
-  String? _validateForm() {
-    if (_nameController.text.trim().isEmpty) {
-      return 'Please enter a budget name';
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+class _Header extends StatelessWidget {
+  final bool isEditing;
+  final VoidCallback? onDelete;
+
+  const _Header({required this.isEditing, this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: context.c.onSurface.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          children: [
+            ActionButton(
+              icon: AppIcons.close,
+              onTap: () => Navigator.pop(context),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  isEditing ? 'Edit Budget' : 'New Budget',
+                  style: context.t.titleMedium,
+                ),
+              ),
+            ),
+            if (onDelete != null)
+              ActionButton(
+                icon: AppIcons.trash,
+                onTap: onDelete!,
+                iconColor: context.c.error,
+              )
+            else
+              const SizedBox(width: 40),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Name field ───────────────────────────────────────────────────────────────
+
+class _NameField extends StatelessWidget {
+  final String name;
+  final ValueChanged<String> onChanged;
+
+  const _NameField({required this.name, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return PickerField(
+      icon: Icons.text_fields_rounded,
+      label: 'Name',
+      value: name,
+      iconColor: context.c.onSecondary,
+      backgroundColor: context.c.surfaceContainer,
+      shrink: false,
+      onTap: () => _showInput(context),
+    );
+  }
+
+  Future<void> _showInput(BuildContext context) async {
+    final result = await showModalInput(
+      context: context,
+      initialValue: name,
+      hintText: 'Budget name',
+      maxLength: BudgetEntity.maxNameLength,
+    );
+    if (result != null) onChanged(result);
+  }
+}
+
+// ─── Period picker sheet ──────────────────────────────────────────────────────
+
+class _PeriodPickerSheet extends StatelessWidget {
+  final BudgetPeriod selected;
+  final DateTime? customStart;
+  final DateTime? customEnd;
+
+  const _PeriodPickerSheet({
+    required this.selected,
+    this.customStart,
+    this.customEnd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ModalSheet.scrollable(
+      title: Text('Period', style: context.t.titleMedium),
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          PickerListTile(
+            icon: Icons.calendar_view_week_rounded,
+            iconColor: context.c.primary,
+            iconBackgroundColor: context.c.primary.withAlpha(0x22),
+            title: 'Weekly',
+            subtitle: 'Resets every Monday',
+            isSelected: selected == BudgetPeriod.weekly,
+            onTap: () =>
+                Navigator.pop(context, (BudgetPeriod.weekly, null, null)),
+          ),
+          PickerListTile(
+            icon: Icons.calendar_month_rounded,
+            iconColor: context.c.primary,
+            iconBackgroundColor: context.c.primary.withAlpha(0x22),
+            title: 'Monthly',
+            subtitle: 'Resets on the 1st of each month',
+            isSelected: selected == BudgetPeriod.monthly,
+            onTap: () =>
+                Navigator.pop(context, (BudgetPeriod.monthly, null, null)),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          PickerListTile(
+            icon: AppIcons.calendar,
+            iconColor: context.c.primary,
+            iconBackgroundColor: context.c.primary.withAlpha(0x22),
+            title: 'Custom range',
+            subtitle: selected == BudgetPeriod.custom && customStart != null
+                ? _range(customStart!, customEnd)
+                : 'Pick a start and end date',
+            isSelected: selected == BudgetPeriod.custom,
+            onTap: () => _pickCustom(context),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  String _range(DateTime s, DateTime? e) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final start = '${s.day} ${months[s.month - 1]}';
+    if (e == null) return start;
+    final end = '${e.day} ${months[e.month - 1]}';
+    return '$start – $end';
+  }
+
+  Future<void> _pickCustom(BuildContext context) async {
+    final initial = (customStart != null && customEnd != null)
+        ? DateTimeRange(start: customStart!, end: customEnd!)
+        : null;
+
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      initialDateRange: initial,
+    );
+
+    if (picked != null && context.mounted) {
+      Navigator.pop(context, (
+        BudgetPeriod.custom,
+        picked.start,
+        DateTime(picked.end.year, picked.end.month, picked.end.day, 23, 59, 59),
+      ));
     }
-    if (_amount <= 0) {
-      return 'Please enter a valid limit';
-    }
-    return null;
   }
 }

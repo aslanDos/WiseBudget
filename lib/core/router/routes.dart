@@ -10,4 +10,10 @@ class AppRoutes {
   static const String accountDetail = '/account-detail';
   static const String accountForm = '/account-form';
   static const String budgets = '/budgets';
+  static const String settings = '/settings';
+  static const String settingsCurrency = '/settings/currency';
+  static const String settingsLanguage = '/settings/language';
+  static const String settingsTheme = '/settings/theme';
+  static const String settingsLaunchPage = '/settings/launch-page';
+  static const String categoryDetail = '/category-detail';
 }

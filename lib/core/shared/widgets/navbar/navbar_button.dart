@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
-/// A navigation bar button with an animated dot indicator for active state.
-///
-/// Features:
-/// - Color transition between active and inactive states
-/// - Animated dot indicator underneath active icon
-/// - Smooth 300ms animation for all transitions
 class NavbarButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final int index;
   final int activeIndex;
   final ValueChanged<int> onTap;
@@ -18,6 +13,7 @@ class NavbarButton extends StatelessWidget {
   const NavbarButton({
     super.key,
     required this.icon,
+    required this.label,
     required this.index,
     required this.activeIndex,
     required this.onTap,
@@ -26,6 +22,9 @@ class NavbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navbarTheme = Theme.of(context).extension<NavbarTheme>()!;
+    final color = isActive
+        ? navbarTheme.activeIconColor
+        : navbarTheme.inactiveIconColor;
 
     return Expanded(
       child: Material(
@@ -37,16 +36,29 @@ class NavbarButton extends StatelessWidget {
           highlightColor: Colors.transparent,
           child: SizedBox(
             height: NavbarTheme.height,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                icon,
-                key: ValueKey('$index-$isActive'),
-                color: isActive
-                    ? navbarTheme.activeIconColor
-                    : navbarTheme.inactiveIconColor,
-                size: 24.0,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    icon,
+                    key: ValueKey('$index-$isActive'),
+                    color: color,
+                    size: 22.0,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight:
+                        isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: color,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

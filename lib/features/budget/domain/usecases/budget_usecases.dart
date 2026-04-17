@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/errors/failures.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
@@ -173,11 +173,13 @@ class CalculateBudgetProgress
         (sum, t) => sum + t.amount.abs(),
       );
 
-      return Right(BudgetProgress(
-        budget: budget,
-        spent: totalSpent,
-        transactionCount: matchingTransactions.length,
-      ));
+      return Right(
+        BudgetProgress(
+          budget: budget,
+          spent: totalSpent,
+          transactionCount: matchingTransactions.length,
+        ),
+      );
     } catch (e) {
       return Left(DatabaseFailure('Failed to calculate budget progress: $e'));
     }

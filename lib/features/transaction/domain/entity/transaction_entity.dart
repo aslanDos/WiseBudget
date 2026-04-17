@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
 
 class TransactionEntity extends Equatable {
@@ -83,15 +83,15 @@ class TransactionEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        uuid,
-        amount,
-        currency,
-        type,
-        categoryUuid,
-        accountUuid,
-        toAccountUuid,
-        note,
-        date,
-        createdDate,
-      ];
+    uuid,
+    amount,
+    currency,
+    type,
+    categoryUuid,
+    accountUuid,
+    toAccountUuid,
+    note,
+    date,
+    createdDate,
+  ];
 }

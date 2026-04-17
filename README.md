@@ -61,6 +61,3 @@ Each feature follows Clean Architecture:
 - **Domain** - Entities, Repositories (abstract), Use Cases
 - **Data** - Models, Data Sources, Repositories (implementation)
 
-## License
-
-MIT License

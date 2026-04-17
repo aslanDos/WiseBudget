@@ -149,27 +149,37 @@ class BudgetCubit extends Cubit<BudgetState> {
 
   /// Add a new budget
   Future<void> addBudget(BudgetEntity budget) async {
+    emit(state.copyWith(status: BudgetStatus.loading));
+
     final result = await _createBudget(CreateBudgetParams(budget: budget));
 
     result.fold(
       (failure) {
         _log.warning('Failed to create budget: ${failure.message}');
-        emit(state.copyWith(errorMessage: failure.message));
+        emit(state.copyWith(
+          status: BudgetStatus.failure,
+          errorMessage: failure.message,
+        ));
       },
-      (_) => loadBudgets(),
+      (_) => emit(state.copyWith(status: BudgetStatus.success)),
     );
   }
 
   /// Edit an existing budget
   Future<void> editBudget(BudgetEntity budget) async {
+    emit(state.copyWith(status: BudgetStatus.loading));
+
     final result = await _updateBudget(UpdateBudgetParams(budget: budget));
 
     result.fold(
       (failure) {
         _log.warning('Failed to update budget: ${failure.message}');
-        emit(state.copyWith(errorMessage: failure.message));
+        emit(state.copyWith(
+          status: BudgetStatus.failure,
+          errorMessage: failure.message,
+        ));
       },
-      (_) => loadBudgets(),
+      (_) => emit(state.copyWith(status: BudgetStatus.success)),
     );
   }
 
@@ -184,14 +194,19 @@ class BudgetCubit extends Cubit<BudgetState> {
 
   /// Delete a budget permanently
   Future<void> deleteBudget(String uuid) async {
+    emit(state.copyWith(status: BudgetStatus.loading));
+
     final result = await _deleteBudget(DeleteBudgetParams(uuid: uuid));
 
     result.fold(
       (failure) {
         _log.warning('Failed to delete budget: ${failure.message}');
-        emit(state.copyWith(errorMessage: failure.message));
+        emit(state.copyWith(
+          status: BudgetStatus.failure,
+          errorMessage: failure.message,
+        ));
       },
-      (_) => loadBudgets(),
+      (_) => emit(state.copyWith(status: BudgetStatus.success)),
     );
   }
 

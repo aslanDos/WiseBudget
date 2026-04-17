@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/router/routes.dart';
+import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
+import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
 import 'package:wisebuget/core/shared/widgets/account_chip.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
@@ -76,6 +80,13 @@ class _HomeTabState extends State<HomeTab> {
               );
             },
           ),
+          actionsPadding: EdgeInsets.only(right: 16),
+          actions: [
+            ActionButton(
+              icon: AppIcons.settings,
+              onTap: () => context.push(AppRoutes.settings),
+            ),
+          ],
         ),
         body: BlocBuilder<TransactionCubit, TransactionState>(
           builder: (context, transactionState) {
@@ -288,14 +299,11 @@ class _TotalChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: context.c.surfaceContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        '$prefix${money.formattedNoMarker}',
-        style: context.t.bodySmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
+        '$prefix ${money.formattedNoMarker}',
+        style: context.t.titleSmall?.copyWith(color: context.c.onSecondary),
       ),
     );
   }

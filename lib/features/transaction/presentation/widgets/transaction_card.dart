@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
@@ -35,7 +35,7 @@ class _TransactionCardState extends State<TransactionCard> {
   Widget build(BuildContext context) {
     final isTransfer = widget.transaction.isTransfer;
     final categoryColor = isTransfer
-        ? AppColors.blue
+        ? context.c.primary
         : AppPalette.fromValue(
             widget.category?.colorValue,
             defaultColor: context.c.primary,

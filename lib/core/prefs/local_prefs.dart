@@ -32,4 +32,11 @@ class LocalPreferences {
 
   Future<void> setCurrency(String value) =>
       _prefs.setString(PrefsConstants.currencyKey, value);
+
+  /// launch page
+  String get launchPage =>
+      _prefs.getString(PrefsConstants.launchPageKey) ?? 'home';
+
+  Future<void> setLaunchPage(String value) =>
+      _prefs.setString(PrefsConstants.launchPageKey, value);
 }

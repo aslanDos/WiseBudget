@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/release
 
 specs
+
+# Generated Dart files (regenerate with: dart run build_runner build)
+*.g.dart

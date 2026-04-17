@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/widgets/color_grid.dart';
-import 'package:wisebuget/core/shared/widgets/modal_sheet.dart';
+import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 
 Future<void> showColorPickerModal({
   required BuildContext context,

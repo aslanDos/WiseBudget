@@ -65,6 +65,7 @@ class PickerField extends StatelessWidget {
       color: backgroundColor ?? context.c.secondary,
       borderRadius: BorderRadius.circular(borderRadius),
       child: InkWell(
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         onTap: onTap,
         borderRadius: BorderRadius.circular(borderRadius),
         child: Padding(

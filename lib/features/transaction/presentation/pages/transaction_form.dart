@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
@@ -18,9 +19,9 @@ import 'package:wisebuget/features/transaction/presentation/cubit/transaction_st
 import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/numpad.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/amount_display.dart';
-import 'package:wisebuget/features/transaction/presentation/widgets/form_header.dart';
+import 'package:wisebuget/features/transaction/presentation/widgets/transaction_sheet_header.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_details_section.dart';
-import 'package:wisebuget/features/transaction/presentation/models/transaction_form_data.dart';
+import 'package:wisebuget/features/transaction/domain/entity/transaction_form_entity.dart';
 
 Future<bool?> showTransactionFormModal({
   required BuildContext context,
@@ -32,7 +33,7 @@ Future<bool?> showTransactionFormModal({
   return showCupertinoModalBottomSheet<bool>(
     context: context,
     expand: false,
-    barrierColor: Colors.black54,
+    barrierColor: context.c.onSecondary,
     builder: (context) => TransactionForm(
       initialType: initialType,
       transaction: transaction,
@@ -63,7 +64,7 @@ class TransactionForm extends StatefulWidget {
 }
 
 class _TransactionFormState extends State<TransactionForm> {
-  late TransactionFormData _form;
+  late TransactionFormEntity _form;
   String _amountString = '';
 
   bool get isEditing => widget.isEditing;
@@ -71,7 +72,7 @@ class _TransactionFormState extends State<TransactionForm> {
   @override
   void initState() {
     super.initState();
-    _form = TransactionFormData.fromTransaction(
+    _form = TransactionFormEntity.fromTransaction(
       widget.transaction,
       widget.initialType,
       initialAccountUuid: widget.initialAccountUuid,
@@ -120,7 +121,6 @@ class _TransactionFormState extends State<TransactionForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Вынести выше, чтобы не вызывать при каждом build
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: sl<TransactionCubit>()),
@@ -130,7 +130,7 @@ class _TransactionFormState extends State<TransactionForm> {
       child: Material(
         child: Column(
           children: [
-            FormHeader(
+            TransactionSheetHeader(
               isEditing: isEditing,
               selectedAccountUuid: _form.accountUuid,
               onAccountSelected: (uuid) =>
@@ -230,8 +230,9 @@ class _TransactionFormState extends State<TransactionForm> {
               value: t,
               label: t.label,
               icon: t.icon,
-              selectedBackgroundColor: t.actionBackgroundColor(context),
-              selectedForegroundColor: t.actionColor(context),
+
+              selectedBackgroundColor: t.backgroundColor,
+              selectedForegroundColor: t.backgroundColor,
             ),
           )
           .toList(),
@@ -267,17 +268,6 @@ class _TransactionFormState extends State<TransactionForm> {
   //   final result = await context.push(AppRoutes.manageCategories);
   //   if (result == true && context.mounted) {
   //     context.read<CategoryCubit>().loadCategories();
-  //   }
-  // }
-
-  // Future<void> _showAmountInput() async {
-  //   final result = await showInputAmountSheet(
-  //     context: context,
-  //     initialAmount: _form.amount,
-  //     title: _form.type.label,
-  //   );
-  //   if (result != null) {
-  //     setState(() => _form.amount = result);
   //   }
   // }
 

@@ -1,41 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/circle_icon_button.dart';
+import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
 
 /// Shared header used by both [CategoriesPage] and [CategoryForm].
 /// Renders a close button, an expense/income type toggle, and a [trailing] slot.
 class CategorySheetHeader extends StatelessWidget {
+  final bool isEditing;
+  final VoidCallback onDelete;
   final TransactionType selectedType;
   final ValueChanged<TransactionType> onTypeChanged;
-  final Widget trailing;
 
   const CategorySheetHeader({
     super.key,
+    required this.isEditing,
+    required this.onDelete,
     required this.selectedType,
     required this.onTypeChanged,
-    required this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: context.c.onSurface.withValues(alpha: 0.1),
-            width: 0.5,
-          ),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: SafeArea(
         bottom: false,
         child: Row(
           children: [
-            CircleIconButton(
+            ActionButton(
+              backgroundColor: Colors.transparent,
               icon: AppIcons.close,
               onTap: () => Navigator.pop(context),
             ),
@@ -51,9 +47,8 @@ class CategorySheetHeader extends StatelessWidget {
                             value: t,
                             label: t.label,
                             icon: t.icon,
-                            selectedBackgroundColor:
-                                t.actionBackgroundColor(context),
-                            selectedForegroundColor: t.actionColor(context),
+                            selectedBackgroundColor: t.backgroundColor,
+                            selectedForegroundColor: t.backgroundColor,
                           ),
                         )
                         .toList(),
@@ -63,7 +58,15 @@ class CategorySheetHeader extends StatelessWidget {
                 ),
               ),
             ),
-            trailing,
+            if (isEditing)
+              ActionButton(
+                backgroundColor: Colors.transparent,
+                icon: AppIcons.trash,
+                onTap: onDelete,
+                iconColor: context.c.error,
+              )
+            else
+              const SizedBox(width: 48),
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:objectbox/objectbox.dart';
-import 'package:wisebuget/core/shared/enums/transaction_type.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 
 @Entity()
@@ -42,7 +43,7 @@ class CategoryModel {
   TransactionType get transactionType {
     try {
       return TransactionType.values.firstWhere(
-        (element) => element.value == type,
+        (element) => element.label == type,
       );
     } catch (e) {
       return TransactionType.expense;
@@ -50,7 +51,7 @@ class CategoryModel {
   }
 
   set transactionType(TransactionType value) {
-    type = value.value;
+    type = value.label;
   }
 
   /// Convert to domain entity
@@ -76,7 +77,7 @@ class CategoryModel {
       sortOrder: entity.sortOrder,
       iconCode: entity.iconCode,
       createdDate: entity.createdDate,
-      type: entity.type.value,
+      type: entity.type.label,
       colorValue: entity.colorValue,
       visible: entity.visibleRaw,
     );

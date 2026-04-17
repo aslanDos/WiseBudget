@@ -5,6 +5,7 @@ class TypeToggle<T> extends StatefulWidget {
   final List<TypeToggleItem<T>> items;
   final T selected;
   final ValueChanged<T> onChanged;
+  final Color? backgroundColor;
   final Color Function(T)? selectedBackgroundColor;
   final Color Function(T)? selectedForegroundColor;
 
@@ -13,6 +14,7 @@ class TypeToggle<T> extends StatefulWidget {
     required this.items,
     required this.selected,
     required this.onChanged,
+    this.backgroundColor,
     this.selectedBackgroundColor,
     this.selectedForegroundColor,
   });
@@ -30,7 +32,7 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
       decoration: BoxDecoration(
-        color: context.c.surfaceContainer,
+        color: widget.backgroundColor ?? context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: LayoutBuilder(
@@ -72,9 +74,12 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 200),
                             style: !isSelected
-                                ? context.t.bodySmall!
+                                ? context.t.bodySmall!.copyWith(
+                                    fontSize: item.size,
+                                  )
                                 : context.t.titleSmall!.copyWith(
                                     color: context.c.onPrimary,
+                                    fontSize: item.size,
                                   ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -87,7 +92,7 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
                                     child: isSelected
                                         ? Icon(
                                             item.icon,
-                                            size: 16,
+                                            size: item.size,
                                             color: context.c.onPrimary,
                                           )
                                         : null,
@@ -114,6 +119,7 @@ class TypeToggleItem<T> {
   final T value;
   final String label;
   final IconData? icon;
+  final double? size;
 
   final Color? selectedBackgroundColor;
   final Color? selectedForegroundColor;
@@ -122,6 +128,7 @@ class TypeToggleItem<T> {
     required this.value,
     required this.label,
     this.icon,
+    this.size = 12,
     this.selectedBackgroundColor,
     this.selectedForegroundColor,
   });
