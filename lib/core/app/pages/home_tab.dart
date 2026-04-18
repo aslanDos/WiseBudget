@@ -9,7 +9,7 @@ import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
 import 'package:wisebuget/core/shared/widgets/account_chip.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';

@@ -6,7 +6,7 @@ import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/widgets/account_chip.dart';
 import 'package:wisebuget/core/shared/widgets/period_chip.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_cubit.dart';
@@ -57,7 +57,8 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
                         accounts: accountState.accounts,
                         allSelected: selectedUuid == null,
                         onSelected: sl<AnalyticsCubit>().selectAccount,
-                        onAllSelected: () => sl<AnalyticsCubit>().selectAccount(null),
+                        onAllSelected: () =>
+                            sl<AnalyticsCubit>().selectAccount(null),
                       ),
                       const SizedBox(width: 8),
                       PeriodChip(
@@ -95,7 +96,8 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (state.selectedPeriod.hasChart && state.barBuckets.isNotEmpty)
+                  if (state.selectedPeriod.hasChart &&
+                      state.barBuckets.isNotEmpty)
                     Container(
                       constraints: const BoxConstraints(maxHeight: 210),
                       padding: const EdgeInsets.fromLTRB(16, 14, 12, 12),
@@ -118,7 +120,8 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
                         ],
                       ),
                     ),
-                  if (state.selectedPeriod.hasChart && state.barBuckets.isNotEmpty)
+                  if (state.selectedPeriod.hasChart &&
+                      state.barBuckets.isNotEmpty)
                     const SizedBox(height: 12),
                   CategoryDonutChart(
                     data: state.categoryBreakdown,

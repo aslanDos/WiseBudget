@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class ModalHeader extends StatelessWidget {
   final bool isEditing;

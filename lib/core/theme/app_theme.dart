@@ -3,7 +3,7 @@ import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/constants/app_constants.dart';
 import 'package:wisebuget/core/theme/app_colors_scheme.dart';
 import 'package:wisebuget/core/theme/app_text_theme.dart';
-import 'package:wisebuget/core/theme/extensions/pie_theme_x.dart';
+import 'package:wisebuget/core/theme/theme_extensions/pie_theme_x.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
 class AppTheme {

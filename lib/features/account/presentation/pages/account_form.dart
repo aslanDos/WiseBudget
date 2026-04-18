@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/constants/icons_constants.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
@@ -16,7 +17,7 @@ import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
@@ -27,6 +28,8 @@ import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
 import 'package:wisebuget/core/shared/widgets/form_section.dart';
 import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
 import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
+import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
 const _currencies = ['KZT', 'USD', 'EUR', 'RUB'];
 
@@ -60,6 +63,7 @@ class _AccountFormState extends State<AccountForm> {
   late String _selectedCurrency;
   late String _balance;
   bool _isSaving = false;
+  double? _pendingAdjustmentDelta;
 
   @override
   void initState() {
@@ -92,6 +96,22 @@ class _AccountFormState extends State<AccountForm> {
         listener: (context, state) {
           if (state.status == CubitStatus.success) {
             _isSaving = false;
+            final delta = _pendingAdjustmentDelta;
+            if (delta != null) {
+              _pendingAdjustmentDelta = null;
+              sl<TransactionCubit>().addTransaction(
+                TransactionEntity(
+                  uuid: const Uuid().v4(),
+                  amount: delta,
+                  currency: _selectedCurrency,
+                  type: TransactionType.adjustment,
+                  categoryUuid: '',
+                  accountUuid: widget.account!.uuid,
+                  date: DateTime.now(),
+                  createdDate: DateTime.now(),
+                ),
+              );
+            }
             Navigator.pop(context, true);
           } else if (state.status == CubitStatus.failure) {
             _isSaving = false;
@@ -287,6 +307,9 @@ class _AccountFormState extends State<AccountForm> {
     setState(() => _isSaving = true);
 
     if (widget.isEditing) {
+      final delta = balance - widget.account!.balance;
+      if (delta != 0) _pendingAdjustmentDelta = delta;
+
       cubit.editAccount(
         widget.account!.copyWith(
           name: name,

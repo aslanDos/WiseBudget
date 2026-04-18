@@ -3,7 +3,7 @@ import 'package:wisebuget/core/shared/widgets/calendar/month_header.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/month_view.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/week_day_labels.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/week_view.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class Calendar extends StatefulWidget {
   final DateTime? selectedDate;

@@ -5,7 +5,7 @@ import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
@@ -33,8 +33,10 @@ class TransactionCard extends StatefulWidget {
 class _TransactionCardState extends State<TransactionCard> {
   @override
   Widget build(BuildContext context) {
-    final isTransfer = widget.transaction.isTransfer;
-    final categoryColor = isTransfer
+    final transaction = widget.transaction;
+    final isTransfer = transaction.isTransfer;
+    final isAdjustment = transaction.isAdjustment;
+    final categoryColor = isTransfer || isAdjustment
         ? context.c.primary
         : AppPalette.fromValue(
             widget.category?.colorValue,
@@ -55,6 +57,8 @@ class _TransactionCardState extends State<TransactionCard> {
               size: 24,
               icon: isTransfer
                   ? AppIcons.arrowUpDown
+                  : isAdjustment
+                  ? AppIcons.pen
                   : (widget.category?.icon ?? AppIcons.empty),
               color: categoryColor,
             ),
@@ -65,16 +69,47 @@ class _TransactionCardState extends State<TransactionCard> {
                       fromAccount: widget.account,
                       toAccount: widget.toAccount,
                     )
+                  : isAdjustment
+                  ? _AdjustmentDetails(account: widget.account)
                   : _TransactionDetails(
                       categoryName: widget.category?.name ?? 'Unknown',
                       accountName: widget.account?.name,
-                      note: widget.transaction.note,
+                      note: transaction.note,
                     ),
             ),
-            _TransactionAmount(transaction: widget.transaction),
+            _TransactionAmount(transaction: transaction),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AdjustmentDetails extends StatelessWidget {
+  final AccountEntity? account;
+
+  const _AdjustmentDetails({required this.account});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Adjustment',
+          style: context.t.titleMedium,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          account?.name ?? 'Unknown',
+          style: context.t.bodySmall?.copyWith(color: context.c.onSecondary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }
@@ -199,6 +234,10 @@ class _TransactionAmount extends StatelessWidget {
       TransactionType.expense => ('-', AppColors.red),
       TransactionType.income => ('+', AppColors.green),
       TransactionType.transfer => ('', AppColors.blue),
+      TransactionType.adjustment =>
+        transaction.amount >= 0
+            ? ('+', AppColors.green)
+            : ('', AppColors.red), // money.formatted already includes '-'
     };
   }
 }

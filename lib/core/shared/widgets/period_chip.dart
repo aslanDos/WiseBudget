@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period.dart';
 
 class PeriodChip extends StatelessWidget {

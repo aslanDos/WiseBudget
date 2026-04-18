@@ -102,15 +102,19 @@ class AppIcons {
   static const IconData chevronRight = LucideIcons.chevronRight;
   static const IconData chevronLeft = LucideIcons.chevronLeft;
   static const IconData circle = LucideIcons.circle;
+  static const IconData circle400 = LucideIcons.circle400;
   static const IconData chart = LucideIcons.chartNoAxesCombined;
+  static const IconData chart400 = LucideIcons.chartNoAxesCombined400;
   static const IconData add = LucideIcons.plus;
   static const IconData close = LucideIcons.x;
   static const IconData arrowUpleft = LucideIcons.arrowUpLeft;
   static const IconData arrowDownRight = LucideIcons.arrowDownRight;
   static const IconData arrowUpDown = LucideIcons.arrowUpDown;
+  static const IconData scales = LucideIcons.equal;
   static const IconData check = LucideIcons.check;
   static const IconData briefCase = LucideIcons.briefcaseBusiness;
   static const IconData wallet = LucideIcons.wallet;
+  static const IconData wallet400 = LucideIcons.wallet400;
   static const IconData settings = LucideIcons.settings;
   static const IconData pencil = LucideIcons.pencil;
   static const IconData gripVertical = LucideIcons.gripVertical;
@@ -157,6 +161,7 @@ class AppIcons {
 
   // Finance
   static const IconData piggyBank = LucideIcons.piggyBank;
+  static const IconData piggyBank400 = LucideIcons.piggyBank400;
   static const IconData creditCard = LucideIcons.creditCard;
   static const IconData coins = LucideIcons.coins;
   static const IconData banknote = LucideIcons.banknote;

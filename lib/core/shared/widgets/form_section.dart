@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 /// A container card with a title row and an optional action label,
 /// used to wrap pickers (color, icon, etc.) inside forms.

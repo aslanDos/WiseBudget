@@ -7,7 +7,7 @@ import 'package:wisebuget/core/shared/widgets/navbar/navbar.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/new_transaction_button.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/core/app/pages/account_tab.dart';
 import 'package:wisebuget/core/app/pages/analytics_tab.dart';
 import 'package:wisebuget/core/app/pages/home_tab.dart';

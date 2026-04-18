@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class AmountDisplay extends StatelessWidget {
   final String amount;

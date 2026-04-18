@@ -49,17 +49,18 @@ class TransactionDetails extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            type == TransactionType.transfer
-                ? TransactionDestinationAccountPicker(
-                    selectedAccount: selectedToAccount,
-                    accounts: availableToAccounts,
-                    onSelected: onToAccountSelected,
-                  )
-                : TransactionCategoryPicker(
-                    selectedCategory: selectedCategory,
-                    categories: categories,
-                    onCategorySelected: onCategorySelected,
-                  ),
+            if (type == TransactionType.transfer)
+              TransactionDestinationAccountPicker(
+                selectedAccount: selectedToAccount,
+                accounts: availableToAccounts,
+                onSelected: onToAccountSelected,
+              )
+            else if (type != TransactionType.adjustment)
+              TransactionCategoryPicker(
+                selectedCategory: selectedCategory,
+                categories: categories,
+                onCategorySelected: onCategorySelected,
+              ),
             TransactionDatePicker(date: date, onDateSelected: onDateSelected),
           ],
         ),

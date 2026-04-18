@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wisebuget/core/shared/widgets/input_amount/input_value.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 /// Calculator operations
 enum CalculatorOperation { add, subtract, multiply, divide }
@@ -131,7 +131,9 @@ class _InputAmountSheetState extends State<InputAmountSheet> {
 
   void _setCalculatorOperation(CalculatorOperation op) {
     setState(() {
-      if (_operationCache != null && _currentOperation != null && !_resetOnNextInput) {
+      if (_operationCache != null &&
+          _currentOperation != null &&
+          !_resetOnNextInput) {
         _evaluateCalculation();
       }
       _currentOperation = op;
@@ -182,7 +184,9 @@ class _InputAmountSheetState extends State<InputAmountSheet> {
 
   // Calculate the preview result based on current operation
   String get _previewResult {
-    if (_currentOperation == null || _operationCache == null || _resetOnNextInput) {
+    if (_currentOperation == null ||
+        _operationCache == null ||
+        _resetOnNextInput) {
       return _operationCache?.toString() ?? _displayAmount;
     }
 
@@ -250,8 +254,8 @@ class _InputAmountSheetState extends State<InputAmountSheet> {
                 child: Text(
                   widget.title!,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
 
@@ -276,14 +280,18 @@ class _InputAmountSheetState extends State<InputAmountSheet> {
     String? expressionText;
     if (_currentOperation != null && _operationCache != null) {
       if (_resetOnNextInput) {
-        expressionText = '$_operationCache ${_operationSymbol(_currentOperation!)}';
+        expressionText =
+            '$_operationCache ${_operationSymbol(_currentOperation!)}';
       } else {
-        expressionText = '$_operationCache ${_operationSymbol(_currentOperation!)} $_displayAmount';
+        expressionText =
+            '$_operationCache ${_operationSymbol(_currentOperation!)} $_displayAmount';
       }
     }
 
     // Show preview result when in calculator mode, otherwise current input
-    final displayValue = _currentOperation != null ? _previewResult : _displayAmount;
+    final displayValue = _currentOperation != null
+        ? _previewResult
+        : _displayAmount;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -325,7 +333,10 @@ class _InputAmountSheetState extends State<InputAmountSheet> {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(20),
@@ -527,7 +538,8 @@ class _NumpadButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final bgColor = backgroundColor ?? context.c.secondary.withValues(alpha: 0.3);
+    final bgColor =
+        backgroundColor ?? context.c.secondary.withValues(alpha: 0.3);
 
     return Material(
       color: bgColor,

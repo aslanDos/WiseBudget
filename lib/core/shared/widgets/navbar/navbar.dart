@@ -40,14 +40,14 @@ class Navbar extends StatelessWidget {
               children: [
                 NavbarButton(
                   index: 0,
-                  icon: AppIcons.circle,
+                  icon: activeIndex == 0 ? AppIcons.circle400 : AppIcons.circle,
                   label: 'Home',
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),
                 NavbarButton(
                   index: 1,
-                  icon: AppIcons.wallet,
+                  icon: activeIndex == 1 ? AppIcons.wallet400 : AppIcons.wallet,
                   label: 'Accounts',
                   activeIndex: activeIndex,
                   onTap: onTap,
@@ -65,14 +65,16 @@ class Navbar extends StatelessWidget {
               children: [
                 NavbarButton(
                   index: 2,
-                  icon: AppIcons.chart,
+                  icon: activeIndex == 2 ? AppIcons.chart400 : AppIcons.chart,
                   label: 'Analytics',
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),
                 NavbarButton(
                   index: 3,
-                  icon: AppIcons.piggyBank,
+                  icon: activeIndex == 3
+                      ? AppIcons.piggyBank400
+                      : AppIcons.piggyBank,
                   label: 'Budget',
                   activeIndex: activeIndex,
                   onTap: onTap,

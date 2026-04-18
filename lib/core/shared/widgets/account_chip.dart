@@ -4,7 +4,7 @@ import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
 class AccountChip extends StatelessWidget {

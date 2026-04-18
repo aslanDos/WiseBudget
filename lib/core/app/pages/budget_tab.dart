@@ -5,7 +5,7 @@ import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';

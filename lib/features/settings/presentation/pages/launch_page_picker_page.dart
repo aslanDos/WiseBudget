@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/settings_state.dart';
 
@@ -52,8 +52,8 @@ class LaunchPagePickerPage extends StatelessWidget {
                           isSelected: state.launchPage == options[i].key,
                           isFirst: i == 0,
                           isLast: i == options.length - 1,
-                          onTap: () => sl<SettingsCubit>()
-                              .setLaunchPage(options[i].key),
+                          onTap: () =>
+                              sl<SettingsCubit>().setLaunchPage(options[i].key),
                         ),
                       ],
                     ],

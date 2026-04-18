@@ -4,7 +4,7 @@ import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 /// Shared header used by both [CategoriesPage] and [CategoryForm].
 /// Renders a close button, an expense/income type toggle, and a [trailing] slot.

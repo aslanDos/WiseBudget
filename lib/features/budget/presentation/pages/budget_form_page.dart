@@ -20,7 +20,7 @@ import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';

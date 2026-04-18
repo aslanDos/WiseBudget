@@ -37,21 +37,22 @@ class TransactionEntity extends Equatable {
   bool get isExpense => type == TransactionType.expense;
   bool get isIncome => type == TransactionType.income;
   bool get isTransfer => type == TransactionType.transfer;
+  bool get isAdjustment => type == TransactionType.adjustment;
   bool get hasNote => note != null && note!.isNotEmpty;
 
   /// Validation
   bool get isValid {
-    if (amount <= 0) return false;
+    if (isAdjustment ? amount == 0 : amount <= 0) return false;
     if (currency.isEmpty) return false;
     if (accountUuid.isEmpty) return false;
     if (note != null && note!.length > maxNoteLength) return false;
 
-    // Transfer-specific validation
     if (isTransfer) {
       return toAccountUuid != null && toAccountUuid!.isNotEmpty;
     }
 
-    // Income/Expense require category
+    if (isAdjustment) return true;
+
     return categoryUuid.isNotEmpty;
   }
 

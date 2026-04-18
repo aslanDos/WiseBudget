@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/icons/icon_groups.dart';
 import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 Future<void> showIconPickerModal({
   required BuildContext context,

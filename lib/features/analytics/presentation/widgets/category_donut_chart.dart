@@ -6,7 +6,7 @@ import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.dart';
 
 class CategoryDonutChart extends StatefulWidget {

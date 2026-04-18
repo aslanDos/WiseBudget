@@ -3,7 +3,7 @@ import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
 class NewTransactionButton extends StatefulWidget {

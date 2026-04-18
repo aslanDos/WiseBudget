@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 
 class TotalBalanceCard extends StatelessWidget {

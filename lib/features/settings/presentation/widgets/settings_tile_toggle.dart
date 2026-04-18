@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class SettingsTileToggle extends StatelessWidget {
   final IconData icon;

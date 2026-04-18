@@ -7,7 +7,7 @@ import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
@@ -20,7 +20,7 @@ import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/numpad.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/amount_display.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_sheet_header.dart';
-import 'package:wisebuget/features/transaction/presentation/widgets/transaction_details_section.dart';
+import 'package:wisebuget/features/transaction/presentation/widgets/transaction_details.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_form_entity.dart';
 
 Future<bool?> showTransactionFormModal({
@@ -33,7 +33,7 @@ Future<bool?> showTransactionFormModal({
   return showCupertinoModalBottomSheet<bool>(
     context: context,
     expand: false,
-    barrierColor: context.c.onSecondary,
+    barrierColor: Colors.black54,
     builder: (context) => TransactionForm(
       initialType: initialType,
       transaction: transaction,
@@ -66,6 +66,8 @@ class TransactionForm extends StatefulWidget {
 class _TransactionFormState extends State<TransactionForm> {
   late TransactionFormEntity _form;
   String _amountString = '';
+  // Preserves sign for adjustment transactions when editing.
+  late bool _isNegativeAdjustment;
 
   bool get isEditing => widget.isEditing;
 
@@ -78,8 +80,12 @@ class _TransactionFormState extends State<TransactionForm> {
       initialAccountUuid: widget.initialAccountUuid,
       initialDate: widget.initialDate,
     );
-    if (_form.amount > 0) {
-      _amountString = _form.amount
+    _isNegativeAdjustment = _form.isAdjustment && (_form.amount < 0);
+    final displayAmount = _form.isAdjustment
+        ? _form.amount.abs()
+        : _form.amount;
+    if (displayAmount > 0) {
+      _amountString = displayAmount
           .toStringAsFixed(2)
           .replaceAll(RegExp(r'\.?0+$'), '');
     }
@@ -138,10 +144,14 @@ class _TransactionFormState extends State<TransactionForm> {
               onDelete: () => _showDeleteDialog(context),
             ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-              child: _buildTypeToggle(),
-            ),
+            if (!_form.isAdjustment)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+                child: _buildTypeToggle(),
+              ),
 
             Expanded(
               child: AmountDisplay(
@@ -224,7 +234,7 @@ class _TransactionFormState extends State<TransactionForm> {
   Widget _buildTypeToggle() {
     return TypeToggle<TransactionType>(
       items: TransactionType.values
-          // .where((t) => t != TransactionType.transfer)
+          .where((t) => t != TransactionType.adjustment)
           .map(
             (t) => TypeToggleItem(
               value: t,
@@ -284,12 +294,18 @@ class _TransactionFormState extends State<TransactionForm> {
       (a) => a.uuid == _form.accountUuid,
     );
     final cubit = context.read<TransactionCubit>();
-    final categoryUuid = _form.isTransfer ? '' : (_form.categoryUuid ?? '');
+    final categoryUuid = _form.isTransfer || _form.isAdjustment
+        ? ''
+        : (_form.categoryUuid ?? '');
+    // Preserve direction for adjustment: negative adjustments stay negative.
+    final amount = _form.isAdjustment && _isNegativeAdjustment
+        ? -_form.amount
+        : _form.amount;
 
     if (isEditing) {
       cubit.editTransaction(
         widget.transaction!.copyWith(
-          amount: _form.amount,
+          amount: amount,
           currency: account.currency,
           type: _form.type,
           categoryUuid: categoryUuid,
@@ -303,7 +319,7 @@ class _TransactionFormState extends State<TransactionForm> {
       cubit.addTransaction(
         TransactionEntity(
           uuid: const Uuid().v4(),
-          amount: _form.amount,
+          amount: amount,
           currency: account.currency,
           type: _form.type,
           categoryUuid: categoryUuid,

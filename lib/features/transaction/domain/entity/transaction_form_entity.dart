@@ -59,8 +59,11 @@ class TransactionFormEntity {
   // ─────────────────────────────────────────────────────────────────────────
 
   /// Returns the appropriate category UUID based on transaction type.
-  String? get categoryUuid =>
-      type == TransactionType.income ? incomeCategoryUuid : expenseCategoryUuid;
+  String? get categoryUuid => isAdjustment
+      ? null
+      : type == TransactionType.income
+          ? incomeCategoryUuid
+          : expenseCategoryUuid;
 
   set categoryUuid(String? uuid) {
     if (type == TransactionType.income) {
@@ -75,7 +78,8 @@ class TransactionFormEntity {
   // ─────────────────────────────────────────────────────────────────────────
 
   bool get isTransfer => type == TransactionType.transfer;
-  bool get isValidAmount => amount > 0;
+  bool get isAdjustment => type == TransactionType.adjustment;
+  bool get isValidAmount => isAdjustment ? amount != 0 : amount > 0;
 
   /// Formats amount for display using shared formatter.
   String get displayAmount => AmountFormatter.format(amount);
@@ -86,7 +90,7 @@ class TransactionFormEntity {
 
   /// Returns error message if validation fails, null if valid.
   String? validate() {
-    if (amount <= 0) return 'Please enter a valid amount';
+    if (!isValidAmount) return 'Please enter a valid amount';
     if (accountUuid == null) return 'Please select an account';
 
     if (isTransfer) {
@@ -94,7 +98,7 @@ class TransactionFormEntity {
       if (accountUuid == toAccountUuid) {
         return 'Source and destination accounts must be different';
       }
-    } else if (categoryUuid == null) {
+    } else if (!isAdjustment && categoryUuid == null) {
       return 'Please select a category';
     }
 

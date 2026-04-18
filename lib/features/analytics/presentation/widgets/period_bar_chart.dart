@@ -3,7 +3,7 @@ import 'dart:math' show log, max, pow, ln10;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.dart';
 
 class PeriodBarChart extends StatelessWidget {
@@ -15,7 +15,9 @@ class PeriodBarChart extends StatelessWidget {
   int get _labelStep {
     if (data.length <= 12) return 1;
     if (data.length <= 14) return 2;
-    if (data.length <= 31) return 5; // daily month view: ~6 evenly spaced labels
+    if (data.length <= 31) {
+      return 5; // daily month view: ~6 evenly spaced labels
+    }
     return 7;
   }
 

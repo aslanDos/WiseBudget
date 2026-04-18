@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class TypeToggle<T> extends StatefulWidget {
   final List<TypeToggleItem<T>> items;

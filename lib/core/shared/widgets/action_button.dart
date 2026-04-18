@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
-import 'package:wisebuget/core/theme/extensions/theme_extensions.dart';
+import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class ActionButton extends StatefulWidget {
   final VoidCallback? onTap;
