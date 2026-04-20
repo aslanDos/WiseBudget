@@ -6,7 +6,8 @@ class OnboardingRouter {
   static final routes = <GoRoute>[
     GoRoute(
       path: AppRoutes.onboarding,
-      builder: (context, state) => const OnboardingPage(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: OnboardingPage()),
     ),
   ];
 }

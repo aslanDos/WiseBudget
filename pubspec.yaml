@@ -33,6 +33,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0
   fl_chart: ^0.70.2
   flutter_launcher_icons: ^0.14.4
+  flutter_svg: ^2.2.4
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +50,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/image/
     - assets/fonts/
 
   fonts:

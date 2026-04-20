@@ -17,7 +17,8 @@ class HomeRouter {
   static final routes = <GoRoute>[
     GoRoute(
       path: AppRoutes.home,
-      builder: (context, state) => const MainShell(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: MainShell()),
     ),
     GoRoute(
       path: AppRoutes.manageCategories,
