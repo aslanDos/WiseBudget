@@ -134,5 +134,110 @@
   "sep": "Sep",
   "oct": "Oct",
   "nov": "Nov",
-  "dec": "Dec"
+  "dec": "Dec",
+
+  "adjustment": "Adjustment",
+  "selectAll": "Select All",
+  "doneCount": "Done ({count})",
+  "@doneCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "nAccountsSelected": "{count} accounts",
+  "@nAccountsSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "selectDestination": "Select destination",
+  "selectDestinationAccount": "Select Destination Account",
+  "selectCategory": "Select Category",
+  "noCategory": "No category",
+  "deleteTransaction": "Delete Transaction",
+  "areYouSureDeleteTransaction": "Are you sure you want to delete this transaction?",
+  "deleteCategory": "Delete Category",
+  "areYouSureDeleteCategory": "Are you sure you want to delete this category?",
+  "areYouSureDeleteAccount": "Are you sure you want to delete this account?",
+  "areYouSureDeleteBudget": "Are you sure you want to delete this budget?",
+  "areYouSureDeleteNamed": "Are you sure you want to delete \"{name}\"?",
+  "@areYouSureDeleteNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "color": "Color",
+  "icon": "Icon",
+  "name": "Name",
+  "newAccount": "New account",
+  "selectCurrency": "Select Currency",
+  "addAccount": "Add Account",
+  "noAccountsYet": "No Accounts Yet",
+  "addFirstAccountDescription": "Add your first account to start tracking your finances",
+  "searchAccounts": "Search accounts",
+  "failedToLoadAccounts": "Failed to load accounts",
+  "failedToLoadBudgets": "Failed to load budgets",
+  "noBudgetsYet": "No budgets yet",
+  "setBudgetToTrack": "Set a budget to track your spending",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "thisWeek": "This Week",
+  "thisMonth": "This Month",
+  "previousMonth": "Previous month",
+  "thisYear": "This year",
+  "moreColors": "More colors",
+  "moreIcons": "More icons",
+  "selectAccount": "Select account",
+  "resetsEveryMonday": "Resets every Monday",
+  "resetsEveryMonth": "Resets on the 1st of each month",
+  "customRange": "Custom range",
+  "pickStartAndEndDate": "Pick a start and end date",
+  "noCategoriesOfType": "No {type} categories",
+  "@noCategoriesOfType": {
+    "placeholders": { "type": { "type": "String" } }
+  },
+  "on": "On",
+  "data": "Data",
+  "clearAllData": "Clear All Data",
+  "clearAllDataConfirmation": "This will permanently delete all accounts, transactions, budgets, and categories. This action cannot be undone.",
+  "clearAll": "Clear All",
+  "home": "Home",
+  "tools": "Tools",
+  "choosePeriod": "Choose period",
+  "startDate": "Start date",
+  "endDate": "End date",
+  "pleaseEnterCategoryName": "Please enter a category name",
+  "spentAmount": "Spent {amount}",
+  "@spentAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "overByAmount": "Over by {amount}",
+  "@overByAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountLeft": "{amount} left",
+  "@amountLeft": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountRemaining": "{amount} remaining",
+  "@amountRemaining": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "transactionsCount": "Transactions ({count})",
+  "@transactionsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "daysLeftInPeriod": "{days} days left in {period}",
+  "@daysLeftInPeriod": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "period": { "type": "String" }
+    }
+  },
+  "spendingAbovePace": "Spending {percent}% above daily pace",
+  "@spendingAbovePace": {
+    "placeholders": { "percent": { "type": "String" } }
+  },
+  "accountNameLabel": "Account Name",
+  "setUpAccountDescription": "Set up an account to start tracking your finances",
+  "initialBalance": "Initial Balance (optional)",
+  "nameTooLong": "Name is too long (max 50 chars)",
+  "onboardingDescription1": "Take control of your finances with simple, intuitive tracking",
+  "onboardingDescription2": "Record income, expenses, and transfers across multiple accounts",
+  "onboardingDescription3": "Understand your spending habits and make smarter decisions",
+  "cashSavingsExample": "e.g., Cash, Savings, Credit Card"
 }

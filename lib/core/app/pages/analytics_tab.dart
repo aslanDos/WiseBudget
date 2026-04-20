@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/widgets/account_chip.dart';
@@ -81,7 +82,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
             if (state.status == CubitStatus.failure) {
               return Center(
                 child: Text(
-                  state.errorMessage ?? 'Failed to load analytics',
+                  state.errorMessage ?? context.l10n.failedToLoad,
                   style: context.t.bodyMedium,
                 ),
               );
@@ -110,7 +111,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Income and Expenses',
+                            context.l10n.incomeAndExpenses,
                             style: context.t.titleMedium,
                           ),
                           const SizedBox(height: 10),
@@ -166,14 +167,14 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No data yet',
+            context.l10n.noDataYet,
             style: context.t.titleMedium?.copyWith(
               color: context.c.onSurface.withAlpha(0x80),
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Add transactions to see your overview',
+            context.l10n.addTransactionsToSeeOverview,
             style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(0x60),
             ),

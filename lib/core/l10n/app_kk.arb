@@ -134,5 +134,110 @@
   "sep": "Қыр",
   "oct": "Қаз",
   "nov": "Қар",
-  "dec": "Жел"
+  "dec": "Жел",
+
+  "adjustment": "Реттеу",
+  "selectAll": "Барлығын таңдау",
+  "doneCount": "Дайын ({count})",
+  "@doneCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "nAccountsSelected": "{count} шот",
+  "@nAccountsSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "selectDestination": "Мақсатты таңдау",
+  "selectDestinationAccount": "Мақсатты шотты таңдау",
+  "selectCategory": "Санатты таңдау",
+  "noCategory": "Санатсыз",
+  "deleteTransaction": "Транзакцияны өшіру",
+  "areYouSureDeleteTransaction": "Бұл транзакцияны өшіруді қалайсыз ба?",
+  "deleteCategory": "Санатты өшіру",
+  "areYouSureDeleteCategory": "Бұл санатты өшіруді қалайсыз ба?",
+  "areYouSureDeleteAccount": "Бұл шотты өшіруді қалайсыз ба?",
+  "areYouSureDeleteBudget": "Бұл бюджетті өшіруді қалайсыз ба?",
+  "areYouSureDeleteNamed": "\"{name}\" өшіруді қалайсыз ба?",
+  "@areYouSureDeleteNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "color": "Түс",
+  "icon": "Белгіше",
+  "name": "Атауы",
+  "newAccount": "Жаңа шот",
+  "selectCurrency": "Валюта таңдау",
+  "addAccount": "Шот қосу",
+  "noAccountsYet": "Шоттар әлі жоқ",
+  "addFirstAccountDescription": "Қаржыны бақылауды бастау үшін бірінші шотыңызды қосыңыз",
+  "searchAccounts": "Шоттарды іздеу",
+  "failedToLoadAccounts": "Шоттарды жүктеу сәтсіз болды",
+  "failedToLoadBudgets": "Бюджеттерді жүктеу сәтсіз болды",
+  "noBudgetsYet": "Бюджеттер әлі жоқ",
+  "setBudgetToTrack": "Шығындарды қадағалау үшін бюджет орнатыңыз",
+  "today": "Бүгін",
+  "yesterday": "Кеше",
+  "thisWeek": "Осы аптада",
+  "thisMonth": "Осы айда",
+  "previousMonth": "Өткен ай",
+  "thisYear": "Биыл",
+  "moreColors": "Көбірек түстер",
+  "moreIcons": "Көбірек белгішелер",
+  "selectAccount": "Шот таңдау",
+  "resetsEveryMonday": "Әр дүйсенбі жаңарады",
+  "resetsEveryMonth": "Ай сайын 1-де жаңарады",
+  "customRange": "Өзгертілген кезең",
+  "pickStartAndEndDate": "Басталу мен аяқталу күнін таңдаңыз",
+  "noCategoriesOfType": "{type} санаттары жоқ",
+  "@noCategoriesOfType": {
+    "placeholders": { "type": { "type": "String" } }
+  },
+  "on": "Қосулы",
+  "data": "Деректер",
+  "clearAllData": "Барлық деректерді тазалау",
+  "clearAllDataConfirmation": "Бұл барлық шоттарды, транзакцияларды, бюджеттерді және санаттарды біржола өшіреді. Бұл әрекетті болдырмау мүмкін емес.",
+  "clearAll": "Барлығын тазалау",
+  "home": "Басты",
+  "tools": "Құралдар",
+  "choosePeriod": "Кезеңді таңдау",
+  "startDate": "Басталу күні",
+  "endDate": "Аяқталу күні",
+  "pleaseEnterCategoryName": "Санат атауын енгізіңіз",
+  "spentAmount": "{amount} жұмсалды",
+  "@spentAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "overByAmount": "{amount}-ға асты",
+  "@overByAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountLeft": "{amount} қалды",
+  "@amountLeft": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountRemaining": "{amount} қалды",
+  "@amountRemaining": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "transactionsCount": "Транзакциялар ({count})",
+  "@transactionsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "daysLeftInPeriod": "{period} кезеңінде {days} күн қалды",
+  "@daysLeftInPeriod": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "period": { "type": "String" }
+    }
+  },
+  "spendingAbovePace": "Тәуліктік қарқыннан {percent}% жоғары",
+  "@spendingAbovePace": {
+    "placeholders": { "percent": { "type": "String" } }
+  },
+  "accountNameLabel": "Шот атауы",
+  "setUpAccountDescription": "Қаржыны бақылауды бастау үшін шот қосыңыз",
+  "initialBalance": "Бастапқы баланс (міндетті емес)",
+  "nameTooLong": "Атауы тым ұзын (макс. 50 таңба)",
+  "onboardingDescription1": "Қаржыңызды қарапайым және ыңғайлы бақылаумен басқарыңыз",
+  "onboardingDescription2": "Бірнеше шот бойынша кіріс, шығыс және аударымдарды жазыңыз",
+  "onboardingDescription3": "Шығындарыңызды талдап, дұрыс шешімдер қабылдаңыз",
+  "cashSavingsExample": "мысалы, Қолма-қол, Жинақ, Карта"
 }

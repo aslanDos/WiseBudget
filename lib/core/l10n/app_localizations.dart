@@ -837,6 +837,414 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dec'**
   String get dec;
+
+  /// No description provided for @adjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get adjustment;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get selectAll;
+
+  /// No description provided for @doneCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Done ({count})'**
+  String doneCount(int count);
+
+  /// No description provided for @nAccountsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} accounts'**
+  String nAccountsSelected(int count);
+
+  /// No description provided for @selectDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Select destination'**
+  String get selectDestination;
+
+  /// No description provided for @selectDestinationAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Destination Account'**
+  String get selectDestinationAccount;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategory;
+
+  /// No description provided for @noCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No category'**
+  String get noCategory;
+
+  /// No description provided for @deleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Transaction'**
+  String get deleteTransaction;
+
+  /// No description provided for @areYouSureDeleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this transaction?'**
+  String get areYouSureDeleteTransaction;
+
+  /// No description provided for @deleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category'**
+  String get deleteCategory;
+
+  /// No description provided for @areYouSureDeleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this category?'**
+  String get areYouSureDeleteCategory;
+
+  /// No description provided for @areYouSureDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this account?'**
+  String get areYouSureDeleteAccount;
+
+  /// No description provided for @areYouSureDeleteBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this budget?'**
+  String get areYouSureDeleteBudget;
+
+  /// No description provided for @areYouSureDeleteNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{name}\"?'**
+  String areYouSureDeleteNamed(String name);
+
+  /// No description provided for @color.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get color;
+
+  /// No description provided for @icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get icon;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @newAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'New account'**
+  String get newAccount;
+
+  /// No description provided for @selectCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Currency'**
+  String get selectCurrency;
+
+  /// No description provided for @addAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Account'**
+  String get addAccount;
+
+  /// No description provided for @noAccountsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Accounts Yet'**
+  String get noAccountsYet;
+
+  /// No description provided for @addFirstAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first account to start tracking your finances'**
+  String get addFirstAccountDescription;
+
+  /// No description provided for @searchAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search accounts'**
+  String get searchAccounts;
+
+  /// No description provided for @failedToLoadAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load accounts'**
+  String get failedToLoadAccounts;
+
+  /// No description provided for @failedToLoadBudgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load budgets'**
+  String get failedToLoadBudgets;
+
+  /// No description provided for @noBudgetsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No budgets yet'**
+  String get noBudgetsYet;
+
+  /// No description provided for @setBudgetToTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a budget to track your spending'**
+  String get setBudgetToTrack;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// No description provided for @thisYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get thisYear;
+
+  /// No description provided for @moreColors.
+  ///
+  /// In en, this message translates to:
+  /// **'More colors'**
+  String get moreColors;
+
+  /// No description provided for @moreIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'More icons'**
+  String get moreIcons;
+
+  /// No description provided for @selectAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select account'**
+  String get selectAccount;
+
+  /// No description provided for @resetsEveryMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets every Monday'**
+  String get resetsEveryMonday;
+
+  /// No description provided for @resetsEveryMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets on the 1st of each month'**
+  String get resetsEveryMonth;
+
+  /// No description provided for @customRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom range'**
+  String get customRange;
+
+  /// No description provided for @pickStartAndEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a start and end date'**
+  String get pickStartAndEndDate;
+
+  /// No description provided for @noCategoriesOfType.
+  ///
+  /// In en, this message translates to:
+  /// **'No {type} categories'**
+  String noCategoriesOfType(String type);
+
+  /// No description provided for @on.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get on;
+
+  /// No description provided for @data.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get data;
+
+  /// No description provided for @clearAllData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Data'**
+  String get clearAllData;
+
+  /// No description provided for @clearAllDataConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete all accounts, transactions, budgets, and categories. This action cannot be undone.'**
+  String get clearAllDataConfirmation;
+
+  /// No description provided for @clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAll;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @tools.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get tools;
+
+  /// No description provided for @choosePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose period'**
+  String get choosePeriod;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get endDate;
+
+  /// No description provided for @pleaseEnterCategoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a category name'**
+  String get pleaseEnterCategoryName;
+
+  /// No description provided for @spentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent {amount}'**
+  String spentAmount(String amount);
+
+  /// No description provided for @overByAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Over by {amount}'**
+  String overByAmount(String amount);
+
+  /// No description provided for @amountLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} left'**
+  String amountLeft(String amount);
+
+  /// No description provided for @amountRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} remaining'**
+  String amountRemaining(String amount);
+
+  /// No description provided for @transactionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions ({count})'**
+  String transactionsCount(int count);
+
+  /// No description provided for @daysLeftInPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left in {period}'**
+  String daysLeftInPeriod(int days, String period);
+
+  /// No description provided for @spendingAbovePace.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending {percent}% above daily pace'**
+  String spendingAbovePace(String percent);
+
+  /// No description provided for @accountNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Name'**
+  String get accountNameLabel;
+
+  /// No description provided for @setUpAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up an account to start tracking your finances'**
+  String get setUpAccountDescription;
+
+  /// No description provided for @initialBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Balance (optional)'**
+  String get initialBalance;
+
+  /// No description provided for @nameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is too long (max 50 chars)'**
+  String get nameTooLong;
+
+  /// No description provided for @onboardingDescription1.
+  ///
+  /// In en, this message translates to:
+  /// **'Take control of your finances with simple, intuitive tracking'**
+  String get onboardingDescription1;
+
+  /// No description provided for @onboardingDescription2.
+  ///
+  /// In en, this message translates to:
+  /// **'Record income, expenses, and transfers across multiple accounts'**
+  String get onboardingDescription2;
+
+  /// No description provided for @onboardingDescription3.
+  ///
+  /// In en, this message translates to:
+  /// **'Understand your spending habits and make smarter decisions'**
+  String get onboardingDescription3;
+
+  /// No description provided for @cashSavingsExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cash, Savings, Credit Card'**
+  String get cashSavingsExample;
 }
 
 class _AppLocalizationsDelegate

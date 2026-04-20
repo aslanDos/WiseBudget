@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
+import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
@@ -35,7 +37,7 @@ class BudgetDetailPage extends StatelessWidget {
           if (budgetProgress == null) {
             return Scaffold(
               appBar: AppBar(),
-              body: const Center(child: Text('Budget not found')),
+              body: Center(child: Text(context.l10n.budgetNotFound)),
             );
           }
 
@@ -131,8 +133,8 @@ class _BudgetDetailContent extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 isExceeded
-                    ? 'Over by ${progress.overByMoney.formatted}'
-                    : '${progress.remainingMoney.formatted} remaining',
+                    ? context.l10n.overByAmount(progress.overByMoney.formatted)
+                    : context.l10n.amountRemaining(progress.remainingMoney.formatted),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: isExceeded ? colors.error : null,
                   fontWeight: FontWeight.w500,
@@ -144,7 +146,7 @@ class _BudgetDetailContent extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            '${budget.daysRemaining} days left in ${budget.periodLabel}',
+            context.l10n.daysLeftInPeriod(budget.daysRemaining, budget.periodLabel),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -172,7 +174,7 @@ class _BudgetDetailContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Daily Breakdown',
+            context.l10n.dailyBreakdown,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -182,7 +184,7 @@ class _BudgetDetailContent extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatItem(
-                  label: 'Daily limit',
+                  label: context.l10n.dailyLimit,
                   value: progress.dailyBudgetMoney.formatted,
                   icon: Icons.flag_outlined,
                   iconColor: colors.primary,
@@ -190,7 +192,7 @@ class _BudgetDetailContent extends StatelessWidget {
               ),
               Expanded(
                 child: _StatItem(
-                  label: 'Your average',
+                  label: context.l10n.yourAverage,
                   value: '\$${dailyAverage.toStringAsFixed(2)}',
                   icon: Icons.trending_up,
                   iconColor: isOverPace
@@ -213,7 +215,7 @@ class _BudgetDetailContent extends StatelessWidget {
                   Icon(Icons.trending_up, size: 18, color: colors.error),
                   const SizedBox(width: 8),
                   Text(
-                    'Spending ${((dailyAverage / dailyBudget - 1) * 100).toStringAsFixed(0)}% above daily pace',
+                    context.l10n.spendingAbovePace(((dailyAverage / dailyBudget - 1) * 100).toStringAsFixed(0)),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colors.error,
                       fontWeight: FontWeight.w500,
@@ -261,7 +263,7 @@ class _BudgetDetailContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 12),
               child: Text(
-                'Transactions (${matchingTransactions.length})',
+                context.l10n.transactionsCount(matchingTransactions.length),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: colors.onSurfaceVariant,
@@ -277,7 +279,7 @@ class _BudgetDetailContent extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'No transactions yet',
+                    context.l10n.noTransactionsYet,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
@@ -407,13 +409,13 @@ class _TransactionItem extends StatelessWidget {
         ),
       ),
       title: Text(
-        category?.name ?? 'Unknown',
+        category?.name ?? context.l10n.unknown,
         style: theme.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w500,
         ),
       ),
       subtitle: Text(
-        _formatDate(transaction.date),
+        _formatDate(context, transaction.date),
         style: theme.textTheme.bodySmall?.copyWith(
           color: colors.onSurfaceVariant,
         ),
@@ -428,21 +430,8 @@ class _TransactionItem extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+  String _formatDate(BuildContext context, DateTime date) {
+    final months = DateFormatter.monthAbbreviations(context.l10n);
     return '${months[date.month - 1]} ${date.day}';
   }
 }

@@ -30,7 +30,7 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
       decoration: BoxDecoration(
         color: widget.backgroundColor ?? context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(12.0),
@@ -82,13 +82,14 @@ class _TypeToggleState<T> extends State<TypeToggle<T>> {
                                     fontSize: item.size,
                                   ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (item.icon != null)
                                   AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     curve: Curves.easeOutCubic,
-                                    width: isSelected ? 18 : 0,
+                                    width: isSelected ? 16 : 0,
                                     child: isSelected
                                         ? Icon(
                                             item.icon,

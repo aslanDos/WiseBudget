@@ -3,11 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/shared/utils/list_utils.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
+import 'package:wisebuget/core/shared/widgets/cubit_error_widget.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_card.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
@@ -44,7 +48,7 @@ class _AccountTabState extends State<AccountTab>
         appBar: AppBar(
           titleSpacing: 16,
           centerTitle: false,
-          title: Text('Accounts', style: context.t.headlineMedium),
+          title: Text(context.l10n.accounts, style: context.t.headlineMedium),
           actionsPadding: EdgeInsets.only(right: 16),
           actions: [
             ActionButton(
@@ -70,28 +74,9 @@ class _AccountTabState extends State<AccountTab>
             }
 
             if (state.status == CubitStatus.failure) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48.0,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      state.errorMessage ?? 'Failed to load accounts',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 16.0),
-                    FilledButton(
-                      onPressed: () =>
-                          context.read<AccountCubit>().loadAccounts(),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return CubitErrorWidget(
+                message: state.errorMessage ?? context.l10n.failedToLoadAccounts,
+                onRetry: () => context.read<AccountCubit>().loadAccounts(),
               );
             }
 
@@ -138,47 +123,25 @@ class _AccountTabState extends State<AccountTab>
     int oldIndex,
     int newIndex,
   ) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-
+    final reordered = applyReorder(accounts, oldIndex, newIndex);
     final cubit = context.read<AccountCubit>();
-    final reorderedAccounts = List<AccountEntity>.from(accounts);
-    final movedAccount = reorderedAccounts.removeAt(oldIndex);
-    reorderedAccounts.insert(newIndex, movedAccount);
-
-    for (int i = 0; i < reorderedAccounts.length; i++) {
-      final account = reorderedAccounts[i];
-      if (account.sortOrder != i) {
-        cubit.editAccount(account.copyWith(sortOrder: i));
-      }
+    for (int i = 0; i < reordered.length; i++) {
+      final account = reordered[i];
+      if (account.sortOrder != i) cubit.editAccount(account.copyWith(sortOrder: i));
     }
   }
 
-  void _handleDelete(BuildContext context, AccountEntity account) {
-    showDialog(
+  Future<void> _handleDelete(BuildContext context, AccountEntity account) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: Text('Are you sure you want to delete "${account.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<AccountCubit>().removeAccount(account.uuid);
-              Navigator.pop(dialogContext);
-            },
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
+      title: context.l10n.deleteAccount,
+      message: context.l10n.areYouSureDeleteNamed(account.name),
+      confirmText: context.l10n.delete,
+      isDestructive: true,
     );
+    if (confirmed == true && context.mounted) {
+      context.read<AccountCubit>().removeAccount(account.uuid);
+    }
   }
 
   Future<void> _showAddAccountDialog(BuildContext context) async {
@@ -250,7 +213,7 @@ class _AccountsContent extends StatelessWidget {
                   controller: searchController,
                   onChanged: (_) => onSearchChanged(),
                   decoration: InputDecoration(
-                    hintText: 'Search accounts',
+                    hintText: context.l10n.searchAccounts,
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: searchQuery.isNotEmpty
                         ? IconButton(

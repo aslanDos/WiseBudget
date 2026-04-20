@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 
 class NoAccounts extends StatelessWidget {
@@ -32,14 +33,14 @@ class NoAccounts extends StatelessWidget {
             ),
             const SizedBox(height: 24.0),
             Text(
-              'No Accounts Yet',
+              context.l10n.noAccountsYet,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8.0),
             Text(
-              'Add your first account to start tracking your finances',
+              context.l10n.addFirstAccountDescription,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.outline,
@@ -49,7 +50,7 @@ class NoAccounts extends StatelessWidget {
             FilledButton.icon(
               onPressed: onAddAccount,
               icon: const Icon(Icons.add),
-              label: const Text('Add Account'),
+              label: Text(context.l10n.addAccount),
             ),
           ],
         ),

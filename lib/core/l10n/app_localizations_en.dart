@@ -378,4 +378,240 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dec => 'Dec';
+
+  @override
+  String get adjustment => 'Adjustment';
+
+  @override
+  String get selectAll => 'Select All';
+
+  @override
+  String doneCount(int count) {
+    return 'Done ($count)';
+  }
+
+  @override
+  String nAccountsSelected(int count) {
+    return '$count accounts';
+  }
+
+  @override
+  String get selectDestination => 'Select destination';
+
+  @override
+  String get selectDestinationAccount => 'Select Destination Account';
+
+  @override
+  String get selectCategory => 'Select Category';
+
+  @override
+  String get noCategory => 'No category';
+
+  @override
+  String get deleteTransaction => 'Delete Transaction';
+
+  @override
+  String get areYouSureDeleteTransaction =>
+      'Are you sure you want to delete this transaction?';
+
+  @override
+  String get deleteCategory => 'Delete Category';
+
+  @override
+  String get areYouSureDeleteCategory =>
+      'Are you sure you want to delete this category?';
+
+  @override
+  String get areYouSureDeleteAccount =>
+      'Are you sure you want to delete this account?';
+
+  @override
+  String get areYouSureDeleteBudget =>
+      'Are you sure you want to delete this budget?';
+
+  @override
+  String areYouSureDeleteNamed(String name) {
+    return 'Are you sure you want to delete \"$name\"?';
+  }
+
+  @override
+  String get color => 'Color';
+
+  @override
+  String get icon => 'Icon';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get newAccount => 'New account';
+
+  @override
+  String get selectCurrency => 'Select Currency';
+
+  @override
+  String get addAccount => 'Add Account';
+
+  @override
+  String get noAccountsYet => 'No Accounts Yet';
+
+  @override
+  String get addFirstAccountDescription =>
+      'Add your first account to start tracking your finances';
+
+  @override
+  String get searchAccounts => 'Search accounts';
+
+  @override
+  String get failedToLoadAccounts => 'Failed to load accounts';
+
+  @override
+  String get failedToLoadBudgets => 'Failed to load budgets';
+
+  @override
+  String get noBudgetsYet => 'No budgets yet';
+
+  @override
+  String get setBudgetToTrack => 'Set a budget to track your spending';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get thisYear => 'This year';
+
+  @override
+  String get moreColors => 'More colors';
+
+  @override
+  String get moreIcons => 'More icons';
+
+  @override
+  String get selectAccount => 'Select account';
+
+  @override
+  String get resetsEveryMonday => 'Resets every Monday';
+
+  @override
+  String get resetsEveryMonth => 'Resets on the 1st of each month';
+
+  @override
+  String get customRange => 'Custom range';
+
+  @override
+  String get pickStartAndEndDate => 'Pick a start and end date';
+
+  @override
+  String noCategoriesOfType(String type) {
+    return 'No $type categories';
+  }
+
+  @override
+  String get on => 'On';
+
+  @override
+  String get data => 'Data';
+
+  @override
+  String get clearAllData => 'Clear All Data';
+
+  @override
+  String get clearAllDataConfirmation =>
+      'This will permanently delete all accounts, transactions, budgets, and categories. This action cannot be undone.';
+
+  @override
+  String get clearAll => 'Clear All';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get tools => 'Tools';
+
+  @override
+  String get choosePeriod => 'Choose period';
+
+  @override
+  String get startDate => 'Start date';
+
+  @override
+  String get endDate => 'End date';
+
+  @override
+  String get pleaseEnterCategoryName => 'Please enter a category name';
+
+  @override
+  String spentAmount(String amount) {
+    return 'Spent $amount';
+  }
+
+  @override
+  String overByAmount(String amount) {
+    return 'Over by $amount';
+  }
+
+  @override
+  String amountLeft(String amount) {
+    return '$amount left';
+  }
+
+  @override
+  String amountRemaining(String amount) {
+    return '$amount remaining';
+  }
+
+  @override
+  String transactionsCount(int count) {
+    return 'Transactions ($count)';
+  }
+
+  @override
+  String daysLeftInPeriod(int days, String period) {
+    return '$days days left in $period';
+  }
+
+  @override
+  String spendingAbovePace(String percent) {
+    return 'Spending $percent% above daily pace';
+  }
+
+  @override
+  String get accountNameLabel => 'Account Name';
+
+  @override
+  String get setUpAccountDescription =>
+      'Set up an account to start tracking your finances';
+
+  @override
+  String get initialBalance => 'Initial Balance (optional)';
+
+  @override
+  String get nameTooLong => 'Name is too long (max 50 chars)';
+
+  @override
+  String get onboardingDescription1 =>
+      'Take control of your finances with simple, intuitive tracking';
+
+  @override
+  String get onboardingDescription2 =>
+      'Record income, expenses, and transfers across multiple accounts';
+
+  @override
+  String get onboardingDescription3 =>
+      'Understand your spending habits and make smarter decisions';
+
+  @override
+  String get cashSavingsExample => 'e.g., Cash, Savings, Credit Card';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/navbar_button.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
@@ -41,14 +42,14 @@ class Navbar extends StatelessWidget {
                 NavbarButton(
                   index: 0,
                   icon: activeIndex == 0 ? AppIcons.circle400 : AppIcons.circle,
-                  label: 'Home',
+                  label: context.l10n.home,
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),
                 NavbarButton(
                   index: 1,
                   icon: activeIndex == 1 ? AppIcons.wallet400 : AppIcons.wallet,
-                  label: 'Accounts',
+                  label: context.l10n.accounts,
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),
@@ -66,7 +67,7 @@ class Navbar extends StatelessWidget {
                 NavbarButton(
                   index: 2,
                   icon: activeIndex == 2 ? AppIcons.chart400 : AppIcons.chart,
-                  label: 'Analytics',
+                  label: context.l10n.analytics,
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),
@@ -75,7 +76,7 @@ class Navbar extends StatelessWidget {
                   icon: activeIndex == 3
                       ? AppIcons.piggyBank400
                       : AppIcons.piggyBank,
-                  label: 'Budget',
+                  label: context.l10n.budget,
                   activeIndex: activeIndex,
                   onTap: onTap,
                 ),

@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/constants/icons_constants.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
@@ -23,11 +24,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_name_field.dart';
 import 'package:wisebuget/features/account/presentation/widgets/account_sheet_header.dart';
-import 'package:wisebuget/core/shared/widgets/color_grid.dart';
-import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
-import 'package:wisebuget/core/shared/widgets/form_section.dart';
-import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
-import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/color_icon_selector.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
@@ -116,7 +113,7 @@ class _AccountFormState extends State<AccountForm> {
           } else if (state.status == CubitStatus.failure) {
             _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
+              SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
             );
           }
         },
@@ -134,7 +131,7 @@ class _AccountFormState extends State<AccountForm> {
                 AccountSheetHeader(
                   title: widget.isEditing
                       ? widget.account!.name
-                      : 'New account',
+                      : context.l10n.newAccount,
                   onDelete: () => _showDeleteDialog(context),
                   isEditing: widget.isEditing,
                 ),
@@ -165,14 +162,14 @@ class _AccountFormState extends State<AccountForm> {
                           children: [
                             PickerField(
                               icon: Icons.account_balance_rounded,
-                              label: 'Balance',
+                              label: context.l10n.balance,
                               value: _balance,
                               shrink: false,
                               onTap: () => _showBalanceInput(context),
                             ),
                             PickerField(
                               icon: Icons.currency_exchange_rounded,
-                              label: 'Currency',
+                              label: context.l10n.currency,
                               value: _selectedCurrency,
                               shrink: false,
                               onTap: () => _showCurrencyPicker(context),
@@ -180,39 +177,12 @@ class _AccountFormState extends State<AccountForm> {
                           ],
                         ),
                         const SizedBox(height: 12.0),
-                        FormSection(
-                          title: 'Color',
-                          actionLabel: 'More colors',
-                          onAction: () => showColorPickerModal(
-                            context: context,
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (value) =>
-                                setState(() => _selectedColorValue = value),
-                          ),
-                          child: ColorGrid(
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (value) =>
-                                setState(() => _selectedColorValue = value),
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        FormSection(
-                          title: 'Icon',
-                          actionLabel: 'More icons',
-                          onAction: () => showIconPickerModal(
-                            context: context,
-                            selectedIconCode: _selectedIconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _selectedIconCode = code),
-                          ),
-                          child: IconGrid(
-                            iconOptions: iconOptions,
-                            selectedIconCode: _selectedIconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _selectedIconCode = code),
-                          ),
+                        ColorIconSelector(
+                          selectedColorValue: _selectedColorValue,
+                          selectedIconCode: _selectedIconCode,
+                          iconOptions: iconOptions,
+                          onColorChanged: (value) => setState(() => _selectedColorValue = value),
+                          onIconChanged: (code) => setState(() => _selectedIconCode = code),
                         ),
                         const SizedBox(height: 12.0),
                       ],
@@ -222,7 +192,7 @@ class _AccountFormState extends State<AccountForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Button(
-                    label: 'Save',
+                    label: context.l10n.save,
                     isLoading: isLoading,
                     onPressed: isLoading || _name.trim().isEmpty
                         ? null
@@ -243,7 +213,7 @@ class _AccountFormState extends State<AccountForm> {
     final result = await showModal<String>(
       context: context,
       builder: (context) => ModalSheet.scrollable(
-        title: Text('Select Currency'),
+        title: Text(context.l10n.selectCurrency),
         child: ListView.builder(
           shrinkWrap: true,
           itemCount: _currencies.length,
@@ -282,9 +252,9 @@ class _AccountFormState extends State<AccountForm> {
   Future<void> _showDeleteDialog(BuildContext context) async {
     final confirmed = await showAppConfirmDialog(
       context: context,
-      title: 'Delete Transaction',
-      message: 'Are you sure you want to delete this transaction?',
-      confirmText: 'Delete',
+      title: context.l10n.deleteAccount,
+      message: context.l10n.areYouSureDeleteAccount,
+      confirmText: context.l10n.delete,
       isDestructive: true,
     );
 
@@ -297,7 +267,7 @@ class _AccountFormState extends State<AccountForm> {
     final name = _name.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an account name')),
+        SnackBar(content: Text(context.l10n.pleaseEnterAccountName)),
       );
       return;
     }

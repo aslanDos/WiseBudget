@@ -378,4 +378,240 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dec => 'Дек';
+
+  @override
+  String get adjustment => 'Корректировка';
+
+  @override
+  String get selectAll => 'Выбрать все';
+
+  @override
+  String doneCount(int count) {
+    return 'Готово ($count)';
+  }
+
+  @override
+  String nAccountsSelected(int count) {
+    return '$count счёта(-ов)';
+  }
+
+  @override
+  String get selectDestination => 'Выбрать назначение';
+
+  @override
+  String get selectDestinationAccount => 'Выбрать счёт назначения';
+
+  @override
+  String get selectCategory => 'Выбрать категорию';
+
+  @override
+  String get noCategory => 'Без категории';
+
+  @override
+  String get deleteTransaction => 'Удалить транзакцию';
+
+  @override
+  String get areYouSureDeleteTransaction =>
+      'Вы уверены, что хотите удалить эту транзакцию?';
+
+  @override
+  String get deleteCategory => 'Удалить категорию';
+
+  @override
+  String get areYouSureDeleteCategory =>
+      'Вы уверены, что хотите удалить эту категорию?';
+
+  @override
+  String get areYouSureDeleteAccount =>
+      'Вы уверены, что хотите удалить этот счёт?';
+
+  @override
+  String get areYouSureDeleteBudget =>
+      'Вы уверены, что хотите удалить этот бюджет?';
+
+  @override
+  String areYouSureDeleteNamed(String name) {
+    return 'Вы уверены, что хотите удалить \"$name\"?';
+  }
+
+  @override
+  String get color => 'Цвет';
+
+  @override
+  String get icon => 'Иконка';
+
+  @override
+  String get name => 'Название';
+
+  @override
+  String get newAccount => 'Новый счёт';
+
+  @override
+  String get selectCurrency => 'Выбрать валюту';
+
+  @override
+  String get addAccount => 'Добавить счёт';
+
+  @override
+  String get noAccountsYet => 'Счетов пока нет';
+
+  @override
+  String get addFirstAccountDescription =>
+      'Добавьте первый счёт, чтобы начать отслеживать финансы';
+
+  @override
+  String get searchAccounts => 'Поиск счетов';
+
+  @override
+  String get failedToLoadAccounts => 'Не удалось загрузить счета';
+
+  @override
+  String get failedToLoadBudgets => 'Не удалось загрузить бюджеты';
+
+  @override
+  String get noBudgetsYet => 'Бюджетов пока нет';
+
+  @override
+  String get setBudgetToTrack => 'Создайте бюджет для отслеживания расходов';
+
+  @override
+  String get today => 'Сегодня';
+
+  @override
+  String get yesterday => 'Вчера';
+
+  @override
+  String get thisWeek => 'На этой неделе';
+
+  @override
+  String get thisMonth => 'В этом месяце';
+
+  @override
+  String get previousMonth => 'Прошлый месяц';
+
+  @override
+  String get thisYear => 'Этот год';
+
+  @override
+  String get moreColors => 'Больше цветов';
+
+  @override
+  String get moreIcons => 'Больше иконок';
+
+  @override
+  String get selectAccount => 'Выбрать счёт';
+
+  @override
+  String get resetsEveryMonday => 'Сбрасывается каждый понедельник';
+
+  @override
+  String get resetsEveryMonth => 'Сбрасывается 1-го числа каждого месяца';
+
+  @override
+  String get customRange => 'Произвольный период';
+
+  @override
+  String get pickStartAndEndDate => 'Выберите начальную и конечную даты';
+
+  @override
+  String noCategoriesOfType(String type) {
+    return 'Нет категорий типа $type';
+  }
+
+  @override
+  String get on => 'Вкл.';
+
+  @override
+  String get data => 'Данные';
+
+  @override
+  String get clearAllData => 'Очистить все данные';
+
+  @override
+  String get clearAllDataConfirmation =>
+      'Это действие безвозвратно удалит все счета, транзакции, бюджеты и категории. Его нельзя отменить.';
+
+  @override
+  String get clearAll => 'Очистить всё';
+
+  @override
+  String get home => 'Главная';
+
+  @override
+  String get tools => 'Инструменты';
+
+  @override
+  String get choosePeriod => 'Выбрать период';
+
+  @override
+  String get startDate => 'Дата начала';
+
+  @override
+  String get endDate => 'Дата окончания';
+
+  @override
+  String get pleaseEnterCategoryName => 'Введите название категории';
+
+  @override
+  String spentAmount(String amount) {
+    return 'Потрачено $amount';
+  }
+
+  @override
+  String overByAmount(String amount) {
+    return 'Превышено на $amount';
+  }
+
+  @override
+  String amountLeft(String amount) {
+    return '$amount осталось';
+  }
+
+  @override
+  String amountRemaining(String amount) {
+    return '$amount осталось';
+  }
+
+  @override
+  String transactionsCount(int count) {
+    return 'Транзакции ($count)';
+  }
+
+  @override
+  String daysLeftInPeriod(int days, String period) {
+    return '$days дн. до конца $period';
+  }
+
+  @override
+  String spendingAbovePace(String percent) {
+    return 'Траты на $percent% выше дневного темпа';
+  }
+
+  @override
+  String get accountNameLabel => 'Название счёта';
+
+  @override
+  String get setUpAccountDescription =>
+      'Добавьте счёт, чтобы начать отслеживать финансы';
+
+  @override
+  String get initialBalance => 'Начальный баланс (необязательно)';
+
+  @override
+  String get nameTooLong => 'Слишком длинное название (макс. 50 символов)';
+
+  @override
+  String get onboardingDescription1 =>
+      'Контролируйте свои финансы с помощью простого и удобного трекера';
+
+  @override
+  String get onboardingDescription2 =>
+      'Записывайте доходы, расходы и переводы по нескольким счетам';
+
+  @override
+  String get onboardingDescription3 =>
+      'Анализируйте траты и принимайте более обоснованные решения';
+
+  @override
+  String get cashSavingsExample => 'например, Наличные, Сбережения, Карта';
 }

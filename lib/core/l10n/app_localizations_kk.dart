@@ -378,4 +378,237 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get dec => 'Жел';
+
+  @override
+  String get adjustment => 'Реттеу';
+
+  @override
+  String get selectAll => 'Барлығын таңдау';
+
+  @override
+  String doneCount(int count) {
+    return 'Дайын ($count)';
+  }
+
+  @override
+  String nAccountsSelected(int count) {
+    return '$count шот';
+  }
+
+  @override
+  String get selectDestination => 'Мақсатты таңдау';
+
+  @override
+  String get selectDestinationAccount => 'Мақсатты шотты таңдау';
+
+  @override
+  String get selectCategory => 'Санатты таңдау';
+
+  @override
+  String get noCategory => 'Санатсыз';
+
+  @override
+  String get deleteTransaction => 'Транзакцияны өшіру';
+
+  @override
+  String get areYouSureDeleteTransaction =>
+      'Бұл транзакцияны өшіруді қалайсыз ба?';
+
+  @override
+  String get deleteCategory => 'Санатты өшіру';
+
+  @override
+  String get areYouSureDeleteCategory => 'Бұл санатты өшіруді қалайсыз ба?';
+
+  @override
+  String get areYouSureDeleteAccount => 'Бұл шотты өшіруді қалайсыз ба?';
+
+  @override
+  String get areYouSureDeleteBudget => 'Бұл бюджетті өшіруді қалайсыз ба?';
+
+  @override
+  String areYouSureDeleteNamed(String name) {
+    return '\"$name\" өшіруді қалайсыз ба?';
+  }
+
+  @override
+  String get color => 'Түс';
+
+  @override
+  String get icon => 'Белгіше';
+
+  @override
+  String get name => 'Атауы';
+
+  @override
+  String get newAccount => 'Жаңа шот';
+
+  @override
+  String get selectCurrency => 'Валюта таңдау';
+
+  @override
+  String get addAccount => 'Шот қосу';
+
+  @override
+  String get noAccountsYet => 'Шоттар әлі жоқ';
+
+  @override
+  String get addFirstAccountDescription =>
+      'Қаржыны бақылауды бастау үшін бірінші шотыңызды қосыңыз';
+
+  @override
+  String get searchAccounts => 'Шоттарды іздеу';
+
+  @override
+  String get failedToLoadAccounts => 'Шоттарды жүктеу сәтсіз болды';
+
+  @override
+  String get failedToLoadBudgets => 'Бюджеттерді жүктеу сәтсіз болды';
+
+  @override
+  String get noBudgetsYet => 'Бюджеттер әлі жоқ';
+
+  @override
+  String get setBudgetToTrack => 'Шығындарды қадағалау үшін бюджет орнатыңыз';
+
+  @override
+  String get today => 'Бүгін';
+
+  @override
+  String get yesterday => 'Кеше';
+
+  @override
+  String get thisWeek => 'Осы аптада';
+
+  @override
+  String get thisMonth => 'Осы айда';
+
+  @override
+  String get previousMonth => 'Өткен ай';
+
+  @override
+  String get thisYear => 'Биыл';
+
+  @override
+  String get moreColors => 'Көбірек түстер';
+
+  @override
+  String get moreIcons => 'Көбірек белгішелер';
+
+  @override
+  String get selectAccount => 'Шот таңдау';
+
+  @override
+  String get resetsEveryMonday => 'Әр дүйсенбі жаңарады';
+
+  @override
+  String get resetsEveryMonth => 'Ай сайын 1-де жаңарады';
+
+  @override
+  String get customRange => 'Өзгертілген кезең';
+
+  @override
+  String get pickStartAndEndDate => 'Басталу мен аяқталу күнін таңдаңыз';
+
+  @override
+  String noCategoriesOfType(String type) {
+    return '$type санаттары жоқ';
+  }
+
+  @override
+  String get on => 'Қосулы';
+
+  @override
+  String get data => 'Деректер';
+
+  @override
+  String get clearAllData => 'Барлық деректерді тазалау';
+
+  @override
+  String get clearAllDataConfirmation =>
+      'Бұл барлық шоттарды, транзакцияларды, бюджеттерді және санаттарды біржола өшіреді. Бұл әрекетті болдырмау мүмкін емес.';
+
+  @override
+  String get clearAll => 'Барлығын тазалау';
+
+  @override
+  String get home => 'Басты';
+
+  @override
+  String get tools => 'Құралдар';
+
+  @override
+  String get choosePeriod => 'Кезеңді таңдау';
+
+  @override
+  String get startDate => 'Басталу күні';
+
+  @override
+  String get endDate => 'Аяқталу күні';
+
+  @override
+  String get pleaseEnterCategoryName => 'Санат атауын енгізіңіз';
+
+  @override
+  String spentAmount(String amount) {
+    return '$amount жұмсалды';
+  }
+
+  @override
+  String overByAmount(String amount) {
+    return '$amount-ға асты';
+  }
+
+  @override
+  String amountLeft(String amount) {
+    return '$amount қалды';
+  }
+
+  @override
+  String amountRemaining(String amount) {
+    return '$amount қалды';
+  }
+
+  @override
+  String transactionsCount(int count) {
+    return 'Транзакциялар ($count)';
+  }
+
+  @override
+  String daysLeftInPeriod(int days, String period) {
+    return '$period кезеңінде $days күн қалды';
+  }
+
+  @override
+  String spendingAbovePace(String percent) {
+    return 'Тәуліктік қарқыннан $percent% жоғары';
+  }
+
+  @override
+  String get accountNameLabel => 'Шот атауы';
+
+  @override
+  String get setUpAccountDescription =>
+      'Қаржыны бақылауды бастау үшін шот қосыңыз';
+
+  @override
+  String get initialBalance => 'Бастапқы баланс (міндетті емес)';
+
+  @override
+  String get nameTooLong => 'Атауы тым ұзын (макс. 50 таңба)';
+
+  @override
+  String get onboardingDescription1 =>
+      'Қаржыңызды қарапайым және ыңғайлы бақылаумен басқарыңыз';
+
+  @override
+  String get onboardingDescription2 =>
+      'Бірнеше шот бойынша кіріс, шығыс және аударымдарды жазыңыз';
+
+  @override
+  String get onboardingDescription3 =>
+      'Шығындарыңызды талдап, дұрыс шешімдер қабылдаңыз';
+
+  @override
+  String get cashSavingsExample => 'мысалы, Қолма-қол, Жинақ, Карта';
 }

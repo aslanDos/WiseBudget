@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
@@ -261,12 +262,12 @@ class _TransactionFormState extends State<TransactionForm> {
           Navigator.pop(context, true);
         } else if (state.status == CubitStatus.failure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
+            SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
           );
         }
       },
       builder: (context, state) => Button(
-        label: 'Save',
+        label: context.l10n.save,
         isLoading: state.status == CubitStatus.loading,
         onPressed: _form.isValidAmount ? () => _saveTransaction(context) : null,
         width: double.infinity,
@@ -336,9 +337,9 @@ class _TransactionFormState extends State<TransactionForm> {
   Future<void> _showDeleteDialog(BuildContext context) async {
     final confirmed = await showAppConfirmDialog(
       context: context,
-      title: 'Delete Transaction',
-      message: 'Are you sure you want to delete this transaction?',
-      confirmText: 'Delete',
+      title: context.l10n.deleteTransaction,
+      message: context.l10n.areYouSureDeleteTransaction,
+      confirmText: context.l10n.delete,
       isDestructive: true,
     );
 

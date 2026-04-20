@@ -77,11 +77,11 @@ class _SettingsViewState extends State<_SettingsView> {
                   SettingsTile(
                     icon: Icons.notifications_rounded,
                     title: l10n.notifications,
-                    subtitle: 'On',
+                    subtitle: l10n.on,
                   ),
                   SettingsTile(
                     icon: Icons.grid_view_rounded,
-                    title: 'Categories',
+                    title: l10n.categories,
                     subtitle: '',
                     isLast: true,
                     onTap: () => showCategoriesModal(context: context),
@@ -116,13 +116,13 @@ class _SettingsViewState extends State<_SettingsView> {
                 ],
               ),
               const SizedBox(height: 24),
-              SectionLabel(label: 'Data'),
+              SectionLabel(label: l10n.data),
               const SizedBox(height: 8),
               SettingsCard(
                 items: [
                   SettingsTile(
                     icon: Icons.delete_sweep_rounded,
-                    title: 'Clear All Data',
+                    title: l10n.clearAllData,
                     subtitle: '',
                     isFirst: true,
                     isLast: true,
@@ -152,27 +152,25 @@ class _SettingsViewState extends State<_SettingsView> {
   String _launchPageLabel(String page, AppLocalizations l10n) => switch (page) {
     'accounts' => l10n.accounts,
     'analytics' => l10n.analytics,
-    'tools' => 'Tools',
-    _ => 'Home',
+    'tools' => l10n.tools,
+    _ => l10n.home,
   };
 
   Future<void> _confirmClearData(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear All Data'),
-        content: const Text(
-          'This will permanently delete all accounts, transactions, budgets, and categories. This action cannot be undone.',
-        ),
+        title: Text(context.l10n.clearAllData),
+        content: Text(context.l10n.clearAllDataConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.red),
-            child: const Text('Clear All'),
+            child: Text(context.l10n.clearAll),
           ),
         ],
       ),

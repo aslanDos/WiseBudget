@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pie_menu/pie_menu.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/navbar.dart';
 import 'package:wisebuget/core/shared/widgets/navbar/new_transaction_button.dart';
@@ -29,6 +30,7 @@ class _MainShellState extends State<MainShell>
   @override
   void initState() {
     super.initState();
+    _selectedAccountUuid = sl<LocalPreferences>().lastChosenAccount;
     _currentIndex = _launchPageIndex(sl<SettingsCubit>().state.launchPage);
     _tabController = TabController(
       vsync: this,
@@ -61,8 +63,10 @@ class _MainShellState extends State<MainShell>
             HomeTab(
               scrollController: _homeTabScrollController,
               selectedAccountUuid: _selectedAccountUuid,
-              onAccountChanged: (uuid) =>
-                  setState(() => _selectedAccountUuid = uuid),
+              onAccountChanged: (uuid) {
+                setState(() => _selectedAccountUuid = uuid);
+                sl<LocalPreferences>().setLastChosenAccount(uuid);
+              },
               selectedDate: _selectedDate,
               onDateChanged: (date) => setState(() => _selectedDate = date),
             ),

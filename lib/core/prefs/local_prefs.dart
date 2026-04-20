@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import "package:shared_preferences/shared_preferences.dart";
-import "package:wisebuget/core/prefs/local_prefs_constatns.dart";
+import "package:wisebuget/core/prefs/local_prefs_constants.dart";
 
 class LocalPreferences {
   final SharedPreferences _prefs;
@@ -39,4 +39,16 @@ class LocalPreferences {
 
   Future<void> setLaunchPage(String value) =>
       _prefs.setString(PrefsConstants.launchPageKey, value);
+
+  /// last chosen account
+  String? get lastChosenAccount =>
+      _prefs.getString(PrefsConstants.lastChosenAccountKey);
+
+  Future<void> setLastChosenAccount(String? value) async {
+    if (value == null) {
+      await _prefs.remove(PrefsConstants.lastChosenAccountKey);
+    } else {
+      await _prefs.setString(PrefsConstants.lastChosenAccountKey, value);
+    }
+  }
 }

@@ -7,17 +7,14 @@ import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/constants/icons_constants.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
-import 'package:wisebuget/core/shared/widgets/color_grid.dart';
-import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/color_icon_selector.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
-import 'package:wisebuget/core/shared/widgets/form_section.dart';
-import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
-import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
@@ -83,7 +80,7 @@ class _CategoryFormState extends State<CategoryForm> {
             Navigator.pop(context, true);
           } else if (state.status == CubitStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
+              SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
             );
           }
         },
@@ -126,39 +123,12 @@ class _CategoryFormState extends State<CategoryForm> {
                           onNameChanged: (name) => setState(() => _name = name),
                         ),
                         const SizedBox(height: 12.0),
-                        FormSection(
-                          title: 'Color',
-                          actionLabel: 'More colors',
-                          onAction: () => showColorPickerModal(
-                            context: context,
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (value) =>
-                                setState(() => _selectedColorValue = value),
-                          ),
-                          child: ColorGrid(
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (value) =>
-                                setState(() => _selectedColorValue = value),
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        FormSection(
-                          title: 'Icon',
-                          actionLabel: 'More icons',
-                          onAction: () => showIconPickerModal(
-                            context: context,
-                            selectedIconCode: _selectedIconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _selectedIconCode = code),
-                          ),
-                          child: IconGrid(
-                            iconOptions: iconOptions,
-                            selectedIconCode: _selectedIconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _selectedIconCode = code),
-                          ),
+                        ColorIconSelector(
+                          selectedColorValue: _selectedColorValue,
+                          selectedIconCode: _selectedIconCode,
+                          iconOptions: iconOptions,
+                          onColorChanged: (value) => setState(() => _selectedColorValue = value),
+                          onIconChanged: (code) => setState(() => _selectedIconCode = code),
                         ),
                         const SizedBox(height: 12.0),
                       ],
@@ -168,7 +138,7 @@ class _CategoryFormState extends State<CategoryForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Button(
-                    label: 'Save',
+                    label: context.l10n.save,
                     isLoading: isLoading,
                     onPressed: isLoading || _name.trim().isEmpty
                         ? null
@@ -188,9 +158,9 @@ class _CategoryFormState extends State<CategoryForm> {
   Future<void> _showDeleteDialog(BuildContext context) async {
     final confirmed = await showAppConfirmDialog(
       context: context,
-      title: 'Delete Category',
-      message: 'Are you sure you want to delete this category?',
-      confirmText: 'Delete',
+      title: context.l10n.deleteCategory,
+      message: context.l10n.areYouSureDeleteCategory,
+      confirmText: context.l10n.delete,
       isDestructive: true,
     );
 
@@ -203,7 +173,7 @@ class _CategoryFormState extends State<CategoryForm> {
     final name = _name.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a category name')),
+        SnackBar(content: Text(context.l10n.pleaseEnterCategoryName)),
       );
       return;
     }

@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
+import 'package:wisebuget/core/shared/utils/list_utils.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
@@ -76,7 +79,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           ),
                           const SizedBox(height: 16.0),
                           Text(
-                            'No ${_selectedType.label} categories',
+                            context.l10n.noCategoriesOfType(_selectedType.l10nLabel(context.l10n)),
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.outline,
@@ -125,45 +128,25 @@ class _CategoriesPageState extends State<CategoriesPage> {
     int oldIndex,
     int newIndex,
   ) {
-    if (oldIndex < newIndex) newIndex -= 1;
-
+    final reordered = applyReorder(categories, oldIndex, newIndex);
     final cubit = context.read<CategoryCubit>();
-    final reordered = List<CategoryEntity>.from(categories);
-    final moved = reordered.removeAt(oldIndex);
-    reordered.insert(newIndex, moved);
-
     for (int i = 0; i < reordered.length; i++) {
       final category = reordered[i];
-      if (category.sortOrder != i) {
-        cubit.editCategory(category.copyWith(sortOrder: i));
-      }
+      if (category.sortOrder != i) cubit.editCategory(category.copyWith(sortOrder: i));
     }
   }
 
-  void _handleDelete(BuildContext context, CategoryEntity category) {
-    showDialog(
+  Future<void> _handleDelete(BuildContext context, CategoryEntity category) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Category'),
-        content: Text('Are you sure you want to delete "${category.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<CategoryCubit>().removeCategory(category.uuid);
-              Navigator.pop(dialogContext);
-            },
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
+      title: context.l10n.deleteCategory,
+      message: context.l10n.areYouSureDeleteNamed(category.name),
+      confirmText: context.l10n.delete,
+      isDestructive: true,
     );
+    if (confirmed == true && context.mounted) {
+      context.read<CategoryCubit>().removeCategory(category.uuid);
+    }
   }
 
   void _handleToggleVisibility(BuildContext context, CategoryEntity category) {

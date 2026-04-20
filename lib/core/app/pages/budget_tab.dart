@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
+import 'package:wisebuget/core/shared/widgets/cubit_error_widget.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
@@ -9,6 +11,7 @@ import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
 import 'package:wisebuget/features/budget/presentation/pages/budget_form_page.dart';
 import 'package:wisebuget/features/budget/presentation/widgets/budget_progress_bar.dart';
@@ -42,7 +45,7 @@ class _BudgetTabState extends State<BudgetTab> {
         appBar: AppBar(
           titleSpacing: 16,
           centerTitle: false,
-          title: Text('Budgets', style: context.t.headlineMedium),
+          title: Text(context.l10n.budgets, style: context.t.headlineMedium),
           actionsPadding: EdgeInsets.only(right: 16),
           actions: [
             ActionButton(
@@ -53,16 +56,14 @@ class _BudgetTabState extends State<BudgetTab> {
         ),
         body: BlocBuilder<BudgetCubit, BudgetState>(
           builder: (context, state) {
-            if (state.status == BudgetStatus.loading ||
-                state.status == BudgetStatus.initial) {
+            if (state.status == CubitStatus.loading ||
+                state.status == CubitStatus.initial) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (state.status == BudgetStatus.failure) {
-              return Center(
-                child: Text(
-                  state.errorMessage ?? 'Failed to load budgets',
-                  style: context.t.bodyMedium,
-                ),
+            if (state.status == CubitStatus.failure) {
+              return CubitErrorWidget(
+                message: state.errorMessage ?? context.l10n.failedToLoadBudgets,
+                onRetry: () => sl<BudgetCubit>().loadBudgets(),
               );
             }
             if (!state.hasBudgets) {
@@ -119,7 +120,7 @@ class _BudgetList extends StatelessWidget {
     // Group budgets by period label
     final groups = <String, List<BudgetProgress>>{};
     for (final p in state.sortedBudgets) {
-      final label = _groupLabel(p.budget);
+      final label = _groupLabel(context, p.budget);
       groups.putIfAbsent(label, () => []).add(p);
     }
 
@@ -156,11 +157,11 @@ class _BudgetList extends StatelessWidget {
     );
   }
 
-  String _groupLabel(BudgetEntity budget) {
+  String _groupLabel(BuildContext context, BudgetEntity budget) {
     return switch (budget.period) {
-      BudgetPeriod.weekly => 'This Week',
-      BudgetPeriod.monthly => 'This Month',
-      BudgetPeriod.custom => 'Custom',
+      BudgetPeriod.weekly => context.l10n.thisWeek,
+      BudgetPeriod.monthly => context.l10n.thisMonth,
+      BudgetPeriod.custom => context.l10n.periodCustom,
     };
   }
 }
@@ -280,15 +281,15 @@ class _BudgetCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Spent ${progress.spentMoney.formatted}',
+                  context.l10n.spentAmount(progress.spentMoney.formatted),
                   style: context.t.labelSmall?.copyWith(
                     color: context.c.onSurface.withAlpha(0x80),
                   ),
                 ),
                 Text(
                   isExceeded
-                      ? 'Over by ${progress.overByMoney.formatted}'
-                      : '${progress.remainingMoney.formatted} left',
+                      ? context.l10n.overByAmount(progress.overByMoney.formatted)
+                      : context.l10n.amountLeft(progress.remainingMoney.formatted),
                   style: context.t.labelSmall?.copyWith(
                     color: isExceeded
                         ? context.c.error
@@ -365,14 +366,14 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No budgets yet',
+            context.l10n.noBudgetsYet,
             style: context.t.titleMedium?.copyWith(
               color: context.c.onSurface.withAlpha(0x80),
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Set a budget to track your spending',
+            context.l10n.setBudgetToTrack,
             style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(0x60),
             ),
@@ -381,7 +382,7 @@ class _EmptyState extends StatelessWidget {
           FilledButton.icon(
             onPressed: onTap,
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Create budget'),
+            label: Text(context.l10n.createBudget),
             style: FilledButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -134,5 +134,110 @@
   "sep": "Сен",
   "oct": "Окт",
   "nov": "Ноя",
-  "dec": "Дек"
+  "dec": "Дек",
+
+  "adjustment": "Корректировка",
+  "selectAll": "Выбрать все",
+  "doneCount": "Готово ({count})",
+  "@doneCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "nAccountsSelected": "{count} счёта(-ов)",
+  "@nAccountsSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "selectDestination": "Выбрать назначение",
+  "selectDestinationAccount": "Выбрать счёт назначения",
+  "selectCategory": "Выбрать категорию",
+  "noCategory": "Без категории",
+  "deleteTransaction": "Удалить транзакцию",
+  "areYouSureDeleteTransaction": "Вы уверены, что хотите удалить эту транзакцию?",
+  "deleteCategory": "Удалить категорию",
+  "areYouSureDeleteCategory": "Вы уверены, что хотите удалить эту категорию?",
+  "areYouSureDeleteAccount": "Вы уверены, что хотите удалить этот счёт?",
+  "areYouSureDeleteBudget": "Вы уверены, что хотите удалить этот бюджет?",
+  "areYouSureDeleteNamed": "Вы уверены, что хотите удалить \"{name}\"?",
+  "@areYouSureDeleteNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "color": "Цвет",
+  "icon": "Иконка",
+  "name": "Название",
+  "newAccount": "Новый счёт",
+  "selectCurrency": "Выбрать валюту",
+  "addAccount": "Добавить счёт",
+  "noAccountsYet": "Счетов пока нет",
+  "addFirstAccountDescription": "Добавьте первый счёт, чтобы начать отслеживать финансы",
+  "searchAccounts": "Поиск счетов",
+  "failedToLoadAccounts": "Не удалось загрузить счета",
+  "failedToLoadBudgets": "Не удалось загрузить бюджеты",
+  "noBudgetsYet": "Бюджетов пока нет",
+  "setBudgetToTrack": "Создайте бюджет для отслеживания расходов",
+  "today": "Сегодня",
+  "yesterday": "Вчера",
+  "thisWeek": "На этой неделе",
+  "thisMonth": "В этом месяце",
+  "previousMonth": "Прошлый месяц",
+  "thisYear": "Этот год",
+  "moreColors": "Больше цветов",
+  "moreIcons": "Больше иконок",
+  "selectAccount": "Выбрать счёт",
+  "resetsEveryMonday": "Сбрасывается каждый понедельник",
+  "resetsEveryMonth": "Сбрасывается 1-го числа каждого месяца",
+  "customRange": "Произвольный период",
+  "pickStartAndEndDate": "Выберите начальную и конечную даты",
+  "noCategoriesOfType": "Нет категорий типа {type}",
+  "@noCategoriesOfType": {
+    "placeholders": { "type": { "type": "String" } }
+  },
+  "on": "Вкл.",
+  "data": "Данные",
+  "clearAllData": "Очистить все данные",
+  "clearAllDataConfirmation": "Это действие безвозвратно удалит все счета, транзакции, бюджеты и категории. Его нельзя отменить.",
+  "clearAll": "Очистить всё",
+  "home": "Главная",
+  "tools": "Инструменты",
+  "choosePeriod": "Выбрать период",
+  "startDate": "Дата начала",
+  "endDate": "Дата окончания",
+  "pleaseEnterCategoryName": "Введите название категории",
+  "spentAmount": "Потрачено {amount}",
+  "@spentAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "overByAmount": "Превышено на {amount}",
+  "@overByAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountLeft": "{amount} осталось",
+  "@amountLeft": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountRemaining": "{amount} осталось",
+  "@amountRemaining": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "transactionsCount": "Транзакции ({count})",
+  "@transactionsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "daysLeftInPeriod": "{days} дн. до конца {period}",
+  "@daysLeftInPeriod": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "period": { "type": "String" }
+    }
+  },
+  "spendingAbovePace": "Траты на {percent}% выше дневного темпа",
+  "@spendingAbovePace": {
+    "placeholders": { "percent": { "type": "String" } }
+  },
+  "accountNameLabel": "Название счёта",
+  "setUpAccountDescription": "Добавьте счёт, чтобы начать отслеживать финансы",
+  "initialBalance": "Начальный баланс (необязательно)",
+  "nameTooLong": "Слишком длинное название (макс. 50 символов)",
+  "onboardingDescription1": "Контролируйте свои финансы с помощью простого и удобного трекера",
+  "onboardingDescription2": "Записывайте доходы, расходы и переводы по нескольким счетам",
+  "onboardingDescription3": "Анализируйте траты и принимайте более обоснованные решения",
+  "cashSavingsExample": "например, Наличные, Сбережения, Карта"
 }

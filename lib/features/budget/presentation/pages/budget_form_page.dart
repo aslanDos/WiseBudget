@@ -10,20 +10,20 @@ import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
-import 'package:wisebuget/core/shared/widgets/color_grid.dart';
-import 'package:wisebuget/core/shared/widgets/color_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/color_icon_selector.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
-import 'package:wisebuget/core/shared/widgets/form_section.dart';
-import 'package:wisebuget/core/shared/widgets/icon_grid.dart';
-import 'package:wisebuget/core/shared/widgets/icon_picker_modal.dart';
+import 'package:wisebuget/core/shared/widgets/dialog.dart';
 import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
+import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/shared/widgets/picker_list_tile.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
 import 'package:wisebuget/features/budget/presentation/widgets/category_multi_select.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
@@ -158,33 +158,15 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
         .replaceAll(RegExp(r'\.$'), '');
   }
 
-  String get _periodLabel {
+  String _periodLabel(AppLocalizations l10n) {
     return switch (_period) {
-      BudgetPeriod.weekly => 'Weekly',
-      BudgetPeriod.monthly => 'Monthly',
+      BudgetPeriod.weekly => l10n.periodWeekly,
+      BudgetPeriod.monthly => l10n.periodMonthly,
       BudgetPeriod.custom =>
         _customStart != null && _customEnd != null
-            ? '${_fmt(_customStart!)} – ${_fmt(_customEnd!)}'
-            : 'Custom',
+            ? '${DateFormatter.formatShortDate(_customStart!, l10n)} – ${DateFormatter.formatShortDate(_customEnd!, l10n)}'
+            : l10n.periodCustom,
     };
-  }
-
-  String _fmt(DateTime d) {
-    const m = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${d.day} ${m[d.month - 1]}';
   }
 
   @override
@@ -200,21 +182,21 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
       child: BlocConsumer<BudgetCubit, BudgetState>(
         listenWhen: (prev, cur) =>
             _isSaving &&
-            prev.status == BudgetStatus.loading &&
-            cur.status != BudgetStatus.loading,
+            prev.status == CubitStatus.loading &&
+            cur.status != CubitStatus.loading,
         listener: (context, state) {
-          if (state.status == BudgetStatus.success) {
+          if (state.status == CubitStatus.success) {
             _isSaving = false;
             Navigator.pop(context, true);
-          } else if (state.status == BudgetStatus.failure) {
+          } else if (state.status == CubitStatus.failure) {
             _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Failed to save')),
+              SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
             );
           }
         },
         builder: (context, state) {
-          final isLoading = state.status == BudgetStatus.loading;
+          final isLoading = state.status == CubitStatus.loading;
 
           return Material(
             color: context.c.surface,
@@ -255,15 +237,15 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
                           children: [
                             PickerField(
                               icon: Icons.account_balance_wallet_outlined,
-                              label: 'Budget limit',
+                              label: context.l10n.budgetLimit,
                               value: _amountDisplay,
                               shrink: false,
                               onTap: () => _showAmountInput(context),
                             ),
                             PickerField(
                               icon: AppIcons.calendar,
-                              label: 'Period',
-                              value: _periodLabel,
+                              label: context.l10n.period,
+                              value: _periodLabel(context.l10n),
                               shrink: false,
                               onTap: () => _showPeriodPicker(context),
                             ),
@@ -295,7 +277,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
                             return PickerField(
                               backgroundColor: context.c.surfaceContainer,
                               icon: AppIcons.grid,
-                              label: 'Categories',
+                              label: context.l10n.categories,
                               value: categoryValue,
                               shrink: false,
                               onTap: () => _showCategoryPicker(
@@ -306,39 +288,12 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        FormSection(
-                          title: 'Color',
-                          actionLabel: 'More colors',
-                          onAction: () => showColorPickerModal(
-                            context: context,
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (v) =>
-                                setState(() => _selectedColorValue = v),
-                          ),
-                          child: ColorGrid(
-                            selectedColorValue: _selectedColorValue,
-                            onColorSelected: (v) =>
-                                setState(() => _selectedColorValue = v),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        FormSection(
-                          title: 'Icon',
-                          actionLabel: 'More icons',
-                          onAction: () => showIconPickerModal(
-                            context: context,
-                            selectedIconCode: _iconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _iconCode = code),
-                          ),
-                          child: IconGrid(
-                            iconOptions: _kBudgetIconOptions,
-                            selectedIconCode: _iconCode,
-                            selectedColor: selectedColor,
-                            onIconSelected: (code) =>
-                                setState(() => _iconCode = code),
-                          ),
+                        ColorIconSelector(
+                          selectedColorValue: _selectedColorValue,
+                          selectedIconCode: _iconCode,
+                          iconOptions: _kBudgetIconOptions,
+                          onColorChanged: (v) => setState(() => _selectedColorValue = v),
+                          onIconChanged: (code) => setState(() => _iconCode = code),
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -348,7 +303,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: Button(
-                    label: 'Save',
+                    label: context.l10n.save,
                     isLoading: isLoading,
                     onPressed: _isValid ? () => _save(context) : null,
                     width: double.infinity,
@@ -369,7 +324,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
     final result = await showInputAmountSheet(
       context: context,
       initialAmount: _amount,
-      title: 'Budget Limit',
+      title: context.l10n.budgetLimit,
     );
     if (result != null) setState(() => _amount = result);
   }
@@ -400,35 +355,24 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
       context: context,
       categories: categories,
       selectedUuids: _selectedCategoryUuids,
-      title: 'Categories',
+      title: context.l10n.categories,
     );
     if (result != null) {
       setState(() => _selectedCategoryUuids = result);
     }
   }
 
-  void _confirmDelete(BuildContext context) {
-    showDialog(
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (dlg) => AlertDialog(
-        title: const Text('Delete Budget'),
-        content: const Text('Are you sure you want to delete this budget?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dlg),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: context.c.error),
-            onPressed: () {
-              Navigator.pop(dlg);
-              sl<BudgetCubit>().deleteBudget(widget.budgetUuid!);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      title: context.l10n.deleteBudget,
+      message: context.l10n.areYouSureDeleteBudget,
+      confirmText: context.l10n.delete,
+      isDestructive: true,
     );
+    if (confirmed == true) {
+      sl<BudgetCubit>().deleteBudget(widget.budgetUuid!);
+    }
   }
 
   void _save(BuildContext context) {
@@ -512,7 +456,7 @@ class _Header extends StatelessWidget {
             Expanded(
               child: Center(
                 child: Text(
-                  isEditing ? 'Edit Budget' : 'New Budget',
+                  isEditing ? context.l10n.editBudget : context.l10n.newBudget,
                   style: context.t.titleMedium,
                 ),
               ),
@@ -544,7 +488,7 @@ class _NameField extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickerField(
       icon: Icons.text_fields_rounded,
-      label: 'Name',
+      label: context.l10n.name,
       value: name,
       iconColor: context.c.onSecondary,
       backgroundColor: context.c.surfaceContainer,
@@ -580,7 +524,7 @@ class _PeriodPickerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModalSheet.scrollable(
-      title: Text('Period', style: context.t.titleMedium),
+      title: Text(context.l10n.period, style: context.t.titleMedium),
       child: ListView(
         shrinkWrap: true,
         children: [
@@ -588,8 +532,8 @@ class _PeriodPickerSheet extends StatelessWidget {
             icon: Icons.calendar_view_week_rounded,
             iconColor: context.c.primary,
             iconBackgroundColor: context.c.primary.withAlpha(0x22),
-            title: 'Weekly',
-            subtitle: 'Resets every Monday',
+            title: context.l10n.periodWeekly,
+            subtitle: context.l10n.resetsEveryMonday,
             isSelected: selected == BudgetPeriod.weekly,
             onTap: () =>
                 Navigator.pop(context, (BudgetPeriod.weekly, null, null)),
@@ -598,8 +542,8 @@ class _PeriodPickerSheet extends StatelessWidget {
             icon: Icons.calendar_month_rounded,
             iconColor: context.c.primary,
             iconBackgroundColor: context.c.primary.withAlpha(0x22),
-            title: 'Monthly',
-            subtitle: 'Resets on the 1st of each month',
+            title: context.l10n.periodMonthly,
+            subtitle: context.l10n.resetsEveryMonth,
             isSelected: selected == BudgetPeriod.monthly,
             onTap: () =>
                 Navigator.pop(context, (BudgetPeriod.monthly, null, null)),
@@ -609,10 +553,10 @@ class _PeriodPickerSheet extends StatelessWidget {
             icon: AppIcons.calendar,
             iconColor: context.c.primary,
             iconBackgroundColor: context.c.primary.withAlpha(0x22),
-            title: 'Custom range',
+            title: context.l10n.customRange,
             subtitle: selected == BudgetPeriod.custom && customStart != null
-                ? _range(customStart!, customEnd)
-                : 'Pick a start and end date',
+                ? _range(context, customStart!, customEnd)
+                : context.l10n.pickStartAndEndDate,
             isSelected: selected == BudgetPeriod.custom,
             onTap: () => _pickCustom(context),
           ),
@@ -622,25 +566,10 @@ class _PeriodPickerSheet extends StatelessWidget {
     );
   }
 
-  String _range(DateTime s, DateTime? e) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final start = '${s.day} ${months[s.month - 1]}';
+  String _range(BuildContext context, DateTime s, DateTime? e) {
+    final start = DateFormatter.formatShortDate(s, context.l10n);
     if (e == null) return start;
-    final end = '${e.day} ${months[e.month - 1]}';
-    return '$start – $end';
+    return '$start – ${DateFormatter.formatShortDate(e, context.l10n)}';
   }
 
   Future<void> _pickCustom(BuildContext context) async {

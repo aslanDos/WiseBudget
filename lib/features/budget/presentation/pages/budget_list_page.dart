@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
+import 'package:wisebuget/core/shared/widgets/cubit_error_widget.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
 import 'package:wisebuget/features/budget/presentation/pages/budget_detail_page.dart';
 import 'package:wisebuget/features/budget/presentation/pages/budget_form_page.dart';
@@ -48,7 +51,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
       value: sl<BudgetCubit>(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Budgets'),
+          title: Text(context.l10n.budgets),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openBudgetForm(),
@@ -56,11 +59,11 @@ class _BudgetListPageState extends State<BudgetListPage> {
         ),
         body: BlocBuilder<BudgetCubit, BudgetState>(
           builder: (context, state) {
-            if (state.status == BudgetStatus.loading) {
+            if (state.status == CubitStatus.loading) {
               return _buildLoadingState();
             }
 
-            if (state.status == BudgetStatus.failure) {
+            if (state.status == CubitStatus.failure) {
               return _buildErrorState(state.errorMessage);
             }
 
@@ -84,24 +87,9 @@ class _BudgetListPageState extends State<BudgetListPage> {
   }
 
   Widget _buildErrorState(String? message) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 48,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          const SizedBox(height: 16),
-          Text(message ?? 'Something went wrong'),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => sl<BudgetCubit>().loadBudgets(),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
+    return CubitErrorWidget(
+      message: message,
+      onRetry: () => sl<BudgetCubit>().loadBudgets(),
     );
   }
 
@@ -118,7 +106,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
           if (state.totalBudget != null) ...[
             BudgetSummaryCard(
               totalBudget: state.totalBudget,
-              periodLabel: _getCurrentPeriodLabel(),
+              periodLabel: _getCurrentPeriodLabel(context),
             ),
             const SizedBox(height: 24),
           ],
@@ -127,7 +115,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Text(
-              'Your Budgets',
+              context.l10n.yourBudgets,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colors.onSurfaceVariant,
@@ -153,7 +141,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 12),
               child: Text(
-                'Insights',
+                context.l10n.insights,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: colors.onSurfaceVariant,
@@ -178,21 +166,13 @@ class _BudgetListPageState extends State<BudgetListPage> {
     );
   }
 
-  String _getCurrentPeriodLabel() {
+  String _getCurrentPeriodLabel(BuildContext context) {
     final now = DateTime.now();
+    final l10n = context.l10n;
     final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
+      l10n.january, l10n.february, l10n.march, l10n.april,
+      l10n.may, l10n.june, l10n.july, l10n.august,
+      l10n.september, l10n.october, l10n.november, l10n.december,
     ];
     return '${months[now.month - 1]} ${now.year}';
   }

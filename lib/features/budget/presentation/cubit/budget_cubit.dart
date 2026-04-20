@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
 import 'package:wisebuget/features/budget/domain/usecases/budget_usecases.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
@@ -33,7 +34,7 @@ class BudgetCubit extends Cubit<BudgetState> {
 
   /// Load all active budgets and calculate progress
   Future<void> loadBudgets() async {
-    emit(state.copyWith(status: BudgetStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _getBudgets(const GetBudgetsParams(activeOnly: true));
 
@@ -41,7 +42,7 @@ class BudgetCubit extends Cubit<BudgetState> {
       (failure) {
         _log.warning('Failed to load budgets: ${failure.message}');
         emit(state.copyWith(
-          status: BudgetStatus.failure,
+          status: CubitStatus.failure,
           errorMessage: failure.message,
         ));
       },
@@ -52,7 +53,7 @@ class BudgetCubit extends Cubit<BudgetState> {
         final total = _calculateTotalBudget(progressList);
 
         emit(state.copyWith(
-          status: BudgetStatus.success,
+          status: CubitStatus.success,
           budgets: progressList,
           totalBudget: total,
           insights: insights,
@@ -149,7 +150,7 @@ class BudgetCubit extends Cubit<BudgetState> {
 
   /// Add a new budget
   Future<void> addBudget(BudgetEntity budget) async {
-    emit(state.copyWith(status: BudgetStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _createBudget(CreateBudgetParams(budget: budget));
 
@@ -157,17 +158,17 @@ class BudgetCubit extends Cubit<BudgetState> {
       (failure) {
         _log.warning('Failed to create budget: ${failure.message}');
         emit(state.copyWith(
-          status: BudgetStatus.failure,
+          status: CubitStatus.failure,
           errorMessage: failure.message,
         ));
       },
-      (_) => emit(state.copyWith(status: BudgetStatus.success)),
+      (_) => emit(state.copyWith(status: CubitStatus.success)),
     );
   }
 
   /// Edit an existing budget
   Future<void> editBudget(BudgetEntity budget) async {
-    emit(state.copyWith(status: BudgetStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _updateBudget(UpdateBudgetParams(budget: budget));
 
@@ -175,11 +176,11 @@ class BudgetCubit extends Cubit<BudgetState> {
       (failure) {
         _log.warning('Failed to update budget: ${failure.message}');
         emit(state.copyWith(
-          status: BudgetStatus.failure,
+          status: CubitStatus.failure,
           errorMessage: failure.message,
         ));
       },
-      (_) => emit(state.copyWith(status: BudgetStatus.success)),
+      (_) => emit(state.copyWith(status: CubitStatus.success)),
     );
   }
 
@@ -194,7 +195,7 @@ class BudgetCubit extends Cubit<BudgetState> {
 
   /// Delete a budget permanently
   Future<void> deleteBudget(String uuid) async {
-    emit(state.copyWith(status: BudgetStatus.loading));
+    emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _deleteBudget(DeleteBudgetParams(uuid: uuid));
 
@@ -202,17 +203,17 @@ class BudgetCubit extends Cubit<BudgetState> {
       (failure) {
         _log.warning('Failed to delete budget: ${failure.message}');
         emit(state.copyWith(
-          status: BudgetStatus.failure,
+          status: CubitStatus.failure,
           errorMessage: failure.message,
         ));
       },
-      (_) => emit(state.copyWith(status: BudgetStatus.success)),
+      (_) => emit(state.copyWith(status: CubitStatus.success)),
     );
   }
 
   /// Called when transactions change - recalculate progress
   void onTransactionsChanged() {
-    if (state.status == BudgetStatus.success) {
+    if (state.status == CubitStatus.success) {
       loadBudgets();
     }
   }

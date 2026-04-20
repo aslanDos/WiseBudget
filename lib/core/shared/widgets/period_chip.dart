@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period.dart';
+import 'package:wisebuget/core/shared/utils/date_formatter.dart';
+import 'package:wisebuget/features/analytics/domain/analytics_period_l10n.dart';
 
 class PeriodChip extends StatelessWidget {
   final AnalyticsPeriod selectedPeriod;
@@ -37,7 +40,7 @@ class PeriodChip extends StatelessWidget {
           children: [
             Icon(AppIcons.calendar, size: 16, color: context.c.primary),
             const SizedBox(width: 8),
-            Text(selectedPeriod.chipLabel, style: context.t.titleSmall),
+            Text(selectedPeriod.localizedChipLabel(context.l10n), style: context.t.titleSmall),
             const SizedBox(width: 4),
             const Icon(Icons.keyboard_arrow_down_rounded, size: 16),
           ],
@@ -136,31 +139,12 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
     Navigator.pop(context);
   }
 
-  String _formatDate(DateTime d) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final now = DateTime.now();
-    if (d.year == now.year) return '${d.day} ${months[d.month - 1]}';
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
     return ModalSheet.scrollable(
       title: Text(
-        'Choose period',
+        context.l10n.choosePeriod,
         style: context.t.titleLarge?.copyWith(fontWeight: FontWeight.w700),
       ),
       child: ListView(
@@ -173,7 +157,7 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
               runSpacing: 8,
               children: _presets.map((period) {
                 return _PresetChip(
-                  label: period.label,
+                  label: period.localizedLabel(context.l10n),
                   isSelected: _selectedPreset == period,
                   onTap: () => _selectPreset(period),
                 );
@@ -183,12 +167,12 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
           const SizedBox(height: 20),
           const Divider(height: 1),
           _DateRow(
-            label: 'Start date',
-            date: _formatDate(_start),
+            label: context.l10n.startDate,
+            date: DateFormatter.formatShortDate(_start, context.l10n),
             onTap: _pickStart,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
-          _DateRow(label: 'End date', date: _formatDate(_end), onTap: _pickEnd),
+          _DateRow(label: context.l10n.endDate, date: DateFormatter.formatShortDate(_end, context.l10n), onTap: _pickEnd),
           const Divider(height: 1),
           const SizedBox(height: 16),
           Padding(
@@ -202,7 +186,7 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
                 ),
               ),
               child: Text(
-                'Save',
+                context.l10n.save,
                 style: context.t.titleMedium?.copyWith(color: Colors.white),
               ),
             ),

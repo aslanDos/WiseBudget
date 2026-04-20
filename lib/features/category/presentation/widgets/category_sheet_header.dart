@@ -41,7 +41,11 @@ class CategorySheetHeader extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 220),
                   child: TypeToggle<TransactionType>(
                     items: TransactionType.values
-                        .where((t) => t != TransactionType.transfer)
+                        .where(
+                          (t) =>
+                              t != TransactionType.transfer &&
+                              t != TransactionType.adjustment,
+                        )
                         .map(
                           (t) => TypeToggleItem(
                             value: t,

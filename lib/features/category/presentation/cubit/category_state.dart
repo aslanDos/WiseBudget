@@ -1,30 +1,23 @@
-import 'package:equatable/equatable.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
+import 'package:wisebuget/core/shared/cubit/list_cubit_state.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 
-class CategoryState extends Equatable {
-  final CubitStatus status;
-  final List<CategoryEntity> categories;
-  final String? errorMessage;
-
+class CategoryState extends ListCubitState<CategoryEntity> {
   const CategoryState({
-    this.status = CubitStatus.initial,
-    this.categories = const [],
-    this.errorMessage,
-  });
+    super.status,
+    List<CategoryEntity> categories = const [],
+    super.errorMessage,
+  }) : super(items: categories);
+
+  List<CategoryEntity> get categories => items;
 
   CategoryState copyWith({
     CubitStatus? status,
     List<CategoryEntity>? categories,
     String? errorMessage,
-  }) {
-    return CategoryState(
-      status: status ?? this.status,
-      categories: categories ?? this.categories,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
-
-  @override
-  List<Object?> get props => [status, categories, errorMessage];
+  }) => CategoryState(
+    status: status ?? this.status,
+    categories: categories ?? items,
+    errorMessage: errorMessage ?? this.errorMessage,
+  );
 }

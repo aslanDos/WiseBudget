@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
@@ -33,24 +34,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   static const _currencies = ['KZT', 'USD', 'EUR', 'RUB'];
 
-  static const _onboardingData = [
-    (
-      icon: LucideIcons.wallet,
-      title: 'Welcome to WiseBudget',
-      description:
-          'Take control of your finances with simple, intuitive tracking',
-    ),
-    (
-      icon: LucideIcons.arrowLeftRight,
-      title: 'Track Every Transaction',
-      description:
-          'Record income, expenses, and transfers across multiple accounts',
-    ),
-    (
-      icon: LucideIcons.chartPie,
-      title: 'Gain Financial Insights',
-      description: 'Understand your spending habits and make smarter decisions',
-    ),
+  List<({IconData icon, String title, String description})> _onboardingData(AppLocalizations l10n) => [
+    (icon: LucideIcons.wallet, title: l10n.welcomeToWiseBudget, description: l10n.onboardingDescription1),
+    (icon: LucideIcons.arrowLeftRight, title: l10n.trackEveryTransaction, description: l10n.onboardingDescription2),
+    (icon: LucideIcons.chartPie, title: l10n.gainFinancialInsights, description: l10n.onboardingDescription3),
   ];
 
   @override
@@ -115,7 +102,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       onPressed: _currentPage < 3
                           ? _skipToAccountCreation
                           : null,
-                      child: const Text('Skip'),
+                      child: Text(context.l10n.skip),
                     ),
                   ),
                 ),
@@ -131,11 +118,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   children: [
                     // Intro pages (0-2)
                     ...List.generate(
-                      _onboardingData.length,
+                      _onboardingData(context.l10n).length,
                       (index) => OnboardingContent(
-                        icon: _onboardingData[index].icon,
-                        title: _onboardingData[index].title,
-                        description: _onboardingData[index].description,
+                        icon: _onboardingData(context.l10n)[index].icon,
+                        title: _onboardingData(context.l10n)[index].title,
+                        description: _onboardingData(context.l10n)[index].description,
                         isActive: _currentPage == index,
                       ),
                     ),
@@ -172,7 +159,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: FilledButton(
                           onPressed: _nextPage,
                           child: Text(
-                            _currentPage == 2 ? 'Get Started' : 'Next',
+                            _currentPage == 2 ? context.l10n.getStarted : context.l10n.next,
                           ),
                         ),
                       )
@@ -210,6 +197,7 @@ class _AccountCreationPage extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final l10n = context.l10n;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Form(
@@ -221,7 +209,7 @@ class _AccountCreationPage extends StatelessWidget {
 
             // Header
             Text(
-              'Create Your First Account',
+              l10n.createFirstAccount,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
@@ -230,7 +218,7 @@ class _AccountCreationPage extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             Text(
-              'Set up an account to start tracking your finances',
+              l10n.setUpAccountDescription,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -241,18 +229,18 @@ class _AccountCreationPage extends StatelessWidget {
             // Account name field
             TextFormField(
               controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Account Name',
-                hintText: 'e.g., Cash, Savings, Credit Card',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.accountNameLabel,
+                hintText: l10n.cashSavingsExample,
+                border: const OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.words,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter account name';
+                  return l10n.pleaseEnterAccountName;
                 }
                 if (value.length > 50) {
-                  return 'Name is too long (max 50 chars)';
+                  return l10n.nameTooLong;
                 }
                 return null;
               },
@@ -262,9 +250,9 @@ class _AccountCreationPage extends StatelessWidget {
             // Currency dropdown
             DropdownButtonFormField<String>(
               initialValue: selectedCurrency,
-              decoration: const InputDecoration(
-                labelText: 'Currency',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.currency,
+                border: const OutlineInputBorder(),
               ),
               items: currencies
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -276,10 +264,10 @@ class _AccountCreationPage extends StatelessWidget {
             // Initial balance field
             TextFormField(
               controller: balanceController,
-              decoration: const InputDecoration(
-                labelText: 'Initial Balance (optional)',
+              decoration: InputDecoration(
+                labelText: l10n.initialBalance,
                 hintText: '0.00',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -287,7 +275,7 @@ class _AccountCreationPage extends StatelessWidget {
               validator: (value) {
                 if (value != null && value.isNotEmpty) {
                   if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
+                    return l10n.pleaseEnterValidNumber;
                   }
                 }
                 return null;
@@ -302,7 +290,6 @@ class _AccountCreationPage extends StatelessWidget {
                   current.status != CubitStatus.loading,
               listener: (context, state) async {
                 if (state.status == CubitStatus.success) {
-                  // Mark onboarding as completed
                   await sl<LocalPreferences>().setCompletedOnboarding(true);
                   if (context.mounted) {
                     context.go(AppRoutes.home);
@@ -311,7 +298,7 @@ class _AccountCreationPage extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        state.errorMessage ?? 'Failed to create account',
+                        state.errorMessage ?? context.l10n.failedToCreateAccount,
                       ),
                     ),
                   );
@@ -327,7 +314,7 @@ class _AccountCreationPage extends StatelessWidget {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Create Account'),
+                      : Text(context.l10n.createAccount),
                 );
               },
             ),

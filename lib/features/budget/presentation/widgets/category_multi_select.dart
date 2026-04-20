@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
@@ -82,7 +83,7 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
             Expanded(
               child: OutlinedButton(
                 onPressed: _selected.isEmpty ? null : _clearAll,
-                child: const Text('Clear'),
+                child: Text(context.l10n.clear),
               ),
             ),
             const SizedBox(width: 12),
@@ -90,7 +91,7 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
               flex: 2,
               child: FilledButton(
                 onPressed: () => Navigator.pop(context, _selected.toList()),
-                child: Text('Done (${_selected.length})'),
+                child: Text(context.l10n.doneCount(_selected.length)),
               ),
             ),
           ],
@@ -102,7 +103,7 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
           // Select all option
           ListTile(
             leading: Icon(Icons.select_all_rounded, color: colors.primary),
-            title: const Text('Select All'),
+            title: Text(context.l10n.selectAll),
             onTap: _selectAll,
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           ),
@@ -156,79 +157,3 @@ class _CategoryMultiSelectSheetState extends State<_CategoryMultiSelectSheet> {
   }
 }
 
-/// Chip widget for displaying selected categories
-class CategoryChips extends StatelessWidget {
-  final List<CategoryEntity> categories;
-  final List<String> selectedUuids;
-  final VoidCallback? onTap;
-  final bool showAddButton;
-
-  const CategoryChips({
-    super.key,
-    required this.categories,
-    required this.selectedUuids,
-    this.onTap,
-    this.showAddButton = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    final selectedCategories = categories
-        .where((c) => selectedUuids.contains(c.uuid))
-        .toList();
-
-    if (selectedCategories.isEmpty && !showAddButton) {
-      return Text(
-        'All categories',
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: colors.onSurfaceVariant,
-        ),
-      );
-    }
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final category in selectedCategories)
-          _CategoryChip(category: category),
-        if (showAddButton)
-          ActionChip(
-            avatar: const Icon(Icons.add, size: 18),
-            label: Text(selectedCategories.isEmpty ? 'Select' : 'Add'),
-            onPressed: onTap,
-          ),
-      ],
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final CategoryEntity category;
-
-  const _CategoryChip({required this.category});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final color = AppPalette.fromValue(
-      category.colorValue,
-      defaultColor: colors.primary,
-    );
-
-    return Chip(
-      avatar: Icon(
-        AppIcons.fromCode(category.iconCode),
-        size: 18,
-        color: color,
-      ),
-      label: Text(category.name),
-      backgroundColor: color.withAlpha(0x1A),
-      side: BorderSide.none,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-    );
-  }
-}

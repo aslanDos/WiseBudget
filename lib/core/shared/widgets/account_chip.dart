@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
@@ -41,7 +42,7 @@ class AccountChip extends StatelessWidget {
     if (showAll && allSelected) {
       icon = AppIcons.wallet;
       iconColor = context.c.primary;
-      label = 'All Accounts';
+      label = context.l10n.allAccounts;
     } else {
       icon = account != null
           ? AppIcons.fromCode(account!.iconCode)
@@ -50,7 +51,7 @@ class AccountChip extends StatelessWidget {
         account?.colorValue,
         defaultColor: context.c.primary,
       );
-      label = account?.name ?? 'Select an account';
+      label = account?.name ?? context.l10n.selectAccount;
     }
 
     return Pressable(
@@ -89,7 +90,7 @@ void showAccountPicker({
   required String? selectedAccountUuid,
   required ValueChanged<String> onSelected,
   VoidCallback? onAllSelected,
-  String title = 'Select Account',
+  String? title,
 }) {
   if (accounts.isEmpty) return;
 
@@ -102,7 +103,7 @@ void showAccountPicker({
           children: [
             Expanded(
               child: Text(
-                title,
+                title ?? context.l10n.selectAccount,
                 style: context.t.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -115,7 +116,7 @@ void showAccountPicker({
                   Navigator.pop(context);
                 },
                 child: Text(
-                  'All',
+                  context.l10n.all,
                   style: context.t.titleMedium?.copyWith(
                     color: isAllSelected
                         ? context.c.primary

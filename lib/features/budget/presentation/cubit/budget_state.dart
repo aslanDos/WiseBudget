@@ -1,17 +1,16 @@
 import 'package:equatable/equatable.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
 
-enum BudgetStatus { initial, loading, success, failure }
-
 class BudgetState extends Equatable {
-  final BudgetStatus status;
+  final CubitStatus status;
   final List<BudgetProgress> budgets;
   final BudgetProgress? totalBudget;
   final List<BudgetInsight> insights;
   final String? errorMessage;
 
   const BudgetState({
-    this.status = BudgetStatus.initial,
+    this.status = CubitStatus.initial,
     this.budgets = const [],
     this.totalBudget,
     this.insights = const [],
@@ -47,7 +46,7 @@ class BudgetState extends Equatable {
   bool get hasInsights => insights.isNotEmpty;
 
   BudgetState copyWith({
-    BudgetStatus? status,
+    CubitStatus? status,
     List<BudgetProgress>? budgets,
     BudgetProgress? totalBudget,
     List<BudgetInsight>? insights,
