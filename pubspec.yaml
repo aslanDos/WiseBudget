@@ -32,6 +32,7 @@ dependencies:
   pie_menu: ^3.3.1
   modal_bottom_sheet: ^3.0.0
   fl_chart: ^0.70.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -62,5 +63,10 @@ flutter:
           weight: 600
         - asset: assets/fonts/Inter-Bold.ttf
           weight: 700
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/image/logo.png"
   
 
