@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisebuget/core/database/objectbox.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
+import 'package:wisebuget/core/services/network_service.dart';
 import 'package:wisebuget/features/account/data/data_source/account_local_datasource.dart';
 import 'package:wisebuget/features/account/data/data_source/account_local_datasource_impl.dart';
 import 'package:wisebuget/features/account/data/repository/account_repository_impl.dart';
@@ -22,6 +23,11 @@ import 'package:wisebuget/features/category/data/repository/category_repository_
 import 'package:wisebuget/features/category/domain/repository/category_repository.dart';
 import 'package:wisebuget/features/category/domain/usecases/category_usecases.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
+import 'package:wisebuget/features/exchange_rate/data/data_source/exchange_rate_local_datasource.dart';
+import 'package:wisebuget/features/exchange_rate/data/data_source/exchange_rate_remote_datasource.dart';
+import 'package:wisebuget/features/exchange_rate/data/repository/exchange_rate_repository_impl.dart';
+import 'package:wisebuget/features/exchange_rate/domain/repository/exchange_rate_repository.dart';
+import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource_impl.dart';
 import 'package:wisebuget/features/transaction/data/repository/transaction_repository_impl.dart';
@@ -44,6 +50,9 @@ Future<void> init() async {
   // Preferences
   sl.registerSingleton(LocalPreferences(prefs: sl()));
 
+  // Network
+  sl.registerLazySingleton(() => NetworkService());
+
   // Settings
   sl.registerLazySingleton(() => ClearAllData(sl()));
   sl.registerLazySingleton(() => SettingsCubit(sl(), sl()));
@@ -51,9 +60,26 @@ Future<void> init() async {
   // Features
   _initAccountFeature();
   _initCategoryFeature();
+  _initExchangeRateFeature();
   _initTransactionFeature();
   _initBudgetFeature();
   _initAnalyticsFeature();
+}
+
+void _initExchangeRateFeature() {
+  sl.registerLazySingleton<ExchangeRateLocalDataSource>(
+    () => ExchangeRateLocalDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<ExchangeRateRemoteDataSource>(
+    () => FrankfurterRemoteDataSource(networkService: sl()),
+  );
+  sl.registerLazySingleton<ExchangeRateRepository>(
+    () => ExchangeRateRepositoryImpl(
+      localDataSource: sl(),
+      remoteDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetOrFetchExchangeRate(sl()));
 }
 
 void _initAnalyticsFeature() {
@@ -157,6 +183,8 @@ void _initTransactionFeature() {
       updateTransaction: sl(),
       deleteTransaction: sl(),
       accountCubit: sl(),
+      getOrFetchExchangeRate: sl(),
+      prefs: sl(),
     ),
   );
 }

@@ -72,11 +72,11 @@ class AccountChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: iconColor),
+            Icon(icon, size: 16, color: iconColor),
             const SizedBox(width: 8),
             Text(label, style: context.t.titleSmall),
             const SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+            Icon(Icons.keyboard_arrow_down_rounded, size: 16),
           ],
         ),
       ),

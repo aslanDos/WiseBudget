@@ -36,6 +36,7 @@ dependencies:
   flutter_svg: ^2.2.4
   pull_down_button: ^0.10.2
   cupertino_calendar_picker: ^2.2.6
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

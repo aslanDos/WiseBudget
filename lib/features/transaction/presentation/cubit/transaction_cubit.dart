@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
@@ -17,6 +19,8 @@ class TransactionCubit extends Cubit<TransactionState> {
   final UpdateTransaction _updateTransaction;
   final DeleteTransaction _deleteTransaction;
   final AccountCubit _accountCubit;
+  final GetOrFetchExchangeRate _getOrFetchExchangeRate;
+  final LocalPreferences _prefs;
 
   TransactionCubit({
     required GetTransactions getTransactions,
@@ -26,6 +30,8 @@ class TransactionCubit extends Cubit<TransactionState> {
     required UpdateTransaction updateTransaction,
     required DeleteTransaction deleteTransaction,
     required AccountCubit accountCubit,
+    required GetOrFetchExchangeRate getOrFetchExchangeRate,
+    required LocalPreferences prefs,
   })  : _getTransactions = getTransactions,
         _getTransactionsByAccount = getTransactionsByAccount,
         _getTransactionsByCategory = getTransactionsByCategory,
@@ -33,6 +39,8 @@ class TransactionCubit extends Cubit<TransactionState> {
         _updateTransaction = updateTransaction,
         _deleteTransaction = deleteTransaction,
         _accountCubit = accountCubit,
+        _getOrFetchExchangeRate = getOrFetchExchangeRate,
+        _prefs = prefs,
         super(const TransactionState());
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -98,7 +106,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(status: CubitStatus.loading));
 
     final result = await _createTransaction(
-      CreateTransactionParams(transaction: transaction),
+      CreateTransactionParams(transaction: await _attachExchangeRate(transaction)),
     );
 
     result.fold(
@@ -113,13 +121,41 @@ class TransactionCubit extends Cubit<TransactionState> {
     );
   }
 
+  Future<TransactionEntity> _attachExchangeRate(TransactionEntity tx) async {
+    final baseCurrency = _prefs.currency;
+    if (tx.currency == baseCurrency) {
+      return tx.copyWith(
+        exchangeRate: 1.0,
+        convertedAmount: tx.amount,
+        baseCurrency: baseCurrency,
+      );
+    }
+    final result = await _getOrFetchExchangeRate(
+      GetOrFetchRateParams(from: tx.currency, to: baseCurrency, date: tx.date),
+    );
+    return result.fold(
+      (failure) {
+        _log.warning('Could not resolve exchange rate: ${failure.message}');
+        return tx.copyWith(baseCurrency: baseCurrency);
+      },
+      (rateEntity) {
+        if (rateEntity == null) return tx.copyWith(baseCurrency: baseCurrency);
+        return tx.copyWith(
+          exchangeRate: rateEntity.rate,
+          convertedAmount: tx.amount * rateEntity.rate,
+          baseCurrency: baseCurrency,
+        );
+      },
+    );
+  }
+
   Future<void> editTransaction(TransactionEntity transaction) async {
     emit(state.copyWith(status: CubitStatus.loading));
 
     final oldTransaction = _findTransaction(transaction.uuid);
 
     final result = await _updateTransaction(
-      UpdateTransactionParams(transaction: transaction),
+      UpdateTransactionParams(transaction: await _attachExchangeRate(transaction)),
     );
 
     result.fold(

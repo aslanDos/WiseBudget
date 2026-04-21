@@ -121,7 +121,7 @@
     },
     {
       "id": "3:4887377587349221783",
-      "lastPropertyId": "11:8236143487117282939",
+      "lastPropertyId": "14:6390224335941859718",
       "name": "TransactionModel",
       "properties": [
         {
@@ -186,6 +186,21 @@
         {
           "id": "11:8236143487117282939",
           "name": "toAccountUuid",
+          "type": 9
+        },
+        {
+          "id": "12:1594686640401412191",
+          "name": "exchangeRate",
+          "type": 8
+        },
+        {
+          "id": "13:5087022469830603017",
+          "name": "convertedAmount",
+          "type": 8
+        },
+        {
+          "id": "14:6390224335941859718",
+          "name": "baseCurrency",
           "type": 9
         }
       ],
@@ -271,10 +286,58 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "5:3884413796356776261",
+      "lastPropertyId": "7:5692950006897881828",
+      "name": "ExchangeRateModel",
+      "properties": [
+        {
+          "id": "1:4652132676461600254",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4148929884356233274",
+          "name": "pairKey",
+          "indexId": "10:3579162167952397431",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:5683028425676211619",
+          "name": "fromCurrency",
+          "type": 9
+        },
+        {
+          "id": "4:7739446076914437122",
+          "name": "toCurrency",
+          "type": 9
+        },
+        {
+          "id": "5:134570607141651207",
+          "name": "rate",
+          "type": 8
+        },
+        {
+          "id": "6:6413357969690585904",
+          "name": "date",
+          "indexId": "11:249900963597406323",
+          "type": 10,
+          "flags": 8
+        },
+        {
+          "id": "7:5692950006897881828",
+          "name": "fetchedAt",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "4:516645738032068282",
-  "lastIndexId": "9:4183726674299080721",
+  "lastEntityId": "5:3884413796356776261",
+  "lastIndexId": "11:249900963597406323",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

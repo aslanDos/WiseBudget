@@ -14,6 +14,15 @@ class TransactionEntity extends Equatable {
   final DateTime date;
   final DateTime createdDate;
 
+  /// Exchange rate at the time of transaction creation (null = same-currency).
+  final double? exchangeRate;
+
+  /// Amount converted to base currency at creation time (null = same-currency).
+  final double? convertedAmount;
+
+  /// Snapshot of the app's base currency when this transaction was created.
+  final String? baseCurrency;
+
   /// Validation constants
   static const int maxNoteLength = 256;
 
@@ -28,10 +37,20 @@ class TransactionEntity extends Equatable {
     this.note,
     required this.date,
     required this.createdDate,
+    this.exchangeRate,
+    this.convertedAmount,
+    this.baseCurrency,
   });
 
   /// Computed property - returns amount as Money value object
   Money get money => Money(amount, currency);
+
+  /// Amount in base currency. Falls back to raw amount when no conversion is stored.
+  double get amountInBase => convertedAmount ?? amount;
+
+  /// True when transaction currency differs from the base currency at creation.
+  bool get isCrossCurrency =>
+      baseCurrency != null && currency != baseCurrency;
 
   /// Convenience getters
   bool get isExpense => type == TransactionType.expense;
@@ -67,6 +86,9 @@ class TransactionEntity extends Equatable {
     String? note,
     DateTime? date,
     DateTime? createdDate,
+    double? exchangeRate,
+    double? convertedAmount,
+    String? baseCurrency,
   }) {
     return TransactionEntity(
       uuid: uuid ?? this.uuid,
@@ -79,6 +101,9 @@ class TransactionEntity extends Equatable {
       note: note ?? this.note,
       date: date ?? this.date,
       createdDate: createdDate ?? this.createdDate,
+      exchangeRate: exchangeRate ?? this.exchangeRate,
+      convertedAmount: convertedAmount ?? this.convertedAmount,
+      baseCurrency: baseCurrency ?? this.baseCurrency,
     );
   }
 
@@ -94,5 +119,8 @@ class TransactionEntity extends Equatable {
     note,
     date,
     createdDate,
+    exchangeRate,
+    convertedAmount,
+    baseCurrency,
   ];
 }

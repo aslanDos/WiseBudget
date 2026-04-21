@@ -33,6 +33,10 @@ class TransactionModel {
   @Property(type: PropertyType.date)
   DateTime createdDate;
 
+  double? exchangeRate;
+  double? convertedAmount;
+  String? baseCurrency;
+
   TransactionModel({
     this.id = 0,
     required this.uuid,
@@ -45,6 +49,9 @@ class TransactionModel {
     this.note,
     required this.date,
     DateTime? createdDate,
+    this.exchangeRate,
+    this.convertedAmount,
+    this.baseCurrency,
   }) : createdDate = createdDate ?? DateTime.now();
 
   @Transient()
@@ -75,6 +82,9 @@ class TransactionModel {
       note: note,
       date: date,
       createdDate: createdDate,
+      exchangeRate: exchangeRate,
+      convertedAmount: convertedAmount,
+      baseCurrency: baseCurrency,
     );
   }
 
@@ -92,6 +102,9 @@ class TransactionModel {
       note: entity.note,
       date: entity.date,
       createdDate: entity.createdDate,
+      exchangeRate: entity.exchangeRate,
+      convertedAmount: entity.convertedAmount,
+      baseCurrency: entity.baseCurrency,
     );
   }
 }

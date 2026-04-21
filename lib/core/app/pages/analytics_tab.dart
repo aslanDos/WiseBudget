@@ -223,7 +223,7 @@ class _SummaryCard extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: context.t.labelSmall?.copyWith(
+            style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(0x99),
               letterSpacing: 0.8,
             ),
