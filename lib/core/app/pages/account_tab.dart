@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/utils/list_utils.dart';
 import 'package:wisebuget/core/shared/widgets/action_button.dart';
@@ -17,6 +18,7 @@ import 'package:wisebuget/features/account/presentation/widgets/account_card.dar
 import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
 import 'package:wisebuget/features/account/presentation/widgets/no_accounts.dart';
 import 'package:wisebuget/features/account/presentation/widgets/total_balance_card.dart';
+import 'package:wisebuget/features/settings/presentation/cubit/currency_rates_cubit.dart';
 
 class AccountTab extends StatefulWidget {
   const AccountTab({super.key});
@@ -29,11 +31,20 @@ class _AccountTabState extends State<AccountTab>
     with AutomaticKeepAliveClientMixin {
   bool _reordering = false;
   final TextEditingController _searchController = TextEditingController();
+  late final CurrencyRatesCubit _ratesCubit;
 
   String get _searchQuery => _searchController.text.trim().toLowerCase();
 
   @override
+  void initState() {
+    super.initState();
+    _ratesCubit = CurrencyRatesCubit(networkService: sl());
+    _ratesCubit.loadRates(sl<LocalPreferences>().currency);
+  }
+
+  @override
   void dispose() {
+    _ratesCubit.close();
     _searchController.dispose();
     super.dispose();
   }
@@ -42,8 +53,11 @@ class _AccountTabState extends State<AccountTab>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return BlocProvider(
-      create: (_) => sl<AccountCubit>()..loadAccounts(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<AccountCubit>()..loadAccounts()),
+        BlocProvider.value(value: _ratesCubit),
+      ],
       child: Scaffold(
         appBar: AppBar(
           titleSpacing: 16,
@@ -206,7 +220,24 @@ class _AccountsContent extends StatelessWidget {
         children: [
           Column(
             children: [
-              TotalBalanceCard(accounts: accounts, lowOpacity: reordering),
+              BlocBuilder<CurrencyRatesCubit, CurrencyRatesState>(
+                builder: (context, ratesState) {
+                  final baseCurrency = ratesState.baseCurrency.isNotEmpty
+                      ? ratesState.baseCurrency
+                      : sl<LocalPreferences>().currency;
+                  double totalInBase = 0;
+                  for (final account in accounts) {
+                    final rate = ratesState.rateFor(account.currency) ??
+                        (account.currency == baseCurrency ? 1.0 : 0.0);
+                    totalInBase += account.balance * rate;
+                  }
+                  return TotalBalanceCard(
+                    totalInBase: totalInBase,
+                    baseCurrency: baseCurrency,
+                    lowOpacity: reordering,
+                  );
+                },
+              ),
               if (hasSearchBar && !reordering) ...[
                 const SizedBox(height: 16.0),
                 TextField(

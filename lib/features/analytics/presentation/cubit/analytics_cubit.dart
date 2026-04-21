@@ -64,8 +64,8 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     double totalIncome = 0;
     double totalExpense = 0;
     for (final t in filtered) {
-      if (t.isIncome) totalIncome += t.amount;
-      if (t.isExpense) totalExpense += t.amount;
+      if (t.isIncome) totalIncome += t.amountInBase;
+      if (t.isExpense) totalExpense += t.amountInBase;
     }
     final currency = _prefs.currency;
 
@@ -136,44 +136,20 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     required String Function(DateTime) labelFn,
   }) {
     final buckets = <BarBucket>[];
+    final currency = _prefs.currency;
     var current = range.start;
 
     while (!current.isAfter(range.end)) {
-      final dayEnd = DateTime(
-        current.year,
-        current.month,
-        current.day,
-        23,
-        59,
-        59,
-      );
+      final dayEnd = DateTime(current.year, current.month, current.day, 23, 59, 59);
       double income = 0, expense = 0;
-      String currency = '';
 
       for (final t in transactions) {
-        if (t.date.isBefore(current) || t.date.isAfter(dayEnd)) {
-          continue;
-        }
-        if (t.isIncome) {
-          income += t.amount;
-        }
-        if (t.isExpense) {
-          expense += t.amount;
-        }
-        if (currency.isEmpty) {
-          currency = t.currency;
-        }
+        if (t.date.isBefore(current) || t.date.isAfter(dayEnd)) continue;
+        if (t.isIncome) income += t.amountInBase;
+        if (t.isExpense) expense += t.amountInBase;
       }
 
-      buckets.add(
-        BarBucket(
-          label: labelFn(current),
-          income: income,
-          expense: expense,
-          currency: currency,
-        ),
-      );
-
+      buckets.add(BarBucket(label: labelFn(current), income: income, expense: expense, currency: currency));
       current = DateTime(current.year, current.month, current.day + 1);
     }
 
@@ -200,45 +176,25 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     ];
 
     final buckets = <BarBucket>[];
+    final currency = _prefs.currency;
     var y = range.start.year;
     var m = range.start.month;
 
-    while (y < range.end.year ||
-        (y == range.end.year && m <= range.end.month)) {
+    while (y < range.end.year || (y == range.end.year && m <= range.end.month)) {
       final monthStart = DateTime(y, m, 1);
       final monthEnd = DateTime(y, m + 1, 0, 23, 59, 59);
       double income = 0, expense = 0;
-      String currency = '';
 
       for (final t in transactions) {
-        if (t.date.isBefore(monthStart) || t.date.isAfter(monthEnd)) {
-          continue;
-        }
-        if (t.isIncome) {
-          income += t.amount;
-        }
-        if (t.isExpense) {
-          expense += t.amount;
-        }
-        if (currency.isEmpty) {
-          currency = t.currency;
-        }
+        if (t.date.isBefore(monthStart) || t.date.isAfter(monthEnd)) continue;
+        if (t.isIncome) income += t.amountInBase;
+        if (t.isExpense) expense += t.amountInBase;
       }
 
-      buckets.add(
-        BarBucket(
-          label: abbr[m - 1],
-          income: income,
-          expense: expense,
-          currency: currency,
-        ),
-      );
+      buckets.add(BarBucket(label: abbr[m - 1], income: income, expense: expense, currency: currency));
 
       m++;
-      if (m > 12) {
-        m = 1;
-        y++;
-      }
+      if (m > 12) { m = 1; y++; }
     }
 
     return buckets;
@@ -263,47 +219,22 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
       'Dec',
     ];
     final buckets = <BarBucket>[];
+    final currency = _prefs.currency;
     var weekStart = range.start;
 
     while (!weekStart.isAfter(range.end)) {
       final rawEnd = weekStart.add(const Duration(days: 6));
       final effectiveEnd = rawEnd.isAfter(range.end) ? range.end : rawEnd;
-      final weekEnd = DateTime(
-        effectiveEnd.year,
-        effectiveEnd.month,
-        effectiveEnd.day,
-        23,
-        59,
-        59,
-      );
-
+      final weekEnd = DateTime(effectiveEnd.year, effectiveEnd.month, effectiveEnd.day, 23, 59, 59);
       double income = 0, expense = 0;
-      String currency = '';
 
       for (final t in transactions) {
-        if (t.date.isBefore(weekStart) || t.date.isAfter(weekEnd)) {
-          continue;
-        }
-        if (t.isIncome) {
-          income += t.amount;
-        }
-        if (t.isExpense) {
-          expense += t.amount;
-        }
-        if (currency.isEmpty) {
-          currency = t.currency;
-        }
+        if (t.date.isBefore(weekStart) || t.date.isAfter(weekEnd)) continue;
+        if (t.isIncome) income += t.amountInBase;
+        if (t.isExpense) expense += t.amountInBase;
       }
 
-      buckets.add(
-        BarBucket(
-          label: '${weekStart.day} ${abbr[weekStart.month - 1]}',
-          income: income,
-          expense: expense,
-          currency: currency,
-        ),
-      );
-
+      buckets.add(BarBucket(label: '${weekStart.day} ${abbr[weekStart.month - 1]}', income: income, expense: expense, currency: currency));
       weekStart = DateTime(weekStart.year, weekStart.month, weekStart.day + 7);
     }
 
@@ -338,13 +269,10 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     if (typeFiltered.isEmpty) return [];
 
     final Map<String, double> totals = {};
-    String currency = '';
+    final currency = _prefs.currency;
 
     for (final t in typeFiltered) {
-      totals[t.categoryUuid] = (totals[t.categoryUuid] ?? 0) + t.amount;
-      if (currency.isEmpty) {
-        currency = t.currency;
-      }
+      totals[t.categoryUuid] = (totals[t.categoryUuid] ?? 0) + t.amountInBase;
     }
 
     final total = totals.values.fold(0.0, (sum, v) => sum + v);

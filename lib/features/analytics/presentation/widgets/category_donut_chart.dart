@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
+import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/shared/widgets/type_toggle.dart';
@@ -33,10 +34,17 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
   @override
   void didUpdateWidget(CategoryDonutChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedType != widget.selectedType) {
+    if (oldWidget.selectedType != widget.selectedType ||
+        oldWidget.data != widget.data) {
       _touchedIndex = null;
     }
   }
+
+  double get _total =>
+      widget.data.fold(0.0, (sum, d) => sum + d.amount);
+
+  String get _currency =>
+      widget.data.isNotEmpty ? widget.data.first.currency : '';
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +58,7 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // ── Header ──────────────────────────────────────────────────────
           Row(
             children: [
               Text('Categories', style: context.t.titleMedium),
@@ -87,48 +96,38 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
             ],
           ),
           const SizedBox(height: 16),
+
           if (widget.data.isEmpty)
             _EmptyState(type: widget.selectedType)
           else ...[
-            // Donut chart centred
-            Center(
-              child: SizedBox(
-                width: 140,
-                height: 140,
-                child: PieChart(
-                  PieChartData(
-                    centerSpaceRadius: 42,
-                    sectionsSpace: 2,
-                    startDegreeOffset: -90,
-                    pieTouchData: PieTouchData(
-                      touchCallback: (event, response) {
-                        if (event is FlTapUpEvent) {
-                          final index =
-                              response?.touchedSection?.touchedSectionIndex;
-                          setState(() {
-                            _touchedIndex = _touchedIndex == index
-                                ? null
-                                : index;
-                          });
-                        }
-                      },
-                    ),
-                    sections: List.generate(widget.data.length, (i) {
-                      final d = widget.data[i];
-                      final isTouched = i == _touchedIndex;
-                      return PieChartSectionData(
-                        value: d.amount,
-                        color: d.color,
-                        radius: isTouched ? 28 : 22,
-                        showTitle: false,
-                      );
+            // ── Donut + Legend row ────────────────────────────────────────
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _DonutWithTotal(
+                    data: widget.data,
+                    total: _total,
+                    currency: _currency,
+                    touchedIndex: _touchedIndex,
+                    onTouched: (i) => setState(() {
+                      _touchedIndex = _touchedIndex == i ? null : i;
                     }),
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _Legend(
+                      data: widget.data,
+                      touchedIndex: _touchedIndex,
+                      currency: _currency,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            // Category cards
+            const SizedBox(height: 16),
+
+            // ── Category cards ────────────────────────────────────────────
             ...List.generate(widget.data.length, (i) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -148,16 +147,168 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
   }
 }
 
-class _CategoryCard extends StatelessWidget {
-  final CategoryData data;
-  final bool highlighted;
-  final VoidCallback? onTap;
+// ── Donut with stacked center text ──────────────────────────────────────────
 
+class _DonutWithTotal extends StatelessWidget {
+  const _DonutWithTotal({
+    required this.data,
+    required this.total,
+    required this.currency,
+    required this.touchedIndex,
+    required this.onTouched,
+  });
+
+  final List<CategoryData> data;
+  final double total;
+  final String currency;
+  final int? touchedIndex;
+  final ValueChanged<int> onTouched;
+
+  static const _size = 148.0;
+  static const _centerRadius = 46.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalFormatted = currency.isNotEmpty
+        ? Money(total, currency).formattedCompact
+        : total.toStringAsFixed(0);
+
+    return SizedBox(
+      width: _size,
+      height: _size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              centerSpaceRadius: _centerRadius,
+              sectionsSpace: 2,
+              startDegreeOffset: -90,
+              pieTouchData: PieTouchData(
+                touchCallback: (event, response) {
+                  if (event is FlTapUpEvent) {
+                    final index =
+                        response?.touchedSection?.touchedSectionIndex;
+                    if (index != null) onTouched(index);
+                  }
+                },
+              ),
+              sections: List.generate(data.length, (i) {
+                final isTouched = i == touchedIndex;
+                return PieChartSectionData(
+                  value: data[i].amount,
+                  color: data[i].color,
+                  radius: isTouched ? 30 : 24,
+                  showTitle: false,
+                );
+              }),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Total',
+                style: context.t.labelSmall?.copyWith(
+                  color: context.c.onSurface.withAlpha(0x80),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                totalFormatted,
+                style: context.t.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Right-side legend ────────────────────────────────────────────────────────
+
+class _Legend extends StatelessWidget {
+  const _Legend({
+    required this.data,
+    required this.touchedIndex,
+    required this.currency,
+  });
+
+  final List<CategoryData> data;
+  final int? touchedIndex;
+  final String currency;
+
+  String _formatAmount(double amount) {
+    if (currency.isEmpty) return amount.toStringAsFixed(0);
+    return Money(amount, currency).formattedCompact;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(data.length, (i) {
+        final d = data[i];
+        final dimmed = touchedIndex != null && touchedIndex != i;
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 150),
+          opacity: dimmed ? 0.35 : 1.0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: d.color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    d.name,
+                    style: context.t.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _formatAmount(d.amount),
+                  style: context.t.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+// ── Category card (below the chart) ─────────────────────────────────────────
+
+class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
     required this.data,
     required this.highlighted,
     this.onTap,
   });
+
+  final CategoryData data;
+  final bool highlighted;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -234,15 +385,17 @@ class _CategoryCard extends StatelessWidget {
   }
 
   String _formatCompact(double value, String currency) {
-    final formatted = value.toStringAsFixed(2);
-    return currency.isNotEmpty ? '$formatted $currency' : formatted;
+    if (currency.isEmpty) return value.toStringAsFixed(2);
+    return Money(value, currency).formatted;
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  final TransactionType type;
+// ── Empty state ──────────────────────────────────────────────────────────────
 
+class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.type});
+
+  final TransactionType type;
 
   @override
   Widget build(BuildContext context) {

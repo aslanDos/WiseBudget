@@ -4,6 +4,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
@@ -13,6 +14,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
+import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
@@ -70,6 +72,9 @@ class _TransactionFormState extends State<TransactionForm> {
   // Preserves sign for adjustment transactions when editing.
   late bool _isNegativeAdjustment;
 
+  String? _rateChipLabel;
+  bool _rateIsStale = false;
+
   bool get isEditing => widget.isEditing;
 
   @override
@@ -91,6 +96,49 @@ class _TransactionFormState extends State<TransactionForm> {
           .replaceAll(RegExp(r'\.?0+$'), '');
     }
     _loadData();
+    _fetchRate();
+  }
+
+  Future<void> _fetchRate() async {
+    final baseCurrency = sl<LocalPreferences>().currency;
+    final accounts = sl<AccountCubit>().state.accounts;
+    final account = accounts.where((a) => a.uuid == _form.accountUuid).firstOrNull;
+    if (account == null) return;
+
+    final accountCurrency = account.currency;
+    if (accountCurrency == baseCurrency) {
+      if (mounted) setState(() => _rateChipLabel = null);
+      return;
+    }
+
+    final result = await sl<GetOrFetchExchangeRate>()(
+      GetOrFetchRateParams(from: accountCurrency, to: baseCurrency, date: DateTime.now()),
+    );
+
+    if (!mounted) return;
+    result.fold(
+      (_) => setState(() => _rateChipLabel = null),
+      (entity) {
+        if (entity == null) {
+          setState(() => _rateChipLabel = null);
+          return;
+        }
+        final rate = entity.rate;
+        final formatted = _formatRate(rate);
+        setState(() {
+          _rateChipLabel = '1 $accountCurrency ≈ $formatted $baseCurrency';
+          _rateIsStale = entity.isStale;
+        });
+      },
+    );
+  }
+
+  String _formatRate(double rate) {
+    if (rate >= 10000) return rate.toStringAsFixed(0);
+    if (rate >= 100) return rate.toStringAsFixed(1);
+    if (rate >= 1) return rate.toStringAsFixed(2);
+    if (rate >= 0.01) return rate.toStringAsFixed(4);
+    return rate.toStringAsFixed(6);
   }
 
   void _onNumpadKey(String key) {
@@ -140,8 +188,10 @@ class _TransactionFormState extends State<TransactionForm> {
             TransactionSheetHeader(
               isEditing: isEditing,
               selectedAccountUuid: _form.accountUuid,
-              onAccountSelected: (uuid) =>
-                  setState(() => _form.accountUuid = uuid),
+              onAccountSelected: (uuid) {
+                setState(() => _form.accountUuid = uuid);
+                _fetchRate();
+              },
               onDelete: () => _showDeleteDialog(context),
             ),
 
@@ -155,11 +205,30 @@ class _TransactionFormState extends State<TransactionForm> {
               ),
 
             Expanded(
-              child: AmountDisplay(
-                amount: _amountString.isEmpty ? '0' : _amountString,
-                type: _form.type,
+              child: BlocBuilder<AccountCubit, AccountState>(
+                builder: (context, accountState) {
+                  final account = accountState.accounts
+                      .where((a) => a.uuid == _form.accountUuid)
+                      .firstOrNull;
+                  final currency =
+                      account?.currency ?? sl<LocalPreferences>().currency;
+                  return AmountDisplay(
+                    amount: _amountString.isEmpty ? '0' : _amountString,
+                    type: _form.type,
+                    currency: currency,
+                  );
+                },
               ),
             ),
+
+            if (_rateChipLabel != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _RateChip(
+                  label: _rateChipLabel!,
+                  isStale: _rateIsStale,
+                ),
+              ),
 
             Container(
               padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -346,5 +415,34 @@ class _TransactionFormState extends State<TransactionForm> {
     if (confirmed == true) {
       sl<TransactionCubit>().removeTransaction(widget.transaction!.uuid);
     }
+  }
+}
+
+class _RateChip extends StatelessWidget {
+  const _RateChip({required this.label, required this.isStale});
+
+  final String label;
+  final bool isStale;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isStale ? const Color(0xFFF59E0B) : context.c.onSurface.withAlpha(0x60);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withAlpha(0x18),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isStale) ...[
+            Icon(Icons.access_time_rounded, size: 12, color: color),
+            const SizedBox(width: 4),
+          ],
+          Text(label, style: context.t.labelSmall?.copyWith(color: color)),
+        ],
+      ),
+    );
   }
 }

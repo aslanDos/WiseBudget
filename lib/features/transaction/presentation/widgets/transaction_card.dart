@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
+import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
 import 'package:wisebuget/core/theme/app_colors.dart';
@@ -258,9 +261,24 @@ class _TransactionAmount extends StatelessWidget {
   Widget build(BuildContext context) {
     final (prefix, color) = _getAmountStyle(context);
 
-    return Text(
-      '$prefix${transaction.money.formatted}',
-      style: context.t.bodyMedium?.copyWith(color: color),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$prefix${transaction.money.formatted}',
+          style: context.t.bodyMedium?.copyWith(color: color),
+        ),
+        if (transaction.isCrossCurrency &&
+            transaction.convertedAmount != null &&
+            transaction.baseCurrency == sl<LocalPreferences>().currency)
+          Text(
+            '≈ ${Money(transaction.convertedAmount!, transaction.baseCurrency!).formatted}',
+            style: context.t.labelSmall?.copyWith(
+              color: context.c.onSurface.withAlpha(0x60),
+            ),
+          ),
+      ],
     );
   }
 

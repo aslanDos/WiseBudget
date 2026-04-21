@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/utils/date_formatter.dart';
@@ -99,20 +100,18 @@ class _HomeTabState extends State<HomeTab> {
               accountFiltered,
             );
 
-            // Totals for the selected date
+            // Totals for the selected date in base currency
             final dayTransactions = accountFiltered.where((t) {
               return t.date.year == _selectedDate.year &&
                   t.date.month == _selectedDate.month &&
                   t.date.day == _selectedDate.day;
             });
-            final currency = dayTransactions.isNotEmpty
-                ? dayTransactions.first.currency
-                : '';
+            final baseCurrency = sl<LocalPreferences>().currency;
             double incomeTotal = 0;
             double expenseTotal = 0;
             for (final t in dayTransactions) {
-              if (t.isIncome) incomeTotal += t.amount;
-              if (t.isExpense) expenseTotal += t.amount;
+              if (t.isIncome) incomeTotal += t.amountInBase;
+              if (t.isExpense) expenseTotal += t.amountInBase;
             }
 
             return Padding(
@@ -131,11 +130,11 @@ class _HomeTabState extends State<HomeTab> {
 
                   _Header(
                     selectedDate: _selectedDate,
-                    income: incomeTotal > 0 && currency.isNotEmpty
-                        ? Money(incomeTotal, currency)
+                    income: incomeTotal > 0
+                        ? Money(incomeTotal, baseCurrency)
                         : null,
-                    expense: expenseTotal > 0 && currency.isNotEmpty
-                        ? Money(expenseTotal, currency)
+                    expense: expenseTotal > 0
+                        ? Money(expenseTotal, baseCurrency)
                         : null,
                   ),
 

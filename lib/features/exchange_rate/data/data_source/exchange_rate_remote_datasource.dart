@@ -5,14 +5,13 @@ abstract class ExchangeRateRemoteDataSource {
   Future<ExchangeRateModel> fetchRate(String from, String to, DateTime date);
 }
 
-/// Uses Frankfurter.app (ECB data, no API key required).
-/// Supports ~33 major currencies. For exotic currencies (e.g. KZT),
-/// swap this implementation with a provider that covers them.
+/// Uses open.er-api.com (free, no API key, broad currency support including KZT).
+/// Returns latest rates only — historical date parameter is stored but not queried.
 class FrankfurterRemoteDataSource implements ExchangeRateRemoteDataSource {
   FrankfurterRemoteDataSource({required this.networkService});
 
   final NetworkService networkService;
-  static const _baseUrl = 'https://api.frankfurter.app';
+  static const _baseUrl = 'https://open.er-api.com/v6/latest';
 
   @override
   Future<ExchangeRateModel> fetchRate(
@@ -20,32 +19,25 @@ class FrankfurterRemoteDataSource implements ExchangeRateRemoteDataSource {
     String to,
     DateTime date,
   ) async {
-    final dateOnly = DateTime(date.year, date.month, date.day);
-    final today = DateTime.now();
-    final isToday = dateOnly.year == today.year &&
-        dateOnly.month == today.month &&
-        dateOnly.day == today.day;
+    final data = await networkService.get('$_baseUrl/$from');
 
-    final dateStr =
-        '${dateOnly.year}-${dateOnly.month.toString().padLeft(2, '0')}-${dateOnly.day.toString().padLeft(2, '0')}';
-    final endpoint = isToday ? 'latest' : dateStr;
-
-    final data = await networkService.get(
-      '$_baseUrl/$endpoint',
-      queryParams: {'from': from, 'to': to},
-    );
+    if (data['result'] != 'success') {
+      throw Exception('Exchange rate API returned: ${data['result']}');
+    }
 
     final rates = data['rates'] as Map<String, dynamic>;
     if (!rates.containsKey(to)) {
       throw Exception('Rate for $to not found in response');
     }
 
+    final dateOnly = DateTime(date.year, date.month, date.day);
+
     return ExchangeRateModel(
       pairKey: '${from}_$to',
       fromCurrency: from,
       toCurrency: to,
       rate: (rates[to] as num).toDouble(),
-      date: DateTime.parse(data['date'] as String),
+      date: dateOnly,
       fetchedAt: DateTime.now(),
     );
   }
