@@ -13,6 +13,7 @@ import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_state.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/pages/transaction_form.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_card.dart';
 
@@ -177,6 +178,13 @@ class _Body extends StatelessWidget {
               initialType: t.type,
               transaction: t,
             ),
+            onEdit: () => showTransactionFormModal(
+              context: context,
+              initialType: t.type,
+              transaction: t,
+            ),
+            onDelete: () =>
+                sl<TransactionCubit>().removeTransaction(t.uuid),
           ),
         );
         widgets.add(const SizedBox(height: 8));

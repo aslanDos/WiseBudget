@@ -4,6 +4,7 @@ import 'package:wisebuget/core/constants/app_constants.dart';
 import 'package:wisebuget/core/theme/app_colors_scheme.dart';
 import 'package:wisebuget/core/theme/app_text_theme.dart';
 import 'package:wisebuget/core/theme/theme_extensions/pie_theme_x.dart';
+import 'package:wisebuget/core/theme/theme_extensions/pull_down_theme_x.dart';
 import 'package:wisebuget/core/theme/navbar_theme.dart';
 
 class AppTheme {
@@ -67,6 +68,7 @@ class AppTheme {
       ),
       extensions: [
         PieThemeExtension(pieTheme: pieTheme),
+        buildPullDownTheme(scheme: scheme, textTheme: textTheme),
         NavbarTheme(
           backgroundColor: scheme.surface,
           activeIconColor: scheme.primary,

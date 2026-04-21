@@ -247,6 +247,13 @@ class _TransactionsList extends StatelessWidget {
                           transaction: transaction,
                         );
                       },
+                      onEdit: () => showTransactionFormModal(
+                        context: context,
+                        initialType: transaction.type,
+                        transaction: transaction,
+                      ),
+                      onDelete: () => sl<TransactionCubit>()
+                          .removeTransaction(transaction.uuid),
                     );
                   },
                 );

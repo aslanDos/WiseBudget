@@ -74,7 +74,7 @@ class AccountChip extends StatelessWidget {
           children: [
             Icon(icon, size: 20, color: iconColor),
             const SizedBox(width: 8),
-            Text(label, style: context.t.titleMedium),
+            Text(label, style: context.t.titleSmall),
             const SizedBox(width: 4),
             Icon(Icons.keyboard_arrow_down_rounded, size: 20),
           ],

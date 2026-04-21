@@ -3,7 +3,8 @@
     "allow": [
       "Bash(flutter gen-l10n *)",
       "Bash(flutter pub *)",
-      "Bash(find /Users/aslandossymzhan/development/Projects/wisebuget/lib -name \"*.dart\" -exec wc -l {} +)"
+      "Bash(find /Users/aslandossymzhan/development/Projects/wisebuget/lib -name \"*.dart\" -exec wc -l {} +)",
+      "Read(//Users/aslandossymzhan/.pub-cache/**)"
     ]
   }
 }

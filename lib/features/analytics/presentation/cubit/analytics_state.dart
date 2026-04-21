@@ -63,6 +63,10 @@ class AnalyticsState extends Equatable {
   /// Whether to show expense or income category breakdown.
   final TransactionType categoryType;
 
+  final double totalIncome;
+  final double totalExpense;
+  final String currency;
+
   final String? errorMessage;
 
   const AnalyticsState({
@@ -72,6 +76,9 @@ class AnalyticsState extends Equatable {
     this.barBuckets = const [],
     this.categoryBreakdown = const [],
     this.categoryType = TransactionType.expense,
+    this.totalIncome = 0,
+    this.totalExpense = 0,
+    this.currency = '',
     this.errorMessage,
   });
 
@@ -82,6 +89,9 @@ class AnalyticsState extends Equatable {
     List<BarBucket>? barBuckets,
     List<CategoryData>? categoryBreakdown,
     TransactionType? categoryType,
+    double? totalIncome,
+    double? totalExpense,
+    String? currency,
     String? errorMessage,
   }) {
     return AnalyticsState(
@@ -93,6 +103,9 @@ class AnalyticsState extends Equatable {
       barBuckets: barBuckets ?? this.barBuckets,
       categoryBreakdown: categoryBreakdown ?? this.categoryBreakdown,
       categoryType: categoryType ?? this.categoryType,
+      totalIncome: totalIncome ?? this.totalIncome,
+      totalExpense: totalExpense ?? this.totalExpense,
+      currency: currency ?? this.currency,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -105,6 +118,9 @@ class AnalyticsState extends Equatable {
     barBuckets,
     categoryBreakdown,
     categoryType,
+    totalIncome,
+    totalExpense,
+    currency,
     errorMessage,
   ];
 }

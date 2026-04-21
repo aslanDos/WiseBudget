@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
@@ -16,6 +17,8 @@ class TransactionCard extends StatefulWidget {
   final AccountEntity? account;
   final AccountEntity? toAccount;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const TransactionCard({
     super.key,
@@ -24,6 +27,8 @@ class TransactionCard extends StatefulWidget {
     this.account,
     this.toAccount,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -43,7 +48,7 @@ class _TransactionCardState extends State<TransactionCard> {
             defaultColor: context.c.primary,
           );
 
-    return Pressable(
+    final cardContent = Pressable(
       onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -79,6 +84,36 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
             _TransactionAmount(transaction: transaction),
           ],
+        ),
+      ),
+    );
+
+    if (widget.onEdit == null && widget.onDelete == null) return cardContent;
+
+    return CupertinoContextMenu(
+      actions: [
+        if (widget.onEdit != null)
+          CupertinoContextMenuAction(
+            onPressed: widget.onEdit,
+            trailingIcon: CupertinoIcons.pencil,
+            child: const Text('Edit'),
+          ),
+        if (widget.onDelete != null)
+          CupertinoContextMenuAction(
+            isDestructiveAction: true,
+            onPressed: widget.onDelete,
+            trailingIcon: CupertinoIcons.delete,
+            child: const Text('Delete'),
+          ),
+      ],
+      // CupertinoContextMenu places its child in an unconstrained FittedBox
+      // overlay, which breaks Expanded. A fixed width + Material ancestor fix both.
+      // MaterialType.transparency avoids overriding the inherited IconTheme color.
+      child: Material(
+        type: MaterialType.transparency,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width - 32,
+          child: cardContent,
         ),
       ),
     );

@@ -53,8 +53,7 @@ class NavbarButton extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 10,
-                    fontWeight:
-                        isActive ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                     color: color,
                   ),
                 ),

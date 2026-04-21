@@ -34,6 +34,8 @@ dependencies:
   fl_chart: ^0.70.2
   flutter_launcher_icons: ^0.14.4
   flutter_svg: ^2.2.4
+  pull_down_button: ^0.10.2
+  cupertino_calendar_picker: ^2.2.6
 
 dev_dependencies:
   flutter_test:

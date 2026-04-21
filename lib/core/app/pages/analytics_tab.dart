@@ -5,11 +5,13 @@ import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/router/routes.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
+import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/shared/widgets/account_chip.dart';
 import 'package:wisebuget/core/shared/widgets/period_chip.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
+import 'package:wisebuget/features/analytics/domain/analytics_period_l10n.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_cubit.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/category_detail_state.dart';
@@ -97,6 +99,8 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _SummaryCards(state: state),
+                  const SizedBox(height: 12),
                   if (state.selectedPeriod.hasChart &&
                       state.barBuckets.isNotEmpty)
                     Container(
@@ -148,6 +152,98 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _SummaryCards extends StatelessWidget {
+  final AnalyticsState state;
+
+  const _SummaryCards({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final periodLabel = state.selectedPeriod.localizedChipLabel(context.l10n);
+    final currency = state.currency;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _SummaryCard(
+            label: context.l10n.income,
+            amount: state.totalIncome,
+            currency: currency,
+            periodLabel: periodLabel,
+            color: Colors.green,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _SummaryCard(
+            label: context.l10n.expense,
+            amount: state.totalExpense,
+            currency: currency,
+            periodLabel: periodLabel,
+            color: context.c.error,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  final String label;
+  final double amount;
+  final String currency;
+  final String periodLabel;
+  final Color color;
+
+  const _SummaryCard({
+    required this.label,
+    required this.amount,
+    required this.currency,
+    required this.periodLabel,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final formatted = Money(amount, currency).formatted;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: context.t.labelSmall?.copyWith(
+              color: context.c.onSurface.withAlpha(0x99),
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            formatted,
+            style: context.t.headlineSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            periodLabel,
+            style: context.t.bodySmall?.copyWith(
+              color: context.c.onSurface.withAlpha(0x80),
+            ),
+          ),
+        ],
       ),
     );
   }

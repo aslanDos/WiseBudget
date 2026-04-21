@@ -57,7 +57,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.c.primary,
+      backgroundColor: context.c.surface,
       body: Center(
         child: Center(
           child: FadeTransition(
@@ -70,13 +70,17 @@ class _SplashPageState extends State<SplashPage>
                   SvgPicture.asset(
                     'assets/image/piggy-bank.svg',
                     width: 80,
-                    color: context.c.onPrimary,
+                    color: context.c.brightness == Brightness.dark
+                        ? context.c.onPrimary
+                        : context.c.primary,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     AppConstants.appName,
                     style: context.t.headlineMedium?.copyWith(
-                      color: context.c.onPrimary,
+                      color: context.c.brightness == Brightness.dark
+                          ? context.c.onPrimary
+                          : context.c.primary,
                     ),
                   ),
                 ],

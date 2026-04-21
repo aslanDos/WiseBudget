@@ -58,7 +58,7 @@ Future<void> init() async {
 
 void _initAnalyticsFeature() {
   sl.registerLazySingleton(
-    () => AnalyticsCubit(transactionCubit: sl(), categoryCubit: sl()),
+    () => AnalyticsCubit(transactionCubit: sl(), categoryCubit: sl(), prefs: sl()),
   );
   sl.registerFactory(
     () => CategoryDetailCubit(getTransactionsByCategory: sl()),

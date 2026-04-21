@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period.dart';
@@ -12,12 +13,15 @@ import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cu
 class AnalyticsCubit extends Cubit<AnalyticsState> {
   final TransactionCubit _transactionCubit;
   final CategoryCubit _categoryCubit;
+  final LocalPreferences _prefs;
 
   AnalyticsCubit({
     required TransactionCubit transactionCubit,
     required CategoryCubit categoryCubit,
+    required LocalPreferences prefs,
   }) : _transactionCubit = transactionCubit,
        _categoryCubit = categoryCubit,
+       _prefs = prefs,
        super(const AnalyticsState());
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -57,6 +61,14 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
     final filtered = _filterByAccountAndRange(all, accountUuid, period.range);
 
+    double totalIncome = 0;
+    double totalExpense = 0;
+    for (final t in filtered) {
+      if (t.isIncome) totalIncome += t.amount;
+      if (t.isExpense) totalExpense += t.amount;
+    }
+    final currency = _prefs.currency;
+
     emit(
       state.copyWith(
         status: CubitStatus.success,
@@ -65,6 +77,9 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
           filtered,
           state.categoryType,
         ),
+        totalIncome: totalIncome,
+        totalExpense: totalExpense,
+        currency: currency,
       ),
     );
   }

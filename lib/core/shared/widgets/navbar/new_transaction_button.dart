@@ -45,7 +45,7 @@ class _NewTransactionButtonState extends State<NewTransactionButton> {
             (type) => PieAction(
               tooltip: Text(type.label),
               onSelect: () => widget.onActionTap?.call(type),
-              child: Icon(type.icon, size: 24.0),
+              child: Icon(type.icon, size: 24.0, color: context.c.onPrimary),
               buttonTheme: PieButtonTheme(
                 backgroundColor: type.backgroundColor,
                 iconColor: type.backgroundColor,

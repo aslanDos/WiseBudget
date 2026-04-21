@@ -1,71 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
-import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
-import 'package:wisebuget/core/shared/widgets/pressable.dart';
+import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period.dart';
-import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period_l10n.dart';
 
 class PeriodChip extends StatelessWidget {
   final AnalyticsPeriod selectedPeriod;
   final ValueChanged<AnalyticsPeriod> onChanged;
 
-  const PeriodChip({
-    super.key,
-    required this.selectedPeriod,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Pressable(
-      onTap: () => showModal(
-        context: context,
-        builder: (ctx) => _PeriodPickerSheet(
-          selectedPeriod: selectedPeriod,
-          onChanged: onChanged,
-        ),
-      ),
-      child: Container(
-        height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: context.c.surfaceContainer,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(AppIcons.calendar, size: 16, color: context.c.primary),
-            const SizedBox(width: 8),
-            Text(selectedPeriod.localizedChipLabel(context.l10n), style: context.t.titleSmall),
-            const SizedBox(width: 4),
-            const Icon(Icons.keyboard_arrow_down_rounded, size: 16),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PeriodPickerSheet extends StatefulWidget {
-  final AnalyticsPeriod selectedPeriod;
-  final ValueChanged<AnalyticsPeriod> onChanged;
-
-  const _PeriodPickerSheet({
-    required this.selectedPeriod,
-    required this.onChanged,
-  });
-
-  @override
-  State<_PeriodPickerSheet> createState() => _PeriodPickerSheetState();
-}
-
-class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
   static const _presets = <AnalyticsPeriod>[
     TodayPeriod(),
     YesterdayPeriod(),
@@ -75,31 +21,90 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
     ThisYearPeriod(),
   ];
 
-  late AnalyticsPeriod? _selectedPreset;
+  const PeriodChip({
+    super.key,
+    required this.selectedPeriod,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isCustom = selectedPeriod is CustomPeriod;
+
+    return PullDownButton(
+      itemBuilder: (context) => [
+        ..._presets.map(
+          (period) => PullDownMenuItem.selectable(
+            selected: selectedPeriod == period,
+            title: period.localizedLabel(context.l10n),
+            onTap: () => onChanged(period),
+          ),
+        ),
+        // PullDownMenuItem.selectable(
+        //   selected: isCustom,
+        //   title: context.l10n.customRange,
+        //   icon: CupertinoIcons.calendar,
+        //   onTap: () => showCupertinoModalPopup(
+        //     context: context,
+        //     builder: (ctx) => _CustomDateModal(
+        //       selectedPeriod: selectedPeriod,
+        //       onChanged: onChanged,
+        //     ),
+        //   ),
+        // ),
+      ],
+      buttonBuilder: (context, showMenu) => GestureDetector(
+        onTap: showMenu,
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: context.c.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(AppIcons.calendar, size: 16, color: context.c.primary),
+              const SizedBox(width: 8),
+              Text(
+                selectedPeriod.localizedChipLabel(context.l10n),
+                style: context.t.titleSmall,
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _CustomDateModal extends StatefulWidget {
+  final AnalyticsPeriod selectedPeriod;
+  final ValueChanged<AnalyticsPeriod> onChanged;
+
+  const _CustomDateModal({
+    required this.selectedPeriod,
+    required this.onChanged,
+  });
+
+  @override
+  State<_CustomDateModal> createState() => _CustomDateModalState();
+}
+
+class _CustomDateModalState extends State<_CustomDateModal> {
   late DateTime _start;
   late DateTime _end;
 
   @override
   void initState() {
     super.initState();
-    final p = widget.selectedPeriod;
-    if (p is CustomPeriod) {
-      _selectedPreset = null;
-      _start = p.start;
-      _end = p.end;
-    } else {
-      _selectedPreset = p;
-      _start = p.range.start;
-      _end = p.range.end;
-    }
-  }
-
-  void _selectPreset(AnalyticsPeriod period) {
-    setState(() {
-      _selectedPreset = period;
-      _start = period.range.start;
-      _end = period.range.end;
-    });
+    _start = widget.selectedPeriod.range.start;
+    _end = widget.selectedPeriod.range.end;
   }
 
   Future<void> _pickStart() async {
@@ -109,134 +114,99 @@ class _PeriodPickerSheetState extends State<_PeriodPickerSheet> {
       firstDate: DateTime(2020),
       lastDate: _end,
     );
-    if (picked != null && mounted) {
-      setState(() {
-        _selectedPreset = null;
-        _start = picked;
-      });
-    }
+    if (picked != null && mounted) setState(() => _start = picked);
   }
 
   Future<void> _pickEnd() async {
-    final clampedInitial = _end.isAfter(DateTime.now()) ? DateTime.now() : _end;
+    final clamped = _end.isAfter(DateTime.now()) ? DateTime.now() : _end;
     final picked = await showDatePicker(
       context: context,
-      initialDate: clampedInitial,
+      initialDate: clamped,
       firstDate: _start,
       lastDate: DateTime.now(),
     );
     if (picked != null && mounted) {
-      setState(() {
-        _selectedPreset = null;
-        _end = DateTime(picked.year, picked.month, picked.day, 23, 59, 59);
-      });
+      widget.onChanged(
+        CustomPeriod(
+          start: _start,
+          end: DateTime(picked.year, picked.month, picked.day, 23, 59, 59),
+        ),
+      );
+      Navigator.pop(context);
     }
   }
 
-  void _save() {
-    final period = _selectedPreset ?? CustomPeriod(start: _start, end: _end);
-    widget.onChanged(period);
-    Navigator.pop(context);
-  }
-
-
   @override
   Widget build(BuildContext context) {
-    return ModalSheet.scrollable(
-      title: Text(
-        context.l10n.choosePeriod,
-        style: context.t.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-      ),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _presets.map((period) {
-                return _PresetChip(
-                  label: period.localizedLabel(context.l10n),
-                  isSelected: _selectedPreset == period,
-                  onTap: () => _selectPreset(period),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Divider(height: 1),
-          _DateRow(
-            label: context.l10n.startDate,
-            date: DateFormatter.formatShortDate(_start, context.l10n),
-            onTap: _pickStart,
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          _DateRow(label: context.l10n.endDate, date: DateFormatter.formatShortDate(_end, context.l10n), onTap: _pickEnd),
-          const Divider(height: 1),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: FilledButton(
-              onPressed: _save,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Material(
+                color: context.c.surface,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                      child: Text(
+                        context.l10n.customRange,
+                        style: context.t.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _DateRow(
+                      label: context.l10n.startDate,
+                      date: DateFormatter.formatShortDate(_start, context.l10n),
+                      onTap: _pickStart,
+                    ),
+                    const Divider(height: 1, indent: 16, endIndent: 16),
+                    _DateRow(
+                      label: context.l10n.endDate,
+                      date: DateFormatter.formatShortDate(_end, context.l10n),
+                      onTap: _pickEnd,
+                    ),
+                  ],
                 ),
               ),
-              child: Text(
-                context.l10n.save,
-                style: context.t.titleMedium?.copyWith(color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Material(
+                color: context.c.surface,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: Center(
+                      child: Text(
+                        context.l10n.cancel,
+                        style: context.t.titleMedium?.copyWith(
+                          color: context.c.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-
-class _PresetChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _PresetChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Pressable(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? context.c.primary.withAlpha(0x18)
-              : context.c.surfaceContainer,
-          borderRadius: BorderRadius.circular(10),
-          border: isSelected
-              ? Border.all(color: context.c.primary, width: 1.5)
-              : null,
-        ),
-        child: Text(
-          label,
-          style: context.t.bodyMedium?.copyWith(
-            color: isSelected ? context.c.primary : null,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _DateRow extends StatelessWidget {
   final String label;
@@ -254,14 +224,14 @@ class _DateRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(label, style: context.t.bodyMedium),
+            Text(label, style: context.t.bodyLarge),
             const Spacer(),
             Text(
               date,
-              style: context.t.bodyMedium?.copyWith(
+              style: context.t.bodyLarge?.copyWith(
                 color: context.c.onSurface.withAlpha(0x80),
               ),
             ),
