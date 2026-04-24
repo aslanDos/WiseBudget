@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
@@ -114,9 +116,16 @@ class _TransactionCardState extends State<TransactionCard> {
       // MaterialType.transparency avoids overriding the inherited IconTheme color.
       child: Material(
         type: MaterialType.transparency,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width - 32,
-          child: cardContent,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final maxWidth = constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : screenWidth - 32;
+            final resolvedWidth = math.min(maxWidth, 720.0);
+
+            return SizedBox(width: resolvedWidth, child: cardContent);
+          },
         ),
       ),
     );

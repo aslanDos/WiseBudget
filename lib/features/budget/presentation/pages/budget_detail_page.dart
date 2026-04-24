@@ -4,6 +4,7 @@ import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
 import 'package:wisebuget/core/shared/utils/date_formatter.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/layout/app_breakpoints.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
@@ -73,19 +74,61 @@ class _BudgetDetailContent extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= AppBreakpoints.detailWide;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1180),
+              child: isWide
+                  ? _buildWideLayout(context, budgetColor)
+                  : _buildCompactLayout(context, budgetColor),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCompactLayout(BuildContext context, Color budgetColor) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _buildProgressCard(context, budgetColor),
+        const SizedBox(height: 24),
+        _buildDailyBreakdown(context),
+        const SizedBox(height: 24),
+        _buildTransactionsSection(context),
+      ],
+    );
+  }
+
+  Widget _buildWideLayout(BuildContext context, Color budgetColor) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Progress Card
-          _buildProgressCard(context, budgetColor),
-          const SizedBox(height: 24),
-
-          // Daily Breakdown
-          _buildDailyBreakdown(context),
-          const SizedBox(height: 24),
-
-          // Transactions Section
-          _buildTransactionsSection(context),
+          Expanded(
+            flex: 5,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildProgressCard(context, budgetColor),
+                  const SizedBox(height: 24),
+                  _buildDailyBreakdown(context),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            flex: 6,
+            child: SingleChildScrollView(
+              child: _buildTransactionsSection(context),
+            ),
+          ),
         ],
       ),
     );
@@ -103,60 +146,92 @@ class _BudgetDetailContent extends StatelessWidget {
         color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          // Amount display
-          Text(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final stackVertically =
+              constraints.maxWidth < AppBreakpoints.progressStack;
+          final summaryText = Text(
             '${progress.spentMoney.formatted} of ${progress.limitMoney.formatted}',
             style: theme.textTheme.titleMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
-          ),
-          const SizedBox(height: 24),
-
-          // Circular progress
-          BudgetCircularProgress(progress: progress, size: 160),
-
-          const SizedBox(height: 24),
-
-          // Remaining text
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          );
+          final progressIndicator = BudgetCircularProgress(
+            progress: progress,
+            size: stackVertically ? 160 : 180,
+          );
+          final status = Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                isExceeded
-                    ? Icons.warning_amber_rounded
-                    : Icons.check_circle_outline,
-                size: 20,
-                color: isExceeded ? colors.error : const Color(0xFF22C55E),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                isExceeded
-                    ? context.l10n.overByAmount(progress.overByMoney.formatted)
-                    : context.l10n.amountRemaining(
-                        progress.remainingMoney.formatted,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    isExceeded
+                        ? Icons.warning_amber_rounded
+                        : Icons.check_circle_outline,
+                    size: 20,
+                    color: isExceeded ? colors.error : const Color(0xFF22C55E),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      isExceeded
+                          ? context.l10n.overByAmount(
+                              progress.overByMoney.formatted,
+                            )
+                          : context.l10n.amountRemaining(
+                              progress.remainingMoney.formatted,
+                            ),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: isExceeded ? colors.error : null,
+                        fontWeight: FontWeight.w500,
                       ),
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: isExceeded ? colors.error : null,
-                  fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.daysLeftInPeriod(
+                  budget.daysRemaining,
+                  budget.periodLabel,
                 ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
-          ),
+          );
 
-          const SizedBox(height: 8),
+          if (stackVertically) {
+            return Column(
+              children: [
+                summaryText,
+                const SizedBox(height: 24),
+                progressIndicator,
+                const SizedBox(height: 24),
+                status,
+              ],
+            );
+          }
 
-          Text(
-            context.l10n.daysLeftInPeriod(
-              budget.daysRemaining,
-              budget.periodLabel,
-            ),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
-        ],
+          return Column(
+            children: [
+              summaryText,
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(child: Center(child: progressIndicator)),
+                  const SizedBox(width: 24),
+                  Expanded(child: status),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -185,27 +260,53 @@ class _BudgetDetailContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _StatItem(
-                  label: context.l10n.dailyLimit,
-                  value: progress.dailyBudgetMoney.formatted,
-                  icon: Icons.flag_outlined,
-                  iconColor: colors.primary,
-                ),
-              ),
-              Expanded(
-                child: _StatItem(
-                  label: context.l10n.yourAverage,
-                  value: '\$${dailyAverage.toStringAsFixed(2)}',
-                  icon: Icons.trending_up,
-                  iconColor: isOverPace
-                      ? colors.error
-                      : const Color(0xFF22C55E),
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < AppBreakpoints.progressStack) {
+                return Column(
+                  children: [
+                    _StatItem(
+                      label: context.l10n.dailyLimit,
+                      value: progress.dailyBudgetMoney.formatted,
+                      icon: Icons.flag_outlined,
+                      iconColor: colors.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    _StatItem(
+                      label: context.l10n.yourAverage,
+                      value: '\$${dailyAverage.toStringAsFixed(2)}',
+                      icon: Icons.trending_up,
+                      iconColor: isOverPace
+                          ? colors.error
+                          : const Color(0xFF22C55E),
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: _StatItem(
+                      label: context.l10n.dailyLimit,
+                      value: progress.dailyBudgetMoney.formatted,
+                      icon: Icons.flag_outlined,
+                      iconColor: colors.primary,
+                    ),
+                  ),
+                  Expanded(
+                    child: _StatItem(
+                      label: context.l10n.yourAverage,
+                      value: '\$${dailyAverage.toStringAsFixed(2)}',
+                      icon: Icons.trending_up,
+                      iconColor: isOverPace
+                          ? colors.error
+                          : const Color(0xFF22C55E),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           if (isOverPace) ...[
             const SizedBox(height: 12),
@@ -297,6 +398,7 @@ class _BudgetDetailContent extends StatelessWidget {
               )
             else
               Container(
+                constraints: const BoxConstraints(maxHeight: 720),
                 decoration: BoxDecoration(
                   color: colors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(16),
@@ -326,6 +428,7 @@ class _BudgetDetailContent extends StatelessWidget {
     final result = await showBudgetFormModal(
       context: context,
       budgetUuid: progress.budget.uuid,
+      budgetCubit: context.read<BudgetCubit>(),
     );
     if (result == true && context.mounted) {
       context.read<BudgetCubit>().loadBudgets();

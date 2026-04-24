@@ -40,6 +40,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
     final result = await showBudgetFormModal(
       context: context,
       budgetUuid: budgetUuid,
+      budgetCubit: _budgetCubit,
     );
     if (result == true) {
       _budgetCubit.loadBudgets();

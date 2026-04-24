@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
+import 'package:wisebuget/core/shared/layout/app_breakpoints.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/transaction/presentation/widgets/transaction_category_picker.dart';
@@ -43,26 +44,49 @@ class TransactionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final leadingField = switch (type) {
+      TransactionType.transfer => TransactionDestinationAccountPicker(
+        selectedAccount: selectedToAccount,
+        accounts: availableToAccounts,
+        onSelected: onToAccountSelected,
+      ),
+      TransactionType.adjustment => null,
+      _ => TransactionCategoryPicker(
+        selectedCategory: selectedCategory,
+        categories: categories,
+        onCategorySelected: onCategorySelected,
+      ),
+    };
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (type == TransactionType.transfer)
-              TransactionDestinationAccountPicker(
-                selectedAccount: selectedToAccount,
-                accounts: availableToAccounts,
-                onSelected: onToAccountSelected,
-              )
-            else if (type != TransactionType.adjustment)
-              TransactionCategoryPicker(
-                selectedCategory: selectedCategory,
-                categories: categories,
-                onCategorySelected: onCategorySelected,
-              ),
-            TransactionDatePicker(date: date, onDateSelected: onDateSelected),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final datePicker = TransactionDatePicker(
+              date: date,
+              onDateSelected: onDateSelected,
+            );
+
+            if (leadingField == null) {
+              return Align(alignment: Alignment.centerLeft, child: datePicker);
+            }
+
+            if (constraints.maxWidth < AppBreakpoints.pickerStack) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [leadingField, const SizedBox(height: 8), datePicker],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(child: leadingField),
+                const SizedBox(width: 8),
+                datePicker,
+              ],
+            );
+          },
         ),
         const SizedBox(height: 8),
         TransactionNoteField(note: note, onNoteChanged: onNoteChanged),

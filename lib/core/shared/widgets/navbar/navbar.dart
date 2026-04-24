@@ -22,68 +22,73 @@ class Navbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final navbarTheme = Theme.of(context).extension<NavbarTheme>()!;
 
-    return Container(
-      height: NavbarTheme.height,
-      constraints: const BoxConstraints(maxWidth: 480.0),
-      decoration: BoxDecoration(
-        color: navbarTheme.backgroundColor,
-        border: Border(
-          top: BorderSide(
-            color: navbarTheme.inactiveIconColor.withValues(alpha: 0.2),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480.0),
+        child: Container(
+          height: NavbarTheme.height,
+          decoration: BoxDecoration(
+            color: navbarTheme.backgroundColor,
+            border: Border(
+              top: BorderSide(
+                color: navbarTheme.inactiveIconColor.withValues(alpha: 0.2),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    NavbarButton(
+                      index: 0,
+                      icon: activeIndex == 0
+                          ? AppIcons.circle400
+                          : AppIcons.circle,
+                      label: context.l10n.home,
+                      activeIndex: activeIndex,
+                      onTap: onTap,
+                    ),
+                    NavbarButton(
+                      index: 1,
+                      icon: activeIndex == 1
+                          ? AppIcons.wallet400
+                          : AppIcons.wallet,
+                      label: context.l10n.accounts,
+                      activeIndex: activeIndex,
+                      onTap: onTap,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: NavbarTheme.centerGapWidth),
+              Expanded(
+                child: Row(
+                  children: [
+                    NavbarButton(
+                      index: 2,
+                      icon: activeIndex == 2
+                          ? AppIcons.chart400
+                          : AppIcons.chart,
+                      label: context.l10n.analytics,
+                      activeIndex: activeIndex,
+                      onTap: onTap,
+                    ),
+                    NavbarButton(
+                      index: 3,
+                      icon: activeIndex == 3
+                          ? AppIcons.piggyBank400
+                          : AppIcons.piggyBank,
+                      label: context.l10n.budget,
+                      activeIndex: activeIndex,
+                      onTap: onTap,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-      child: Row(
-        children: [
-          // Left section (2 buttons)
-          Expanded(
-            child: Row(
-              children: [
-                NavbarButton(
-                  index: 0,
-                  icon: activeIndex == 0 ? AppIcons.circle400 : AppIcons.circle,
-                  label: context.l10n.home,
-                  activeIndex: activeIndex,
-                  onTap: onTap,
-                ),
-                NavbarButton(
-                  index: 1,
-                  icon: activeIndex == 1 ? AppIcons.wallet400 : AppIcons.wallet,
-                  label: context.l10n.accounts,
-                  activeIndex: activeIndex,
-                  onTap: onTap,
-                ),
-              ],
-            ),
-          ),
-
-          // Center gap for floating button
-          const SizedBox(width: NavbarTheme.centerGapWidth),
-
-          // Right section (2 buttons)
-          Expanded(
-            child: Row(
-              children: [
-                NavbarButton(
-                  index: 2,
-                  icon: activeIndex == 2 ? AppIcons.chart400 : AppIcons.chart,
-                  label: context.l10n.analytics,
-                  activeIndex: activeIndex,
-                  onTap: onTap,
-                ),
-                NavbarButton(
-                  index: 3,
-                  icon: activeIndex == 3
-                      ? AppIcons.piggyBank400
-                      : AppIcons.piggyBank,
-                  label: context.l10n.budget,
-                  activeIndex: activeIndex,
-                  onTap: onTap,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

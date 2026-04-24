@@ -6,6 +6,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/layout/app_breakpoints.dart';
 import 'package:wisebuget/core/shared/colors/app_palette.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/widgets/button.dart';
@@ -59,19 +60,44 @@ const _kBudgetIconOptions = [
 Future<bool?> showBudgetFormModal({
   required BuildContext context,
   String? budgetUuid,
+  BudgetCubit? budgetCubit,
 }) {
+  if (budgetCubit != null) {
+    return showCupertinoModalBottomSheet<bool>(
+      context: context,
+      expand: false,
+      barrierColor: Colors.black54,
+      builder: (context) => BlocProvider.value(
+        value: budgetCubit,
+        child: BudgetFormSheet(
+          budgetUuid: budgetUuid,
+          budgetCubit: budgetCubit,
+        ),
+      ),
+    );
+  }
+
+  final ownedCubit = sl<BudgetCubit>()..loadBudgets();
   return showCupertinoModalBottomSheet<bool>(
     context: context,
     expand: false,
     barrierColor: Colors.black54,
-    builder: (context) => BudgetFormSheet(budgetUuid: budgetUuid),
+    builder: (context) => BlocProvider(
+      create: (_) => ownedCubit,
+      child: BudgetFormSheet(budgetUuid: budgetUuid, budgetCubit: ownedCubit),
+    ),
   );
 }
 
 class BudgetFormSheet extends StatefulWidget {
   final String? budgetUuid;
+  final BudgetCubit budgetCubit;
 
-  const BudgetFormSheet({super.key, this.budgetUuid});
+  const BudgetFormSheet({
+    super.key,
+    this.budgetUuid,
+    required this.budgetCubit,
+  });
 
   bool get isEditing => budgetUuid != null;
 
@@ -96,7 +122,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
   @override
   void initState() {
     super.initState();
-    _budgetCubit = context.read<BudgetCubit>();
+    _budgetCubit = widget.budgetCubit;
     final rng = Random();
     sl<AccountCubit>().loadAccounts();
     sl<CategoryCubit>().loadCategories();
@@ -204,118 +230,45 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
           return Material(
             color: context.c.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _Header(
-                  isEditing: widget.isEditing,
-                  onDelete: widget.isEditing
-                      ? () => _confirmDelete(context)
-                      : null,
-                ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 20),
-                        Center(
-                          child: ColoredIconBox(
-                            icon: AppIcons.fromCode(_iconCode),
-                            color: selectedColor,
-                            size: 56,
-                            padding: 20,
-                            borderRadius: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _NameField(
-                          name: _name,
-                          onChanged: (v) => setState(() => _name = v),
-                        ),
-                        const SizedBox(height: 12),
-                        PickerFieldGroup(
-                          backgroundColor: context.c.surfaceContainer,
-                          children: [
-                            PickerField(
-                              icon: Icons.account_balance_wallet_outlined,
-                              label: context.l10n.budgetLimit,
-                              value: _amountDisplay,
-                              shrink: false,
-                              onTap: () => _showAmountInput(context),
-                            ),
-                            PickerField(
-                              icon: AppIcons.calendar,
-                              label: context.l10n.period,
-                              value: _periodLabel(context.l10n),
-                              shrink: false,
-                              onTap: () => _showPeriodPicker(context),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        BlocBuilder<CategoryCubit, CategoryState>(
-                          builder: (context, catState) {
-                            final expenseCategories = catState.categories
-                                .where(
-                                  (c) =>
-                                      c.type == TransactionType.expense &&
-                                      c.visible,
-                                )
-                                .toList();
-                            final selectedCategories = expenseCategories
-                                .where(
-                                  (c) =>
-                                      _selectedCategoryUuids.contains(c.uuid),
-                                )
-                                .toList();
-                            final String? categoryValue =
-                                selectedCategories.isEmpty
-                                ? null
-                                : selectedCategories.length == 1
-                                ? selectedCategories.first.name
-                                : '${selectedCategories.first.name} +(${selectedCategories.length - 1})';
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= AppBreakpoints.formWide;
+                final horizontalPadding =
+                    constraints.maxWidth >= AppBreakpoints.comfortablePadding
+                    ? 24.0
+                    : 16.0;
 
-                            return PickerField(
-                              backgroundColor: context.c.surfaceContainer,
-                              icon: AppIcons.grid,
-                              label: context.l10n.categories,
-                              value: categoryValue,
-                              shrink: false,
-                              onTap: () => _showCategoryPicker(
-                                context,
-                                expenseCategories,
-                              ),
-                            );
-                          },
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: isWide ? 1080 : 760),
+                    child: Column(
+                      children: [
+                        _Header(
+                          isEditing: widget.isEditing,
+                          onDelete: widget.isEditing
+                              ? () => _confirmDelete(context)
+                              : null,
                         ),
-                        const SizedBox(height: 12),
-                        ColorIconSelector(
-                          selectedColorValue: _selectedColorValue,
-                          selectedIconCode: _iconCode,
-                          iconOptions: _kBudgetIconOptions,
-                          onColorChanged: (v) =>
-                              setState(() => _selectedColorValue = v),
-                          onIconChanged: (code) =>
-                              setState(() => _iconCode = code),
+                        Expanded(
+                          child: isWide
+                              ? _buildWideLayout(
+                                  context: context,
+                                  selectedColor: selectedColor,
+                                  isLoading: isLoading,
+                                  horizontalPadding: horizontalPadding,
+                                )
+                              : _buildCompactLayout(
+                                  context: context,
+                                  selectedColor: selectedColor,
+                                  isLoading: isLoading,
+                                  horizontalPadding: horizontalPadding,
+                                ),
                         ),
-                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: Button(
-                    label: context.l10n.save,
-                    isLoading: isLoading,
-                    onPressed: _isValid ? () => _save(context) : null,
-                    width: double.infinity,
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
-              ],
+                );
+              },
             ),
           );
         },
@@ -433,6 +386,238 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
         ),
       );
     }
+  }
+
+  Widget _buildCompactLayout({
+    required BuildContext context,
+    required Color selectedColor,
+    required bool isLoading,
+    required double horizontalPadding,
+  }) {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: _buildFormContent(
+              context: context,
+              selectedColor: selectedColor,
+              showSelectorFirst: false,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            8,
+            horizontalPadding,
+            16,
+          ),
+          child: Button(
+            label: context.l10n.save,
+            isLoading: isLoading,
+            onPressed: _isValid ? () => _save(context) : null,
+            width: double.infinity,
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
+      ],
+    );
+  }
+
+  Widget _buildWideLayout({
+    required BuildContext context,
+    required Color selectedColor,
+    required bool isLoading,
+    required double horizontalPadding,
+  }) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        12,
+        horizontalPadding,
+        16,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 4,
+            child: SingleChildScrollView(
+              child: _buildVisualPanel(
+                context: context,
+                selectedColor: selectedColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            flex: 6,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: context.c.surfaceContainer.withAlpha(0x55),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: _buildFieldsOnly(context: context),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Button(
+                    label: context.l10n.save,
+                    isLoading: isLoading,
+                    onPressed: _isValid ? () => _save(context) : null,
+                    width: double.infinity,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormContent({
+    required BuildContext context,
+    required Color selectedColor,
+    required bool showSelectorFirst,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 20),
+        _buildBudgetPreview(selectedColor: selectedColor),
+        const SizedBox(height: 16),
+        if (showSelectorFirst) ...[
+          _buildVisualPanel(
+            context: context,
+            selectedColor: selectedColor,
+            includePreview: false,
+          ),
+          const SizedBox(height: 16),
+        ],
+        _buildFieldsOnly(context: context),
+        if (!showSelectorFirst) ...[
+          const SizedBox(height: 12),
+          ColorIconSelector(
+            selectedColorValue: _selectedColorValue,
+            selectedIconCode: _iconCode,
+            iconOptions: _kBudgetIconOptions,
+            onColorChanged: (v) => setState(() => _selectedColorValue = v),
+            onIconChanged: (code) => setState(() => _iconCode = code),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBudgetPreview({required Color selectedColor}) {
+    return Center(
+      child: ColoredIconBox(
+        icon: AppIcons.fromCode(_iconCode),
+        color: selectedColor,
+        size: 56,
+        padding: 20,
+        borderRadius: 24,
+      ),
+    );
+  }
+
+  Widget _buildVisualPanel({
+    required BuildContext context,
+    required Color selectedColor,
+    bool includePreview = true,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainer.withAlpha(0x55),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (includePreview) ...[
+            _buildBudgetPreview(selectedColor: selectedColor),
+            const SizedBox(height: 20),
+          ],
+          ColorIconSelector(
+            selectedColorValue: _selectedColorValue,
+            selectedIconCode: _iconCode,
+            iconOptions: _kBudgetIconOptions,
+            onColorChanged: (v) => setState(() => _selectedColorValue = v),
+            onIconChanged: (code) => setState(() => _iconCode = code),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFieldsOnly({required BuildContext context}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _NameField(name: _name, onChanged: (v) => setState(() => _name = v)),
+        const SizedBox(height: 12),
+        PickerFieldGroup(
+          backgroundColor: context.c.surfaceContainer,
+          children: [
+            PickerField(
+              icon: Icons.account_balance_wallet_outlined,
+              label: context.l10n.budgetLimit,
+              value: _amountDisplay,
+              shrink: false,
+              onTap: () => _showAmountInput(context),
+            ),
+            PickerField(
+              icon: AppIcons.calendar,
+              label: context.l10n.period,
+              value: _periodLabel(context.l10n),
+              shrink: false,
+              onTap: () => _showPeriodPicker(context),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        BlocBuilder<CategoryCubit, CategoryState>(
+          builder: (context, catState) {
+            final expenseCategories = catState.categories
+                .where(
+                  (category) =>
+                      category.type == TransactionType.expense &&
+                      category.visible,
+                )
+                .toList();
+            final selectedCategories = expenseCategories
+                .where(
+                  (category) => _selectedCategoryUuids.contains(category.uuid),
+                )
+                .toList();
+            final String? categoryValue = selectedCategories.isEmpty
+                ? null
+                : selectedCategories.length == 1
+                ? selectedCategories.first.name
+                : '${selectedCategories.first.name} +(${selectedCategories.length - 1})';
+
+            return PickerField(
+              backgroundColor: context.c.surfaceContainer,
+              icon: AppIcons.grid,
+              label: context.l10n.categories,
+              value: categoryValue,
+              shrink: false,
+              onTap: () => _showCategoryPicker(context, expenseCategories),
+            );
+          },
+        ),
+      ],
+    );
   }
 }
 

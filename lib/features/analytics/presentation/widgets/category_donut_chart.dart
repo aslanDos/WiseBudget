@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
+import 'package:wisebuget/core/shared/layout/app_breakpoints.dart';
 import 'package:wisebuget/core/shared/value_obj/money.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/pressable.dart';
@@ -40,107 +41,177 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
     }
   }
 
-  double get _total =>
-      widget.data.fold(0.0, (sum, d) => sum + d.amount);
+  double get _total => widget.data.fold(0.0, (sum, d) => sum + d.amount);
 
   String get _currency =>
       widget.data.isNotEmpty ? widget.data.first.currency : '';
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // ── Header ──────────────────────────────────────────────────────
-          Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact =
+            constraints.maxWidth < AppBreakpoints.chartHeaderStack;
+        final stackChartSection =
+            constraints.maxWidth < AppBreakpoints.chartLegendStack;
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+          decoration: BoxDecoration(
+            color: context.c.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Categories', style: context.t.titleMedium),
-              const Spacer(),
-              SizedBox(
-                width: 160,
-                height: 32,
-                child: TypeToggle<TransactionType>(
-                  backgroundColor: context.c.secondary,
-                  items: TransactionType.values
-                      .where(
-                        (t) =>
-                            t != TransactionType.transfer &&
-                            t != TransactionType.adjustment,
-                      )
-                      .map(
-                        (t) => TypeToggleItem(
-                          value: t,
-                          label: t.label,
-                          icon: t.icon,
-                          size: 10,
-                          selectedBackgroundColor: t.backgroundColor,
-                          selectedForegroundColor: t.backgroundColor,
-                        ),
-                      )
-                      .toList(),
-                  selected: widget.selectedType,
-                  onChanged: widget.onTypeChanged,
-                  selectedBackgroundColor: (type) =>
-                      type == TransactionType.expense
-                      ? AppColors.red
-                      : AppColors.green,
-                ),
+              _Header(
+                isCompact: isCompact,
+                selectedType: widget.selectedType,
+                onTypeChanged: widget.onTypeChanged,
               ),
+              const SizedBox(height: 16),
+              if (widget.data.isEmpty)
+                _EmptyState(type: widget.selectedType)
+              else ...[
+                _ChartSection(
+                  stackVertically: stackChartSection,
+                  data: widget.data,
+                  total: _total,
+                  currency: _currency,
+                  touchedIndex: _touchedIndex,
+                  onTouched: (i) => setState(() {
+                    _touchedIndex = _touchedIndex == i ? null : i;
+                  }),
+                ),
+                const SizedBox(height: 16),
+                ...List.generate(widget.data.length, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _CategoryCard(
+                      data: widget.data[i],
+                      highlighted: _touchedIndex == null || _touchedIndex == i,
+                      onTap: widget.onCategoryTapped != null
+                          ? () => widget.onCategoryTapped!(widget.data[i])
+                          : null,
+                    ),
+                  );
+                }),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
+        );
+      },
+    );
+  }
+}
 
-          if (widget.data.isEmpty)
-            _EmptyState(type: widget.selectedType)
-          else ...[
-            // ── Donut + Legend row ────────────────────────────────────────
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _DonutWithTotal(
-                    data: widget.data,
-                    total: _total,
-                    currency: _currency,
-                    touchedIndex: _touchedIndex,
-                    onTouched: (i) => setState(() {
-                      _touchedIndex = _touchedIndex == i ? null : i;
-                    }),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _Legend(
-                      data: widget.data,
-                      touchedIndex: _touchedIndex,
-                      currency: _currency,
-                    ),
-                  ),
-                ],
+class _Header extends StatelessWidget {
+  final bool isCompact;
+  final TransactionType selectedType;
+  final ValueChanged<TransactionType> onTypeChanged;
+
+  const _Header({
+    required this.isCompact,
+    required this.selectedType,
+    required this.onTypeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final toggle = SizedBox(
+      width: isCompact ? double.infinity : 160,
+      height: 32,
+      child: TypeToggle<TransactionType>(
+        backgroundColor: context.c.secondary,
+        items: TransactionType.values
+            .where(
+              (type) =>
+                  type != TransactionType.transfer &&
+                  type != TransactionType.adjustment,
+            )
+            .map(
+              (type) => TypeToggleItem(
+                value: type,
+                label: type.label,
+                icon: type.icon,
+                size: 10,
+                selectedBackgroundColor: type.backgroundColor,
+                selectedForegroundColor: type.backgroundColor,
               ),
-            ),
-            const SizedBox(height: 16),
+            )
+            .toList(),
+        selected: selectedType,
+        onChanged: onTypeChanged,
+        selectedBackgroundColor: (type) =>
+            type == TransactionType.expense ? AppColors.red : AppColors.green,
+      ),
+    );
 
-            // ── Category cards ────────────────────────────────────────────
-            ...List.generate(widget.data.length, (i) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _CategoryCard(
-                  data: widget.data[i],
-                  highlighted: _touchedIndex == null || _touchedIndex == i,
-                  onTap: widget.onCategoryTapped != null
-                      ? () => widget.onCategoryTapped!(widget.data[i])
-                      : null,
-                ),
-              );
-            }),
-          ],
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Categories', style: context.t.titleMedium),
+          const SizedBox(height: 12),
+          toggle,
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Text('Categories', style: context.t.titleMedium),
+        const Spacer(),
+        toggle,
+      ],
+    );
+  }
+}
+
+class _ChartSection extends StatelessWidget {
+  final bool stackVertically;
+  final List<CategoryData> data;
+  final double total;
+  final String currency;
+  final int? touchedIndex;
+  final ValueChanged<int> onTouched;
+
+  const _ChartSection({
+    required this.stackVertically,
+    required this.data,
+    required this.total,
+    required this.currency,
+    required this.touchedIndex,
+    required this.onTouched,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final donut = _DonutWithTotal(
+      data: data,
+      total: total,
+      currency: currency,
+      touchedIndex: touchedIndex,
+      onTouched: onTouched,
+    );
+    final legend = _Legend(
+      data: data,
+      touchedIndex: touchedIndex,
+      currency: currency,
+    );
+
+    if (stackVertically) {
+      return Column(children: [donut, const SizedBox(height: 16), legend]);
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          donut,
+          const SizedBox(width: 16),
+          Expanded(child: legend),
         ],
       ),
     );
@@ -187,8 +258,7 @@ class _DonutWithTotal extends StatelessWidget {
               pieTouchData: PieTouchData(
                 touchCallback: (event, response) {
                   if (event is FlTapUpEvent) {
-                    final index =
-                        response?.touchedSection?.touchedSectionIndex;
+                    final index = response?.touchedSection?.touchedSectionIndex;
                     if (index != null) onTouched(index);
                   }
                 },

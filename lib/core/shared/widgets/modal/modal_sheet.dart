@@ -1,11 +1,20 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/layout/app_breakpoints.dart';
 
 /// Returns true if the device is a tablet (based on shortest side > 600).
 bool _isTablet(BuildContext context) {
-  final shortestSide = MediaQuery.of(context).size.shortestSide;
-  return shortestSide > 600;
+  return AppBreakpoints.isTablet(context);
+}
+
+BoxConstraints _dialogConstraints(BuildContext context) {
+  final size = MediaQuery.sizeOf(context);
+
+  return BoxConstraints(
+    maxWidth: math.min(size.width * 0.9, 560.0),
+    maxHeight: math.min(size.height * 0.85, 720.0),
+  );
 }
 
 /// Shows a modal bottom sheet with platform-adaptive styling.
@@ -34,7 +43,7 @@ Future<T?> showModal<T>({
           borderRadius: BorderRadius.circular(24.0),
         ),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+          constraints: _dialogConstraints(context),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24.0),
             child: builder(context),
@@ -259,7 +268,7 @@ Future<String?> showModalInput({
           borderRadius: BorderRadius.circular(24.0),
         ),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: _dialogConstraints(context).copyWith(maxHeight: null),
           child: buildSheet(context),
         ),
       ),
