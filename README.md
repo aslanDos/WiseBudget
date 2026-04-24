@@ -20,18 +20,28 @@ WiseBudget helps you:
 
 WiseBudget covers the main personal finance workflow end to end: daily tracking, fast transaction entry, account management, and app customization. Below is a quick visual walkthrough of the current UI.
 
-| Screen | Preview | What it shows |
-|---|---|---|
-| Home Overview | ![](screenshots/home_overview.png) | Daily tracking with account context, calendar navigation, and recent transactions |
-| Analytics Overview | ![](screenshots/analytics_overview.png) | Period-based income and expense analytics with charts and category breakdown |
-| Accounts Overview | ![](screenshots/accounts_overview.png) | Account balances, multiple wallets, and quick access to account management |
-| Account Form | ![](screenshots/account_form.png) | Configure account name, balance, currency, color, and icon in one flow |
-| Transaction Form | ![](screenshots/transaction_form_overview.png) | Bottom-sheet flow for creating income, expense, and transfer entries |
-| Select Account | ![](screenshots/transaction_account_picker.png) | Pick the source account directly from a dedicated modal selector |
-| Select Category | ![](screenshots/transaction_category_picker.png) | Choose a category with icon support for cleaner transaction organization |
-| Pick Date | ![](screenshots/transaction_date_picker.png) | Set the transaction date from a calendar picker without leaving the form |
-| Add Note | ![](screenshots/transaction_note_input.png) | Add optional transaction details inline through a lightweight input sheet |
-| Settings | ![](screenshots/settings_overview.png) | Customize language, currency, theme, launch page, and local device behavior |
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/home_overview.png" width="160" alt="Home Overview" /><br /><sub><b>Home Overview</b></sub></td>
+    <td align="center"><img src="screenshots/analytics_overview.png" width="160" alt="Analytics Overview" /><br /><sub><b>Analytics Overview</b></sub></td>
+    <td align="center"><img src="screenshots/accounts_overview.png" width="160" alt="Accounts Overview" /><br /><sub><b>Accounts Overview</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/account_form.png" width="160" alt="Account Form" /><br /><sub><b>Account Form</b></sub></td>
+    <td align="center"><img src="screenshots/transaction_form_overview.png" width="160" alt="Transaction Form" /><br /><sub><b>Transaction Form</b></sub></td>
+    <td align="center"><img src="screenshots/transaction_account_picker.png" width="160" alt="Select Account" /><br /><sub><b>Select Account</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/transaction_category_picker.png" width="160" alt="Select Category" /><br /><sub><b>Select Category</b></sub></td>
+    <td align="center"><img src="screenshots/transaction_date_picker.png" width="160" alt="Pick Date" /><br /><sub><b>Pick Date</b></sub></td>
+    <td align="center"><img src="screenshots/transaction_note_input.png" width="160" alt="Add Note" /><br /><sub><b>Add Note</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/settings_overview.png" width="160" alt="Settings" /><br /><sub><b>Settings</b></sub></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Features
 
