@@ -20,37 +20,41 @@ WiseBudget helps you:
 
 WiseBudget covers the main personal finance workflow end to end: daily tracking, fast transaction entry, account management, and app customization. Below is a quick visual walkthrough of the current UI.
 
-### Home & Quick Actions
+### Home & Daily Tracking
 
-| Home Overview | Quick Add Menu |
+| Home Overview | Analytics Overview |
 |---|---|
-| ![](screenshots/home.png) | ![](screenshots/home_add_transaction_button.png) |
-| Daily overview with account context, calendar navigation, and recent transactions | Fast access to income, expense, transfer, and adjustment flows from one central action |
+| ![](screenshots/home_overview.png) | ![](screenshots/analytics_overview.png) |
+| Daily tracking with account context, calendar navigation, and recent transactions | Period-based income and expense analytics with chart and category breakdown |
 
 ### Transaction Flow
 
-| Select Account | Select Category |
+| Transaction Form | Select Account |
 |---|---|
-| ![](screenshots/transaction_form_select_account.png) | ![](screenshots/transaction_form_select_category.png) |
-| Choose the source account before saving a transaction | Pick a category with icon and color support for cleaner organization |
+| ![](screenshots/transaction_form_overview.png) | ![](screenshots/transaction_account_picker.png) |
+| Fast bottom-sheet flow for creating income, expense, and transfer entries | Pick the source account directly from a dedicated modal selector |
 
-### Accounts & Settings
-
-| Accounts | Settings |
+| Select Category | Pick Date |
 |---|---|
-| ![](screenshots/accounts.png) | ![](screenshots/tools.png) |
-| Manage balances, currencies, account identity, and ordering | Customize language, theme, currency, launch page, and local app behavior |
+| ![](screenshots/transaction_category_picker.png) | ![](screenshots/transaction_date_picker.png) |
+| Choose a category with icon support for cleaner organization | Set the transaction date from a calendar picker without leaving the form |
 
-### More Screens To Add
+| Add Note |  |
+|---|---|
+| ![](screenshots/transaction_note_input.png) |  |
+| Add optional transaction details inline through a lightweight input sheet |  |
 
-To fully showcase the product in GitHub, the next screenshots worth adding are:
+### Accounts & Customization
 
-- transaction form overview
-- analytics overview
-- category detail analytics
-- budget list
-- budget detail
-- account form / balance adjustment
+| Accounts Overview | Account Form |
+|---|---|
+| ![](screenshots/accounts_overview.png) | ![](screenshots/account_form.png) |
+| Manage balances, currencies, account identity, and ordering | Configure account name, balance, currency, color, and icon in one flow |
+
+| Settings |  |
+|---|---|
+| ![](screenshots/settings_overview.png) |  |
+| Customize language, currency, theme, launch page, and local device behavior |  |
 
 ## Features
 
