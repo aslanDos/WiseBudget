@@ -16,19 +16,41 @@ WiseBudget helps you:
 - work with exchange rates and store transaction snapshots in base currency
 - customize language, theme, currency, and launch page
 
-## Screenshots
+## App Tour
 
-| Home | Quick Add |
+WiseBudget covers the main personal finance workflow end to end: daily tracking, fast transaction entry, account management, and app customization. Below is a quick visual walkthrough of the current UI.
+
+### Home & Quick Actions
+
+| Home Overview | Quick Add Menu |
 |---|---|
 | ![](screenshots/home.png) | ![](screenshots/home_add_transaction_button.png) |
+| Daily overview with account context, calendar navigation, and recent transactions | Fast access to income, expense, transfer, and adjustment flows from one central action |
 
-| Accounts | Settings |
-|---|---|
-| ![](screenshots/accounts.png) | ![](screenshots/tools.png) |
+### Transaction Flow
 
 | Select Account | Select Category |
 |---|---|
 | ![](screenshots/transaction_form_select_account.png) | ![](screenshots/transaction_form_select_category.png) |
+| Choose the source account before saving a transaction | Pick a category with icon and color support for cleaner organization |
+
+### Accounts & Settings
+
+| Accounts | Settings |
+|---|---|
+| ![](screenshots/accounts.png) | ![](screenshots/tools.png) |
+| Manage balances, currencies, account identity, and ordering | Customize language, theme, currency, launch page, and local app behavior |
+
+### More Screens To Add
+
+To fully showcase the product in GitHub, the next screenshots worth adding are:
+
+- transaction form overview
+- analytics overview
+- category detail analytics
+- budget list
+- budget detail
+- account form / balance adjustment
 
 ## Features
 
