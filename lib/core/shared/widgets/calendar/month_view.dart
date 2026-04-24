@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/widgets/calendar/calendar_date_utils.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/day_cell.dart';
 
 class MonthView extends StatelessWidget {
@@ -41,9 +42,12 @@ class MonthView extends StatelessWidget {
       itemBuilder: (context, index) {
         final date = gridStart.add(Duration(days: index));
         final isCurrentMonth = date.month == month.month;
-        final isSelected = _isSameDay(date, selectedDate);
-        final isToday = _isSameDay(date, today);
-        final hasTransaction = _hasTransactionOnDate(date);
+        final isSelected = isSameCalendarDay(date, selectedDate);
+        final isToday = isSameCalendarDay(date, today);
+        final hasTransaction = hasCalendarMarkerOnDate(
+          date,
+          datesWithTransactions,
+        );
 
         return DayCell(
           date: date,
@@ -55,15 +59,5 @@ class MonthView extends StatelessWidget {
         );
       },
     );
-  }
-
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  bool _hasTransactionOnDate(DateTime date) {
-    if (datesWithTransactions == null) return false;
-    final normalizedDate = DateTime(date.year, date.month, date.day);
-    return datesWithTransactions!.contains(normalizedDate);
   }
 }

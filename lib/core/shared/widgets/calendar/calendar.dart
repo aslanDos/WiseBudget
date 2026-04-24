@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wisebuget/core/shared/widgets/calendar/calendar_pager.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/month_header.dart';
-import 'package:wisebuget/core/shared/widgets/calendar/month_view.dart';
 import 'package:wisebuget/core/shared/widgets/calendar/week_day_labels.dart';
-import 'package:wisebuget/core/shared/widgets/calendar/week_view.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
 class Calendar extends StatefulWidget {
@@ -23,8 +22,11 @@ class Calendar extends StatefulWidget {
   State<Calendar> createState() => _CalendarState();
 }
 
-class _CalendarState extends State<Calendar>
-    with SingleTickerProviderStateMixin {
+class _CalendarState extends State<Calendar> {
+  static const int _initialPageIndex = 1000;
+  static const Duration _animationDuration = Duration(milliseconds: 300);
+  static const Curve _animationCurve = Curves.easeInOut;
+
   late DateTime _focusedDate;
   late DateTime _selectedDate;
   bool _isExpanded = false;
@@ -37,7 +39,7 @@ class _CalendarState extends State<Calendar>
     super.initState();
     _selectedDate = widget.selectedDate ?? DateTime.now();
     _focusedDate = _selectedDate;
-    _currentPageIndex = 1000; // Start in the middle for infinite scroll
+    _currentPageIndex = _initialPageIndex;
     _pageController = PageController(initialPage: _currentPageIndex);
   }
 
@@ -50,9 +52,9 @@ class _CalendarState extends State<Calendar>
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      duration: _animationDuration,
+      curve: _animationCurve,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
         color: context.c.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
@@ -78,44 +80,26 @@ class _CalendarState extends State<Calendar>
           const WeekDayLabels(),
           const SizedBox(height: 8.0),
 
-          // Calendar grid
-          GestureDetector(
-            onVerticalDragEnd: _onVerticalDragEnd,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              height: _isExpanded ? 220.0 : 56.0,
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                itemBuilder: (context, index) {
-                  final offset = index - _currentPageIndex;
-                  final displayDate = _isExpanded
-                      ? DateTime(_focusedDate.year, _focusedDate.month + offset)
-                      : _focusedDate.add(Duration(days: offset * 7));
-
-                  return _isExpanded
-                      ? MonthView(
-                          month: displayDate,
-                          selectedDate: _selectedDate,
-                          onDateSelected: _onDateSelected,
-                          datesWithTransactions: widget.datesWithTransactions,
-                        )
-                      : WeekView(
-                          weekStart: _getWeekStart(displayDate),
-                          selectedDate: _selectedDate,
-                          onDateSelected: _onDateSelected,
-                          datesWithTransactions: widget.datesWithTransactions,
-                        );
-                },
-              ),
-            ),
+          CalendarPager(
+            isExpanded: _isExpanded,
+            focusedDate: _focusedDate,
+            selectedDate: _selectedDate,
+            currentPageIndex: _currentPageIndex,
+            pageController: _pageController,
+            onPageChanged: _onPageChanged,
+            onDateSelected: _onDateSelected,
+            onExpand: _expand,
+            onCollapse: _collapse,
+            datesWithTransactions: widget.datesWithTransactions,
           ),
 
-          // Drag handle
           GestureDetector(
             onTap: _toggleExpanded,
-            onVerticalDragEnd: _onVerticalDragEnd,
+            onVerticalDragEnd: (details) {
+              if (details.primaryVelocity == null) return;
+              if (details.primaryVelocity! > 0) _expand();
+              if (details.primaryVelocity! < 0) _collapse();
+            },
             child: Center(
               child: Container(
                 width: 40.0,
@@ -130,11 +114,6 @@ class _CalendarState extends State<Calendar>
         ],
       ),
     );
-  }
-
-  DateTime _getWeekStart(DateTime date) {
-    final weekday = date.weekday;
-    return date.subtract(Duration(days: weekday - 1));
   }
 
   void _onDateSelected(DateTime date) {
@@ -160,35 +139,36 @@ class _CalendarState extends State<Calendar>
 
   void _goToPreviousPage() {
     _pageController.previousPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: _animationDuration,
+      curve: _animationCurve,
     );
   }
 
   void _goToNextPage() {
     _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: _animationDuration,
+      curve: _animationCurve,
     );
   }
 
   void _toggleExpanded() {
-    setState(() => _isExpanded = !_isExpanded);
-    // Джампаем без анимации, чтобы не было визуального скачка
-    _pageController.jumpToPage(1000);
+    if (_isExpanded) {
+      _collapse();
+    } else {
+      _expand();
+    }
   }
 
-  void _onVerticalDragEnd(DragEndDetails details) {
-    if (details.primaryVelocity == null) return;
+  void _expand() {
+    _setExpanded(true);
+  }
 
-    if (details.primaryVelocity! > 0) {
-      // Swiping down - expand
-      setState(() => _isExpanded = true);
-      _pageController.jumpToPage(1000);
-    } else if (details.primaryVelocity! < 0) {
-      // Swiping up - collapse
-      setState(() => _isExpanded = false);
-      _pageController.jumpToPage(1000);
-    }
+  void _collapse() {
+    _setExpanded(false);
+  }
+
+  void _setExpanded(bool isExpanded) {
+    setState(() => _isExpanded = isExpanded);
+    _pageController.jumpToPage(_initialPageIndex);
   }
 }

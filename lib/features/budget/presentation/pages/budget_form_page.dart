@@ -13,7 +13,6 @@ import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/core/shared/widgets/color_icon_selector.dart';
 import 'package:wisebuget/core/shared/widgets/colored_icon_box.dart';
 import 'package:wisebuget/core/shared/widgets/dialog.dart';
-import 'package:wisebuget/core/shared/widgets/input_amount/input_amount.dart';
 import 'package:wisebuget/core/shared/widgets/modal/modal_sheet.dart';
 import 'package:wisebuget/core/shared/widgets/picker_field.dart';
 import 'package:wisebuget/core/shared/utils/date_formatter.dart';
@@ -327,12 +326,19 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
   // ── Pickers ──────────────────────────────────────────────────────────────
 
   Future<void> _showAmountInput(BuildContext context) async {
-    final result = await showInputAmountSheet(
+    final result = await showModalInput(
       context: context,
-      initialAmount: _amount,
-      title: context.l10n.budgetLimit,
+      initialValue: _amount == 0 ? '' : _amountDisplay,
+      hintText: '0.00',
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
     );
-    if (result != null) setState(() => _amount = result);
+    if (result == null) return;
+
+    final normalized = result.replaceAll(',', '.').trim();
+    final parsed = double.tryParse(normalized);
+    if (parsed != null && parsed >= 0) {
+      setState(() => _amount = parsed);
+    }
   }
 
   Future<void> _showPeriodPicker(BuildContext context) async {

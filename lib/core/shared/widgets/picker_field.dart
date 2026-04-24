@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:wisebuget/core/theme/theme_extensions/theme_extensions.dart';
 
+class _PickerFieldGroupScope extends InheritedWidget {
+  final bool enabled;
+
+  const _PickerFieldGroupScope({required this.enabled, required super.child});
+
+  static bool isEnabled(BuildContext context) {
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<_PickerFieldGroupScope>();
+    return scope?.enabled ?? false;
+  }
+
+  @override
+  bool updateShouldNotify(_PickerFieldGroupScope oldWidget) {
+    return enabled != oldWidget.enabled;
+  }
+}
+
 class PickerField extends StatelessWidget {
   /// The icon displayed on the left side of the field.
   final IconData icon;
@@ -61,13 +78,19 @@ class PickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isGrouped = _PickerFieldGroupScope.isEnabled(context);
+    final resolvedBorderRadius = isGrouped ? 0.0 : borderRadius;
+    final resolvedBackgroundColor = isGrouped
+        ? Colors.transparent
+        : (backgroundColor ?? context.c.secondary);
+
     return Material(
-      color: backgroundColor ?? context.c.secondary,
-      borderRadius: BorderRadius.circular(borderRadius),
+      color: resolvedBackgroundColor,
+      borderRadius: BorderRadius.circular(resolvedBorderRadius),
       child: InkWell(
         overlayColor: WidgetStateProperty.all(Colors.transparent),
         onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(resolvedBorderRadius),
         child: Padding(
           padding: padding,
           child: Row(
@@ -172,53 +195,25 @@ class PickerFieldGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor ?? context.c.secondary,
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (int i = 0; i < children.length; i++) ...[
-            // Override the background color of child PickerFields to transparent
-            _PickerFieldWrapper(child: children[i]),
-            if (showDividers && i < children.length - 1)
-              Divider(height: 1, thickness: 1, color: context.c.secondary),
+    return _PickerFieldGroupScope(
+      enabled: true,
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor ?? context.c.secondary,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int i = 0; i < children.length; i++) ...[
+              children[i],
+              if (showDividers && i < children.length - 1)
+                Divider(height: 1, thickness: 1, color: context.c.secondary),
+            ],
           ],
-        ],
+        ),
       ),
     );
-  }
-}
-
-class _PickerFieldWrapper extends StatelessWidget {
-  final Widget child;
-
-  const _PickerFieldWrapper({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    // If the child is a PickerField, rebuild it with transparent background
-    if (child is PickerField) {
-      final pickerField = child as PickerField;
-      return PickerField(
-        icon: pickerField.icon,
-        label: pickerField.label,
-        iconColor: pickerField.iconColor,
-        iconBackgroundColor: pickerField.iconBackgroundColor,
-        value: pickerField.value,
-        valueStyle: pickerField.valueStyle,
-        showChevron: pickerField.showChevron,
-        onTap: pickerField.onTap,
-        backgroundColor: Colors.transparent,
-        borderRadius: 0,
-        padding: pickerField.padding,
-        trailing: pickerField.trailing,
-        shrink: pickerField.shrink,
-      );
-    }
-    return child;
   }
 }
