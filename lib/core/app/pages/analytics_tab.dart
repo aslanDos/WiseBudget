@@ -26,11 +26,14 @@ class AnalyticsTab extends StatefulWidget {
 }
 
 class _AnalyticsTabState extends State<AnalyticsTab> {
+  late final AnalyticsCubit _analyticsCubit;
+
   @override
   void initState() {
     super.initState();
+    _analyticsCubit = sl<AnalyticsCubit>();
     sl<AccountCubit>().loadAccounts();
-    sl<AnalyticsCubit>().init();
+    _analyticsCubit.init();
   }
 
   @override
@@ -38,7 +41,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: sl<AccountCubit>()),
-        BlocProvider.value(value: sl<AnalyticsCubit>()),
+        BlocProvider.value(value: _analyticsCubit),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -59,14 +62,16 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
                         account: selected,
                         accounts: accountState.accounts,
                         allSelected: selectedUuid == null,
-                        onSelected: sl<AnalyticsCubit>().selectAccount,
+                        onSelected: context
+                            .read<AnalyticsCubit>()
+                            .selectAccount,
                         onAllSelected: () =>
-                            sl<AnalyticsCubit>().selectAccount(null),
+                            context.read<AnalyticsCubit>().selectAccount(null),
                       ),
                       const SizedBox(width: 8),
                       PeriodChip(
                         selectedPeriod: analyticsState.selectedPeriod,
-                        onChanged: sl<AnalyticsCubit>().selectPeriod,
+                        onChanged: context.read<AnalyticsCubit>().selectPeriod,
                       ),
                     ],
                   );
@@ -131,7 +136,9 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
                   CategoryDonutChart(
                     data: state.categoryBreakdown,
                     selectedType: state.categoryType,
-                    onTypeChanged: sl<AnalyticsCubit>().selectCategoryType,
+                    onTypeChanged: context
+                        .read<AnalyticsCubit>()
+                        .selectCategoryType,
                     onCategoryTapped: (categoryData) {
                       context.push(
                         AppRoutes.categoryDetail,

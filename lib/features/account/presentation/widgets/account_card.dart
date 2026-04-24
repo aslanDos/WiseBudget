@@ -31,6 +31,7 @@ class AccountCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(16.0),
+
         child: Row(
           children: [
             ColoredIconBox(

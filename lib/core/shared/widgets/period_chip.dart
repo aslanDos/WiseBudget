@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:wisebuget/core/l10n/l10n.dart';
@@ -29,8 +28,6 @@ class PeriodChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCustom = selectedPeriod is CustomPeriod;
-
     return PullDownButton(
       itemBuilder: (context) => [
         ..._presets.map(

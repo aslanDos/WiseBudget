@@ -70,9 +70,12 @@ class _SplashPageState extends State<SplashPage>
                   SvgPicture.asset(
                     'assets/image/piggy-bank.svg',
                     width: 80,
-                    color: context.c.brightness == Brightness.dark
-                        ? context.c.onPrimary
-                        : context.c.primary,
+                    colorFilter: ColorFilter.mode(
+                      context.c.brightness == Brightness.dark
+                          ? context.c.onPrimary
+                          : context.c.primary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
@@ -55,7 +54,7 @@ class _AccountTabState extends State<AccountTab>
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<AccountCubit>()..loadAccounts()),
+        BlocProvider.value(value: sl<AccountCubit>()..loadAccounts()),
         BlocProvider.value(value: _ratesCubit),
       ],
       child: Scaffold(
@@ -89,7 +88,8 @@ class _AccountTabState extends State<AccountTab>
 
             if (state.status == CubitStatus.failure) {
               return CubitErrorWidget(
-                message: state.errorMessage ?? context.l10n.failedToLoadAccounts,
+                message:
+                    state.errorMessage ?? context.l10n.failedToLoadAccounts,
                 onRetry: () => context.read<AccountCubit>().loadAccounts(),
               );
             }
@@ -141,11 +141,16 @@ class _AccountTabState extends State<AccountTab>
     final cubit = context.read<AccountCubit>();
     for (int i = 0; i < reordered.length; i++) {
       final account = reordered[i];
-      if (account.sortOrder != i) cubit.editAccount(account.copyWith(sortOrder: i));
+      if (account.sortOrder != i) {
+        cubit.editAccount(account.copyWith(sortOrder: i));
+      }
     }
   }
 
-  Future<void> _handleDelete(BuildContext context, AccountEntity account) async {
+  Future<void> _handleDelete(
+    BuildContext context,
+    AccountEntity account,
+  ) async {
     final confirmed = await showAppConfirmDialog(
       context: context,
       title: context.l10n.deleteAccount,
@@ -169,13 +174,7 @@ class _AccountTabState extends State<AccountTab>
     BuildContext context,
     AccountEntity account,
   ) async {
-    final result = await showAccountFormModal(
-      context: context,
-      account: account,
-    );
-    if (result == true && context.mounted) {
-      context.pop(true);
-    }
+    await showAccountFormModal(context: context, account: account);
   }
 
   @override
@@ -227,7 +226,8 @@ class _AccountsContent extends StatelessWidget {
                       : sl<LocalPreferences>().currency;
                   double totalInBase = 0;
                   for (final account in accounts) {
-                    final rate = ratesState.rateFor(account.currency) ??
+                    final rate =
+                        ratesState.rateFor(account.currency) ??
                         (account.currency == baseCurrency ? 1.0 : 0.0);
                     totalInBase += account.balance * rate;
                   }

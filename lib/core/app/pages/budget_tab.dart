@@ -27,18 +27,27 @@ class BudgetTab extends StatefulWidget {
 }
 
 class _BudgetTabState extends State<BudgetTab> {
+  late final BudgetCubit _budgetCubit;
+
   @override
   void initState() {
     super.initState();
-    sl<BudgetCubit>().loadBudgets();
+    _budgetCubit = sl<BudgetCubit>();
+    _budgetCubit.loadBudgets();
     sl<CategoryCubit>().loadCategories();
+  }
+
+  @override
+  void dispose() {
+    _budgetCubit.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: sl<BudgetCubit>()),
+        BlocProvider.value(value: _budgetCubit),
         BlocProvider.value(value: sl<CategoryCubit>()),
       ],
       child: Scaffold(
@@ -63,7 +72,7 @@ class _BudgetTabState extends State<BudgetTab> {
             if (state.status == CubitStatus.failure) {
               return CubitErrorWidget(
                 message: state.errorMessage ?? context.l10n.failedToLoadBudgets,
-                onRetry: () => sl<BudgetCubit>().loadBudgets(),
+                onRetry: () => context.read<BudgetCubit>().loadBudgets(),
               );
             }
             if (!state.hasBudgets) {
@@ -95,7 +104,7 @@ class _BudgetTabState extends State<BudgetTab> {
       budgetUuid: budgetUuid,
     );
     if (result == true && mounted) {
-      sl<BudgetCubit>().loadBudgets();
+      _budgetCubit.loadBudgets();
     }
   }
 }
@@ -288,8 +297,12 @@ class _BudgetCard extends StatelessWidget {
                 ),
                 Text(
                   isExceeded
-                      ? context.l10n.overByAmount(progress.overByMoney.formatted)
-                      : context.l10n.amountLeft(progress.remainingMoney.formatted),
+                      ? context.l10n.overByAmount(
+                          progress.overByMoney.formatted,
+                        )
+                      : context.l10n.amountLeft(
+                          progress.remainingMoney.formatted,
+                        ),
                   style: context.t.labelSmall?.copyWith(
                     color: isExceeded
                         ? context.c.error

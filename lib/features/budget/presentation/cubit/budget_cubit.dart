@@ -1,36 +1,37 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/budget/domain/entity/budget_entity.dart';
-import 'package:wisebuget/features/budget/domain/entity/budget_progress.dart';
+import 'package:wisebuget/features/budget/domain/usecases/build_budget_overview.dart';
 import 'package:wisebuget/features/budget/domain/usecases/budget_usecases.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_state.dart';
-import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final GetBudgets _getBudgets;
+  final GetTransactions _getTransactions;
   final CreateBudget _createBudget;
   final UpdateBudget _updateBudget;
   final DeleteBudget _deleteBudget;
-  final CalculateBudgetProgress _calculateProgress;
-  final TransactionCubit _transactionCubit;
+  final BuildBudgetOverview _buildOverview;
 
   final _log = Logger('BudgetCubit');
 
   BudgetCubit({
     required GetBudgets getBudgets,
+    required GetTransactions getTransactions,
     required CreateBudget createBudget,
     required UpdateBudget updateBudget,
     required DeleteBudget deleteBudget,
-    required CalculateBudgetProgress calculateProgress,
-    required TransactionCubit transactionCubit,
-  })  : _getBudgets = getBudgets,
-        _createBudget = createBudget,
-        _updateBudget = updateBudget,
-        _deleteBudget = deleteBudget,
-        _calculateProgress = calculateProgress,
-        _transactionCubit = transactionCubit,
-        super(const BudgetState());
+    required BuildBudgetOverview buildOverview,
+  }) : _getBudgets = getBudgets,
+       _getTransactions = getTransactions,
+       _createBudget = createBudget,
+       _updateBudget = updateBudget,
+       _deleteBudget = deleteBudget,
+       _buildOverview = buildOverview,
+       super(const BudgetState());
 
   /// Load all active budgets and calculate progress
   Future<void> loadBudgets() async {
@@ -41,111 +42,60 @@ class BudgetCubit extends Cubit<BudgetState> {
     result.fold(
       (failure) {
         _log.warning('Failed to load budgets: ${failure.message}');
-        emit(state.copyWith(
-          status: CubitStatus.failure,
-          errorMessage: failure.message,
-        ));
+        emit(
+          state.copyWith(
+            status: CubitStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
       },
       (budgets) async {
-        // Calculate progress for each budget
-        final progressList = await _calculateProgressForBudgets(budgets);
-        final insights = _generateInsights(progressList);
-        final total = _calculateTotalBudget(progressList);
+        final transactionsResult = await _getTransactions(const NoParams());
+        await transactionsResult.fold(
+          (failure) async {
+            _log.warning('Failed to load transactions: ${failure.message}');
+            emit(
+              state.copyWith(
+                status: CubitStatus.failure,
+                errorMessage: failure.message,
+              ),
+            );
+          },
+          (transactions) async {
+            final overviewResult = await _buildOverview(
+              BuildBudgetOverviewParams(
+                budgets: budgets,
+                transactions: transactions,
+              ),
+            );
 
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          budgets: progressList,
-          totalBudget: total,
-          insights: insights,
-        ));
+            overviewResult.fold(
+              (failure) {
+                _log.warning(
+                  'Failed to build budget overview: ${failure.message}',
+                );
+                emit(
+                  state.copyWith(
+                    status: CubitStatus.failure,
+                    errorMessage: failure.message,
+                  ),
+                );
+              },
+              (overview) {
+                emit(
+                  state.copyWith(
+                    status: CubitStatus.success,
+                    budgets: overview.budgets,
+                    totalBudget: overview.totalBudget,
+                    insights: overview.insights,
+                  ),
+                );
+              },
+            );
+          },
+        );
       },
     );
-  }
-
-  /// Calculate progress for all budgets
-  Future<List<BudgetProgress>> _calculateProgressForBudgets(
-    List<BudgetEntity> budgets,
-  ) async {
-    final transactions = _transactionCubit.state.transactions;
-    final progressList = <BudgetProgress>[];
-
-    for (final budget in budgets) {
-      final result = await _calculateProgress(
-        CalculateBudgetProgressParams(
-          budget: budget,
-          transactions: transactions,
-        ),
-      );
-
-      result.fold(
-        (failure) =>
-            _log.warning('Failed to calculate progress: ${failure.message}'),
-        (progress) => progressList.add(progress),
-      );
-    }
-
-    return progressList;
-  }
-
-  /// Calculate aggregated total budget from all budgets
-  BudgetProgress? _calculateTotalBudget(List<BudgetProgress> budgets) {
-    if (budgets.isEmpty) return null;
-
-    final totalLimit = budgets.fold<double>(0, (sum, b) => sum + b.budget.limit);
-    final totalSpent = budgets.fold<double>(0, (sum, b) => sum + b.spent);
-    final totalTransactions =
-        budgets.fold<int>(0, (sum, b) => sum + b.transactionCount);
-
-    // Create a virtual "total" budget entity
-    final totalBudgetEntity = BudgetEntity(
-      uuid: 'total',
-      name: 'Total Budget',
-      limit: totalLimit,
-      currency: budgets.first.budget.currency,
-      period: BudgetPeriod.monthly,
-      startDate: DateTime.now(),
-      categoryUuids: const [],
-      accountUuids: const [],
-      iconCode: 'wallet',
-      colorValue: 0xFF6366F1,
-      createdDate: DateTime.now(),
-    );
-
-    return BudgetProgress(
-      budget: totalBudgetEntity,
-      spent: totalSpent,
-      transactionCount: totalTransactions,
-    );
-  }
-
-  /// Generate insights based on budget progress
-  List<BudgetInsight> _generateInsights(List<BudgetProgress> budgets) {
-    final insights = <BudgetInsight>[];
-
-    for (final progress in budgets) {
-      // Exceeded budget warning
-      if (progress.isExceeded) {
-        insights.add(BudgetInsight(
-          type: BudgetInsightType.warning,
-          title: '${progress.budget.name} exceeded',
-          description:
-              'Over by ${progress.overByMoney.formatted}. Consider adjusting your limit.',
-          budgetUuid: progress.budget.uuid,
-        ));
-      }
-      // Projected overspend suggestion
-      else if (progress.isProjectedToExceed && progress.budget.daysRemaining > 3) {
-        insights.add(BudgetInsight(
-          type: BudgetInsightType.suggestion,
-          title: 'Projected overspend',
-          description:
-              'At current pace, ${progress.budget.name} will reach ${progress.projectedMoney.formatted}',
-          budgetUuid: progress.budget.uuid,
-        ));
-      }
-    }
-
-    return insights;
   }
 
   /// Add a new budget
@@ -154,16 +104,15 @@ class BudgetCubit extends Cubit<BudgetState> {
 
     final result = await _createBudget(CreateBudgetParams(budget: budget));
 
-    result.fold(
-      (failure) {
-        _log.warning('Failed to create budget: ${failure.message}');
-        emit(state.copyWith(
+    result.fold((failure) {
+      _log.warning('Failed to create budget: ${failure.message}');
+      emit(
+        state.copyWith(
           status: CubitStatus.failure,
           errorMessage: failure.message,
-        ));
-      },
-      (_) => emit(state.copyWith(status: CubitStatus.success)),
-    );
+        ),
+      );
+    }, (_) => emit(state.copyWith(status: CubitStatus.success)));
   }
 
   /// Edit an existing budget
@@ -172,16 +121,15 @@ class BudgetCubit extends Cubit<BudgetState> {
 
     final result = await _updateBudget(UpdateBudgetParams(budget: budget));
 
-    result.fold(
-      (failure) {
-        _log.warning('Failed to update budget: ${failure.message}');
-        emit(state.copyWith(
+    result.fold((failure) {
+      _log.warning('Failed to update budget: ${failure.message}');
+      emit(
+        state.copyWith(
           status: CubitStatus.failure,
           errorMessage: failure.message,
-        ));
-      },
-      (_) => emit(state.copyWith(status: CubitStatus.success)),
-    );
+        ),
+      );
+    }, (_) => emit(state.copyWith(status: CubitStatus.success)));
   }
 
   /// Archive a budget (soft delete)
@@ -199,16 +147,15 @@ class BudgetCubit extends Cubit<BudgetState> {
 
     final result = await _deleteBudget(DeleteBudgetParams(uuid: uuid));
 
-    result.fold(
-      (failure) {
-        _log.warning('Failed to delete budget: ${failure.message}');
-        emit(state.copyWith(
+    result.fold((failure) {
+      _log.warning('Failed to delete budget: ${failure.message}');
+      emit(
+        state.copyWith(
           status: CubitStatus.failure,
           errorMessage: failure.message,
-        ));
-      },
-      (_) => emit(state.copyWith(status: CubitStatus.success)),
-    );
+        ),
+      );
+    }, (_) => emit(state.copyWith(status: CubitStatus.success)));
   }
 
   /// Called when transactions change - recalculate progress

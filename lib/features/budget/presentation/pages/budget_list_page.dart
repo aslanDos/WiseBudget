@@ -21,10 +21,19 @@ class BudgetListPage extends StatefulWidget {
 }
 
 class _BudgetListPageState extends State<BudgetListPage> {
+  late final BudgetCubit _budgetCubit;
+
   @override
   void initState() {
     super.initState();
-    sl<BudgetCubit>().loadBudgets();
+    _budgetCubit = sl<BudgetCubit>();
+    _budgetCubit.loadBudgets();
+  }
+
+  @override
+  void dispose() {
+    _budgetCubit.close();
+    super.dispose();
   }
 
   void _openBudgetForm({String? budgetUuid}) async {
@@ -33,14 +42,17 @@ class _BudgetListPageState extends State<BudgetListPage> {
       budgetUuid: budgetUuid,
     );
     if (result == true) {
-      sl<BudgetCubit>().loadBudgets();
+      _budgetCubit.loadBudgets();
     }
   }
 
   void _openBudgetDetail(String budgetUuid) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => BudgetDetailPage(budgetUuid: budgetUuid),
+        builder: (_) => BlocProvider.value(
+          value: _budgetCubit,
+          child: BudgetDetailPage(budgetUuid: budgetUuid),
+        ),
       ),
     );
   }
@@ -48,11 +60,9 @@ class _BudgetListPageState extends State<BudgetListPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: sl<BudgetCubit>(),
+      value: _budgetCubit,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(context.l10n.budgets),
-        ),
+        appBar: AppBar(title: Text(context.l10n.budgets)),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openBudgetForm(),
           child: const Icon(Icons.add),
@@ -68,9 +78,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
             }
 
             if (!state.hasBudgets) {
-              return BudgetEmptyState(
-                onCreateBudget: () => _openBudgetForm(),
-              );
+              return BudgetEmptyState(onCreateBudget: () => _openBudgetForm());
             }
 
             return _buildBudgetList(state);
@@ -81,15 +89,13 @@ class _BudgetListPageState extends State<BudgetListPage> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildErrorState(String? message) {
     return CubitErrorWidget(
       message: message,
-      onRetry: () => sl<BudgetCubit>().loadBudgets(),
+      onRetry: () => _budgetCubit.loadBudgets(),
     );
   }
 
@@ -98,7 +104,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
     final colors = theme.colorScheme;
 
     return RefreshIndicator(
-      onRefresh: () async => sl<BudgetCubit>().loadBudgets(),
+      onRefresh: () async => _budgetCubit.loadBudgets(),
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -124,16 +130,17 @@ class _BudgetListPageState extends State<BudgetListPage> {
           ),
 
           // Budget cards
-          ...state.sortedBudgets.map((progress) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: BudgetCard(
-                  progress: progress,
-                  onTap: () => _openBudgetDetail(progress.budget.uuid),
-                  onLongPress: () => _openBudgetForm(
-                    budgetUuid: progress.budget.uuid,
-                  ),
-                ),
-              )),
+          ...state.sortedBudgets.map(
+            (progress) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: BudgetCard(
+                progress: progress,
+                onTap: () => _openBudgetDetail(progress.budget.uuid),
+                onLongPress: () =>
+                    _openBudgetForm(budgetUuid: progress.budget.uuid),
+              ),
+            ),
+          ),
 
           // Insights section
           if (state.hasInsights) ...[
@@ -148,15 +155,17 @@ class _BudgetListPageState extends State<BudgetListPage> {
                 ),
               ),
             ),
-            ...state.insights.map((insight) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: BudgetInsightCard(
-                    insight: insight,
-                    onTap: insight.budgetUuid != null
-                        ? () => _openBudgetDetail(insight.budgetUuid!)
-                        : null,
-                  ),
-                )),
+            ...state.insights.map(
+              (insight) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: BudgetInsightCard(
+                  insight: insight,
+                  onTap: insight.budgetUuid != null
+                      ? () => _openBudgetDetail(insight.budgetUuid!)
+                      : null,
+                ),
+              ),
+            ),
           ],
 
           // Bottom padding for FAB
@@ -170,9 +179,18 @@ class _BudgetListPageState extends State<BudgetListPage> {
     final now = DateTime.now();
     final l10n = context.l10n;
     final months = [
-      l10n.january, l10n.february, l10n.march, l10n.april,
-      l10n.may, l10n.june, l10n.july, l10n.august,
-      l10n.september, l10n.october, l10n.november, l10n.december,
+      l10n.january,
+      l10n.february,
+      l10n.march,
+      l10n.april,
+      l10n.may,
+      l10n.june,
+      l10n.july,
+      l10n.august,
+      l10n.september,
+      l10n.october,
+      l10n.november,
+      l10n.december,
     ];
     return '${months[now.month - 1]} ${now.year}';
   }

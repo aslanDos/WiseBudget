@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/usecases/usecase.dart';
-import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
+import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
 import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
@@ -15,33 +15,33 @@ class TransactionCubit extends Cubit<TransactionState> {
   final GetTransactions _getTransactions;
   final GetTransactionsByAccount _getTransactionsByAccount;
   final GetTransactionsByCategory _getTransactionsByCategory;
-  final CreateTransaction _createTransaction;
-  final UpdateTransaction _updateTransaction;
-  final DeleteTransaction _deleteTransaction;
-  final AccountCubit _accountCubit;
+  final CreateTransactionWithEffects _createTransactionWithEffects;
+  final UpdateTransactionWithEffects _updateTransactionWithEffects;
+  final DeleteTransactionWithEffects _deleteTransactionWithEffects;
   final GetOrFetchExchangeRate _getOrFetchExchangeRate;
+  final RecalculateAccountBalances _recalculateAccountBalances;
   final LocalPreferences _prefs;
 
   TransactionCubit({
     required GetTransactions getTransactions,
     required GetTransactionsByAccount getTransactionsByAccount,
     required GetTransactionsByCategory getTransactionsByCategory,
-    required CreateTransaction createTransaction,
-    required UpdateTransaction updateTransaction,
-    required DeleteTransaction deleteTransaction,
-    required AccountCubit accountCubit,
+    required CreateTransactionWithEffects createTransactionWithEffects,
+    required UpdateTransactionWithEffects updateTransactionWithEffects,
+    required DeleteTransactionWithEffects deleteTransactionWithEffects,
     required GetOrFetchExchangeRate getOrFetchExchangeRate,
+    required RecalculateAccountBalances recalculateAccountBalances,
     required LocalPreferences prefs,
-  })  : _getTransactions = getTransactions,
-        _getTransactionsByAccount = getTransactionsByAccount,
-        _getTransactionsByCategory = getTransactionsByCategory,
-        _createTransaction = createTransaction,
-        _updateTransaction = updateTransaction,
-        _deleteTransaction = deleteTransaction,
-        _accountCubit = accountCubit,
-        _getOrFetchExchangeRate = getOrFetchExchangeRate,
-        _prefs = prefs,
-        super(const TransactionState());
+  }) : _getTransactions = getTransactions,
+       _getTransactionsByAccount = getTransactionsByAccount,
+       _getTransactionsByCategory = getTransactionsByCategory,
+       _createTransactionWithEffects = createTransactionWithEffects,
+       _updateTransactionWithEffects = updateTransactionWithEffects,
+       _getOrFetchExchangeRate = getOrFetchExchangeRate,
+       _deleteTransactionWithEffects = deleteTransactionWithEffects,
+       _recalculateAccountBalances = recalculateAccountBalances,
+       _prefs = prefs,
+       super(const TransactionState());
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load Operations
@@ -55,12 +55,16 @@ class TransactionCubit extends Cubit<TransactionState> {
     result.fold(
       (failure) => _emitFailure('Failed to load transactions', failure.message),
       (transactions) {
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          transactions: transactions,
-        ));
+        emit(
+          state.copyWith(
+            status: CubitStatus.success,
+            transactions: transactions,
+          ),
+        );
         if (recalculateBalances) {
-          _accountCubit.recalculateBalances(transactions);
+          _recalculateAccountBalances(
+            RecalculateAccountBalancesParams(transactions: transactions),
+          );
         }
       },
     );
@@ -75,10 +79,9 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     result.fold(
       (failure) => _emitFailure('Failed to load by account', failure.message),
-      (transactions) => emit(state.copyWith(
-        status: CubitStatus.success,
-        transactions: transactions,
-      )),
+      (transactions) => emit(
+        state.copyWith(status: CubitStatus.success, transactions: transactions),
+      ),
     );
   }
 
@@ -91,10 +94,9 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     result.fold(
       (failure) => _emitFailure('Failed to load by category', failure.message),
-      (transactions) => emit(state.copyWith(
-        status: CubitStatus.success,
-        transactions: transactions,
-      )),
+      (transactions) => emit(
+        state.copyWith(status: CubitStatus.success, transactions: transactions),
+      ),
     );
   }
 
@@ -105,18 +107,22 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> addTransaction(TransactionEntity transaction) async {
     emit(state.copyWith(status: CubitStatus.loading));
 
-    final result = await _createTransaction(
-      CreateTransactionParams(transaction: await _attachExchangeRate(transaction)),
+    final result = await _createTransactionWithEffects(
+      CreateTransactionWithEffectsParams(
+        transaction: await _attachExchangeRate(transaction),
+      ),
     );
 
     result.fold(
-      (failure) => _emitFailure('Failed to create transaction', failure.message),
+      (failure) =>
+          _emitFailure('Failed to create transaction', failure.message),
       (created) {
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          transactions: [created, ...state.transactions],
-        ));
-        _accountCubit.applyTransactionEffect(created);
+        emit(
+          state.copyWith(
+            status: CubitStatus.success,
+            transactions: [created, ...state.transactions],
+          ),
+        );
       },
     );
   }
@@ -152,29 +158,26 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> editTransaction(TransactionEntity transaction) async {
     emit(state.copyWith(status: CubitStatus.loading));
 
-    final oldTransaction = _findTransaction(transaction.uuid);
-
-    final result = await _updateTransaction(
-      UpdateTransactionParams(transaction: await _attachExchangeRate(transaction)),
+    final result = await _updateTransactionWithEffects(
+      UpdateTransactionWithEffectsParams(
+        transaction: await _attachExchangeRate(transaction),
+      ),
     );
 
     result.fold(
-      (failure) => _emitFailure('Failed to update transaction', failure.message),
+      (failure) =>
+          _emitFailure('Failed to update transaction', failure.message),
       (updated) {
         final updatedList = state.transactions
             .map((t) => t.uuid == updated.uuid ? updated : t)
             .toList();
 
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          transactions: updatedList,
-        ));
-
-        // Reverse old effect, apply new effect
-        if (oldTransaction != null) {
-          _accountCubit.reverseTransactionEffect(oldTransaction);
-        }
-        _accountCubit.applyTransactionEffect(updated);
+        emit(
+          state.copyWith(
+            status: CubitStatus.success,
+            transactions: updatedList,
+          ),
+        );
       },
     );
   }
@@ -182,42 +185,30 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> removeTransaction(String uuid) async {
     emit(state.copyWith(status: CubitStatus.loading));
 
-    final transaction = _findTransaction(uuid);
-
-    final result = await _deleteTransaction(DeleteTransactionParams(uuid: uuid));
+    final result = await _deleteTransactionWithEffects(
+      DeleteTransactionWithEffectsParams(uuid: uuid),
+    );
 
     result.fold(
-      (failure) => _emitFailure('Failed to delete transaction', failure.message),
+      (failure) =>
+          _emitFailure('Failed to delete transaction', failure.message),
       (_) {
         final updatedList = state.transactions
             .where((t) => t.uuid != uuid)
             .toList();
 
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          transactions: updatedList,
-        ));
-
-        if (transaction != null) {
-          _accountCubit.reverseTransactionEffect(transaction);
-        }
+        emit(
+          state.copyWith(
+            status: CubitStatus.success,
+            transactions: updatedList,
+          ),
+        );
       },
     );
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Private Helpers
-  // ─────────────────────────────────────────────────────────────────────────
-
-  TransactionEntity? _findTransaction(String uuid) {
-    return state.transactions.where((t) => t.uuid == uuid).firstOrNull;
-  }
-
   void _emitFailure(String context, String message) {
     _log.warning('$context: $message');
-    emit(state.copyWith(
-      status: CubitStatus.failure,
-      errorMessage: message,
-    ));
+    emit(state.copyWith(status: CubitStatus.failure, errorMessage: message));
   }
 }

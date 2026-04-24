@@ -92,10 +92,12 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
 
   BudgetEntity? _existingBudget;
   bool _isSaving = false;
+  late final BudgetCubit _budgetCubit;
 
   @override
   void initState() {
     super.initState();
+    _budgetCubit = context.read<BudgetCubit>();
     final rng = Random();
     sl<AccountCubit>().loadAccounts();
     sl<CategoryCubit>().loadCategories();
@@ -116,7 +118,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
   }
 
   void _loadExisting() {
-    final budget = sl<BudgetCubit>().state.budgets
+    final budget = _budgetCubit.state.budgets
         .where((b) => b.budget.uuid == widget.budgetUuid)
         .firstOrNull
         ?.budget;
@@ -175,7 +177,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: sl<BudgetCubit>()),
+        BlocProvider.value(value: _budgetCubit),
         BlocProvider.value(value: sl<CategoryCubit>()),
         BlocProvider.value(value: sl<AccountCubit>()),
       ],
@@ -191,7 +193,9 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
           } else if (state.status == CubitStatus.failure) {
             _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
+              SnackBar(
+                content: Text(state.errorMessage ?? context.l10n.failedToSave),
+              ),
             );
           }
         },
@@ -292,8 +296,10 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
                           selectedColorValue: _selectedColorValue,
                           selectedIconCode: _iconCode,
                           iconOptions: _kBudgetIconOptions,
-                          onColorChanged: (v) => setState(() => _selectedColorValue = v),
-                          onIconChanged: (code) => setState(() => _iconCode = code),
+                          onColorChanged: (v) =>
+                              setState(() => _selectedColorValue = v),
+                          onIconChanged: (code) =>
+                              setState(() => _iconCode = code),
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -371,7 +377,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
       isDestructive: true,
     );
     if (confirmed == true) {
-      sl<BudgetCubit>().deleteBudget(widget.budgetUuid!);
+      _budgetCubit.deleteBudget(widget.budgetUuid!);
     }
   }
 
@@ -381,13 +387,12 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
         ? accountState.accounts.first.currency
         : 'USD';
 
-    final cubit = sl<BudgetCubit>();
     final now = DateTime.now();
 
     setState(() => _isSaving = true);
 
     if (widget.isEditing && _existingBudget != null) {
-      cubit.editBudget(
+      _budgetCubit.editBudget(
         _existingBudget!.copyWith(
           name: _name.trim(),
           limit: _amount,
@@ -403,7 +408,7 @@ class _BudgetFormSheetState extends State<BudgetFormSheet> {
         ),
       );
     } else {
-      cubit.addBudget(
+      _budgetCubit.addBudget(
         BudgetEntity(
           uuid: const Uuid().v4(),
           name: _name.trim(),

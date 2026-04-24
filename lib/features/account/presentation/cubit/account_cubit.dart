@@ -2,11 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:wisebuget/core/usecases/usecase.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
-import 'package:wisebuget/features/account/domain/services/balance_service.dart';
 import 'package:wisebuget/features/account/domain/usecases/account_usecases.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
-import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
 final _log = Logger('AccountCubit');
 
@@ -16,7 +14,6 @@ class AccountCubit extends Cubit<AccountState> {
   final UpdateAccount _updateAccount;
   final DeleteAccount _deleteAccount;
   final SeedDefaultAccount _seedDefaultAccount;
-  final BalanceService _balanceService;
 
   AccountCubit({
     required GetAccounts getAccounts,
@@ -24,14 +21,12 @@ class AccountCubit extends Cubit<AccountState> {
     required UpdateAccount updateAccount,
     required DeleteAccount deleteAccount,
     required SeedDefaultAccount seedDefaultAccount,
-    BalanceService balanceService = const BalanceService(),
-  })  : _getAccounts = getAccounts,
-        _createAccount = createAccount,
-        _updateAccount = updateAccount,
-        _deleteAccount = deleteAccount,
-        _seedDefaultAccount = seedDefaultAccount,
-        _balanceService = balanceService,
-        super(const AccountState());
+  }) : _getAccounts = getAccounts,
+       _createAccount = createAccount,
+       _updateAccount = updateAccount,
+       _deleteAccount = deleteAccount,
+       _seedDefaultAccount = seedDefaultAccount,
+       super(const AccountState());
 
   // ─────────────────────────────────────────────────────────────────────────
   // CRUD Operations
@@ -43,14 +38,14 @@ class AccountCubit extends Cubit<AccountState> {
     final result = await _getAccounts(const NoParams());
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: CubitStatus.failure,
-        errorMessage: failure.message,
-      )),
-      (accounts) => emit(state.copyWith(
-        status: CubitStatus.success,
-        accounts: accounts,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: CubitStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (accounts) =>
+          emit(state.copyWith(status: CubitStatus.success, accounts: accounts)),
     );
   }
 
@@ -60,14 +55,18 @@ class AccountCubit extends Cubit<AccountState> {
     final result = await _createAccount(CreateAccountParams(account: account));
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: CubitStatus.failure,
-        errorMessage: failure.message,
-      )),
-      (created) => emit(state.copyWith(
-        status: CubitStatus.success,
-        accounts: [...state.accounts, created],
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: CubitStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (created) => emit(
+        state.copyWith(
+          status: CubitStatus.success,
+          accounts: [...state.accounts, created],
+        ),
+      ),
     );
   }
 
@@ -77,18 +76,19 @@ class AccountCubit extends Cubit<AccountState> {
     final result = await _updateAccount(UpdateAccountParams(account: account));
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: CubitStatus.failure,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: CubitStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
       (updated) {
         final updatedList = state.accounts.map((a) {
           return a.uuid == updated.uuid ? updated : a;
         }).toList();
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          accounts: updatedList,
-        ));
+        emit(
+          state.copyWith(status: CubitStatus.success, accounts: updatedList),
+        );
       },
     );
   }
@@ -99,16 +99,19 @@ class AccountCubit extends Cubit<AccountState> {
     final result = await _deleteAccount(DeleteAccountParams(uuid: uuid));
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: CubitStatus.failure,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: CubitStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
       (_) {
-        final updatedList = state.accounts.where((a) => a.uuid != uuid).toList();
-        emit(state.copyWith(
-          status: CubitStatus.success,
-          accounts: updatedList,
-        ));
+        final updatedList = state.accounts
+            .where((a) => a.uuid != uuid)
+            .toList();
+        emit(
+          state.copyWith(status: CubitStatus.success, accounts: updatedList),
+        );
       },
     );
   }
@@ -117,103 +120,9 @@ class AccountCubit extends Cubit<AccountState> {
     _log.fine('Requesting default account seed');
     final result = await _seedDefaultAccount(const NoParams());
     result.fold(
-      (failure) => _log.warning('Seed default account failed: ${failure.message}'),
+      (failure) =>
+          _log.warning('Seed default account failed: ${failure.message}'),
       (_) => _log.fine('Seed default account completed'),
     );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Balance Operations
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /// Adjusts the balance of an account by the given delta amount.
-  Future<void> adjustBalance(String accountUuid, double delta) async {
-    final account = _findAccount(accountUuid);
-    if (account == null) {
-      _log.warning('Cannot adjust balance: account $accountUuid not found');
-      return;
-    }
-
-    final updated = account.copyWith(balance: account.balance + delta);
-    await editAccount(updated);
-  }
-
-  /// Applies balance changes from a map of accountUuid -> delta.
-  Future<void> applyBalanceChanges(Map<String, double> changes) async {
-    for (final entry in changes.entries) {
-      await adjustBalance(entry.key, entry.value);
-    }
-  }
-
-  /// Applies the balance effect of a transaction.
-  Future<void> applyTransactionEffect(TransactionEntity transaction) async {
-    final changes = _balanceService.calculateAllBalanceChanges(transaction);
-    await applyBalanceChanges(changes);
-  }
-
-  /// Reverses the balance effect of a transaction.
-  Future<void> reverseTransactionEffect(TransactionEntity transaction) async {
-    final changes = _balanceService.calculateAllBalanceChanges(
-      transaction,
-      reverse: true,
-    );
-    await applyBalanceChanges(changes);
-  }
-
-  /// Recalculates all account balances based on the provided transactions.
-  Future<void> recalculateBalances(List<TransactionEntity> transactions) async {
-    if (state.accounts.isEmpty && state.status != CubitStatus.loading) {
-      await loadAccounts();
-    }
-
-    if (state.accounts.isEmpty) {
-      _log.fine('No accounts to recalculate balances for');
-      return;
-    }
-
-    _log.fine('Recalculating balances for ${state.accounts.length} accounts');
-
-    // Calculate balance for each account using BalanceService
-    final balanceMap = <String, double>{};
-    for (final account in state.accounts) {
-      balanceMap[account.uuid] = _balanceService.calculateTotalBalance(
-        transactions,
-        account.uuid,
-        0.0, // Start from zero since we're recalculating from all transactions
-      );
-    }
-
-    // Update accounts with calculated balances
-    final updatedAccounts = state.accounts.map((account) {
-      final calculatedBalance = balanceMap[account.uuid] ?? 0.0;
-      if (account.balance != calculatedBalance) {
-        _log.fine(
-          'Account ${account.name}: ${account.balance} -> $calculatedBalance',
-        );
-        return account.copyWith(balance: calculatedBalance);
-      }
-      return account;
-    }).toList();
-
-    // Persist updated accounts
-    for (final account in updatedAccounts) {
-      final original = state.accounts.firstWhere((a) => a.uuid == account.uuid);
-      if (original.balance != account.balance) {
-        await _updateAccount(UpdateAccountParams(account: account));
-      }
-    }
-
-    emit(state.copyWith(
-      status: CubitStatus.success,
-      accounts: updatedAccounts,
-    ));
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Private Helpers
-  // ─────────────────────────────────────────────────────────────────────────
-
-  AccountEntity? _findAccount(String uuid) {
-    return state.accounts.where((a) => a.uuid == uuid).firstOrNull;
   }
 }

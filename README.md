@@ -1,178 +1,239 @@
 # WiseBudget
 
-A personal finance management app built with Flutter. Track transactions, manage multiple accounts, categorize spending, and gain insights into your financial habits.
+WiseBudget is a personal finance app built with Flutter for tracking income, expenses, transfers, accounts, budgets, and spending analytics in one place.
+
+The project follows a feature-first architecture with `domain / data / presentation` separation, local-first persistence with ObjectBox, and a modular codebase designed to scale without turning state management into spaghetti.
+
+## Overview
+
+WiseBudget helps you:
+
+- track income, expenses, transfers, and balance adjustments
+- manage multiple accounts with their own currency, icon, and color
+- organize transactions with custom categories
+- monitor weekly, monthly, and custom budgets
+- view analytics by period and category
+- work with exchange rates and store transaction snapshots in base currency
+- customize language, theme, currency, and launch page
 
 ## Screenshots
 
-| Home | Add Transaction |
-|------|----------------|
+| Home | Quick Add |
+|---|---|
 | ![](screenshots/home.png) | ![](screenshots/home_add_transaction_button.png) |
 
-| Accounts | Tools (Settings) |
-|-----------|----------|
+| Accounts | Settings |
+|---|---|
 | ![](screenshots/accounts.png) | ![](screenshots/tools.png) |
 
----
+| Select Account | Select Category |
+|---|---|
+| ![](screenshots/transaction_form_select_account.png) | ![](screenshots/transaction_form_select_category.png) |
 
-## What's Done
-
-### Core
-- **Clean Architecture** — feature-based modular structure with strict Domain / Data / Presentation separation
-- **Dependency Injection** — GetIt service locator with lazy singletons; all features wired in `dependency_injection.dart`
-- **Navigation** — GoRouter with typed routes, splash redirect guard, and `NoTransitionPage` for instant tab switches
-- **Theming** — Material 3 with light/dark mode, custom `ThemeExtension` slots for `PieTheme` and `PullDownButtonTheme`
-- **Localisation** — ARB-based l10n with Flutter's `generate: true` pipeline
-- **Network layer** — Dio-based `NetworkService` singleton; single entry point for all HTTP calls
-
-### Features
-
-#### Accounts
-- Create, edit, delete accounts with name, currency, icon, and color
-- Balance auto-updated on every transaction create / edit / delete
-- Account filter chip on the home screen
-
-#### Transactions
-- Income, Expense, Transfer, and Adjustment transaction types
-- iOS Cupertino date picker (bottom sheet) for date selection
-- Long-press context menu (edit / delete) on every transaction card
-- Balance adjustment flow for correcting account balances
-
-#### Categories
-- Custom categories with icon and color picker
-- Seeded defaults on first launch
-- Visibility toggle (hide without deleting)
-
-#### Budget
-- Weekly, monthly, and custom-period budgets
-- Filter by account and/or category
-- Real-time progress: on track / near limit / exceeded states
-- `BudgetProgress` computed entity (not persisted — derived at runtime)
-
-#### Analytics
-- Income/Expense summary cards at the top of the analytics tab
-- Period selector (Day / Week / Month / Year / Custom range) via `PullDownButton`
-- Bar chart trend view per category
-- Category detail page with per-transaction breakdown
-
-#### Exchange Rates
-- `ExchangeRateEntity` — immutable historical rate snapshots
-- `ExchangeRateRepository` with local (ObjectBox) + remote (Frankfurter API) sources
-- `GetOrFetchExchangeRate` use case: local cache hit → stale check → network fetch → offline fallback
-- Rate stamped on every transaction at save time (`exchangeRate`, `convertedAmount`, `baseCurrency`)
-- `amountInBase` and `isCrossCurrency` getters on `TransactionEntity`
-
-#### Settings
-- Theme mode (light / dark / system)
-- App language
-- Default launch page
-- **Currency picker** with live exchange rates per currency (open.er-api.com)
-  - Info banner showing last update timestamp
-  - Error banner with retry button on network failure
-- Clear all data
-
-### UI / UX
-- `Pressable` widget with ripple effect used throughout
-- `ColoredIconBox` for category/type icons
-- `PickerField` — unified tap-to-open field component
-- `PeriodChip` — pull-down menu for period selection
-- `ModalSheet` / `showModal` — platform-adaptive bottom sheet (phone vs tablet)
-- `AccountChip` — account switcher in the home app bar
-- `Calendar` — custom horizontal date strip with transaction dot indicators
-
----
-
-## What's Planned
-
-### Multi-Currency Polish
-- [ ] Show converted amount as secondary text on transaction cards when `isCrossCurrency`
-- [ ] Display live rate chip in the transaction form ("1 USD ≈ 450 ₸") with stale warning
-- [ ] Analytics aggregation using `convertedAmount` for cross-currency totals
-- [ ] Budget progress using `convertedAmount` for cross-currency budgets
-- [ ] "Recalculate historical rates" action in settings (batch re-snapshot)
-
-### Transactions
-- [ ] Recurring / scheduled transactions
-- [ ] Transaction search and full-text filter
-- [ ] Bulk delete
-
-### Analytics
-- [ ] Net worth over time chart
-- [ ] Spending by merchant / payee tag
-- [ ] Export to CSV / PDF
+## Features
 
 ### Accounts
-- [ ] Account reordering (drag-and-drop)
-- [ ] Archive accounts without deleting history
+
+- Create, edit, delete, and reorder accounts
+- Store account name, currency, icon, color, and current balance
+- Switch active account from the home screen
+- Keep balances in sync with transactions
+
+### Transactions
+
+- Support for `income`, `expense`, `transfer`, and `adjustment`
+- Create and edit transactions in bottom-sheet flows
+- Store exchange-rate snapshot per transaction
+- Keep transaction writes and balance updates consistent through an atomic ObjectBox-backed gateway
+
+### Categories
+
+- Custom categories with icon and color selection
+- Default seeded categories on first launch
+- Visibility control for hiding categories without deleting them
 
 ### Budgets
-- [ ] Budget rollover (carry unused balance to next period)
-- [ ] Push notifications when approaching / exceeding a budget
 
-### Settings & Infrastructure
-- [ ] iCloud / Google Drive backup and restore
-- [ ] Biometric app lock
-- [ ] Widget (home screen balance summary)
-- [ ] iPad / tablet layout optimisation
-- [ ] Full unit and widget test coverage
+- Weekly, monthly, and custom-period budgets
+- Budget progress, remaining amount, overspend state, and projections
+- Budget overview built from domain-level computed models
 
----
+### Analytics
 
-## Tech Stack
+- Income and expense summaries
+- Period-based filtering
+- Category breakdown
+- Trend buckets for charts
+- Category detail view with transaction breakdown
 
-| Layer | Library |
-|---|---|
-| UI | Flutter, Material 3 |
-| State management | flutter_bloc (Cubit) |
-| Navigation | go_router |
-| Local database | ObjectBox |
-| Dependency injection | get_it |
-| Networking | Dio |
-| Charts | fl_chart |
-| Icons | lucide_icons_flutter |
-| Date picker | cupertino_calendar_picker |
-| Context menus | pull_down_button |
+### Settings
 
----
-
-## Getting Started
-
-### Prerequisites
-
-- Flutter SDK 3.27+
-- Dart 3.6+
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/wisebuget.git
-cd wisebuget
-
-# Install dependencies
-flutter pub get
-
-# Generate ObjectBox models
-dart run build_runner build
-
-# Run the app
-flutter run
-```
+- Light, dark, and system theme
+- App language
+- Default currency
+- Launch page selection
+- Clear all local data
 
 ## Architecture
 
-```
+The codebase is organized by feature and split into clear layers:
+
+```text
 lib/
 ├── core/
-│   ├── di/            # GetIt wiring
-│   ├── router/        # GoRouter config
-│   ├── services/      # NetworkService (Dio)
-│   ├── prefs/         # SharedPreferences wrapper
-│   ├── shared/        # Value objects, widgets, utils
-│   └── theme/         # Material 3 theme + extensions
+│   ├── app/
+│   ├── constants/
+│   ├── database/
+│   ├── di/
+│   ├── l10n/
+│   ├── prefs/
+│   ├── router/
+│   ├── services/
+│   ├── shared/
+│   └── theme/
 │
 └── features/
     └── <feature>/
-        ├── domain/    # Entities, repository interfaces, use cases
-        ├── data/      # ObjectBox models, data sources, repo implementations
-        └── presentation/  # Cubits, pages, widgets
+        ├── data/
+        ├── domain/
+        └── presentation/
 ```
+
+### Principles used in the project
+
+- Feature-first folder structure
+- `domain / data / presentation` separation
+- `Cubit` for presentation state
+- `GetIt` for dependency injection
+- Use-case oriented domain logic
+- Local-first persistence with ObjectBox
+- Atomic transaction and balance updates through a dedicated gateway
+- Reusable shared UI components under `core/shared`
+
+### Notable architecture decisions
+
+- `AnalyticsCubit` and `BudgetCubit` are page-scoped instead of app-wide singletons
+- Cross-feature business logic was moved out of cubits into domain use cases
+- Transaction side effects are coordinated through `TransactionEffectsGateway`
+- Account balance recalculation is handled outside UI state
+- Business logic around reports and budget overview is covered by unit tests
+
+## Tech Stack
+
+| Area | Tools |
+|---|---|
+| Framework | Flutter |
+| State management | `flutter_bloc` |
+| Routing | `go_router` |
+| Local storage | `ObjectBox` |
+| Dependency injection | `get_it` |
+| Networking | `dio` |
+| Functional error handling | `dartz` |
+| Localization | Flutter l10n + ARB |
+| Charts | `fl_chart` |
+| Icons | `lucide_icons_flutter` |
+| Bottom sheets | `modal_bottom_sheet` |
+| Menus | `pull_down_button`, `pie_menu` |
+
+## Project Status
+
+Current state:
+
+- core finance flows are implemented
+- architecture has been cleaned up and stabilized
+- analyzer is clean
+- unit tests exist for key extracted domain logic
+
+Implemented test coverage includes:
+
+- `BalanceService`
+- analytics report builder
+- budget overview builder
+
+## Getting Started
+
+### Requirements
+
+- Flutter SDK `3.27+`
+- Dart SDK compatible with the version in [pubspec.yaml](/Users/aslandossymzhan/development/Projects/wisebuget/pubspec.yaml:1)
+
+### Install dependencies
+
+```bash
+flutter pub get
+```
+
+### Generate ObjectBox files
+
+```bash
+dart run build_runner build
+```
+
+### Run the app
+
+```bash
+flutter run
+```
+
+### Run static analysis
+
+```bash
+flutter analyze
+```
+
+### Run tests
+
+```bash
+flutter test
+```
+
+## Localization
+
+The app includes localization support and is wired through Flutter's generated l10n pipeline.
+
+Translations live in:
+
+- `lib/core/l10n/app_en.arb`
+- `lib/core/l10n/app_ru.arb`
+- `lib/core/l10n/app_kk.arb`
+
+## Main Dependencies
+
+Some of the main packages used in the project:
+
+- `flutter_bloc`
+- `go_router`
+- `objectbox`
+- `objectbox_flutter_libs`
+- `get_it`
+- `dio`
+- `equatable`
+- `dartz`
+- `fl_chart`
+- `pull_down_button`
+- `modal_bottom_sheet`
+
+## Roadmap
+
+Planned improvements:
+
+- richer multi-currency UX
+- recurring transactions
+- export flows
+- backup and restore
+- biometric lock
+- broader widget and integration test coverage
+- tablet and larger-screen optimizations
+
+## Development Notes
+
+If you are working on the project locally:
+
+- run `build_runner` after ObjectBox model changes
+- keep feature logic in the domain layer when possible
+- avoid cubit-to-cubit business dependencies
+- prefer page-scoped state for screen-specific flows
+
+## License
+
+This project is currently private / unlicensed unless you explicitly add a license file.

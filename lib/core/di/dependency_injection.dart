@@ -16,6 +16,7 @@ import 'package:wisebuget/features/budget/domain/repository/budget_repository.da
 import 'package:wisebuget/features/budget/domain/usecases/budget_usecases.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_cubit.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/category_detail_cubit.dart';
+import 'package:wisebuget/features/analytics/domain/usecases/build_analytics_report.dart';
 import 'package:wisebuget/features/budget/presentation/cubit/budget_cubit.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource_impl.dart';
@@ -30,12 +31,15 @@ import 'package:wisebuget/features/exchange_rate/domain/repository/exchange_rate
 import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource_impl.dart';
+import 'package:wisebuget/features/transaction/data/repository/objectbox_transaction_effects_gateway.dart';
 import 'package:wisebuget/features/transaction/data/repository/transaction_repository_impl.dart';
+import 'package:wisebuget/features/transaction/domain/repository/transaction_effects_gateway.dart';
 import 'package:wisebuget/features/transaction/domain/repository/transaction_repository.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
 import 'package:wisebuget/core/usecases/clear_all_data.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/budget/domain/usecases/build_budget_overview.dart';
 
 final sl = GetIt.instance;
 
@@ -83,8 +87,14 @@ void _initExchangeRateFeature() {
 }
 
 void _initAnalyticsFeature() {
-  sl.registerLazySingleton(
-    () => AnalyticsCubit(transactionCubit: sl(), categoryCubit: sl(), prefs: sl()),
+  sl.registerLazySingleton(() => const BuildAnalyticsReport());
+  sl.registerFactory(
+    () => AnalyticsCubit(
+      getTransactions: sl(),
+      getCategories: sl(),
+      buildReport: sl(),
+      prefs: sl(),
+    ),
   );
   sl.registerFactory(
     () => CategoryDetailCubit(getTransactionsByCategory: sl()),
@@ -108,6 +118,7 @@ void _initAccountFeature() {
   sl.registerLazySingleton(() => CreateAccount(sl()));
   sl.registerLazySingleton(() => UpdateAccount(sl()));
   sl.registerLazySingleton(() => DeleteAccount(sl()));
+  sl.registerLazySingleton(() => RecalculateAccountBalances(sl()));
   sl.registerLazySingleton(() => SeedDefaultAccount(sl()));
 
   // Cubit (singleton so all screens share the same state)
@@ -163,6 +174,9 @@ void _initTransactionFeature() {
   sl.registerLazySingleton<TransactionRepository>(
     () => TransactionRepositoryImpl(localDataSource: sl()),
   );
+  sl.registerLazySingleton<TransactionEffectsGateway>(
+    () => ObjectBoxTransactionEffectsGateway(sl()),
+  );
 
   // Use cases
   sl.registerLazySingleton(() => GetTransactions(sl()));
@@ -170,8 +184,11 @@ void _initTransactionFeature() {
   sl.registerLazySingleton(() => GetTransactionsByAccount(sl()));
   sl.registerLazySingleton(() => GetTransactionsByCategory(sl()));
   sl.registerLazySingleton(() => CreateTransaction(sl()));
+  sl.registerLazySingleton(() => CreateTransactionWithEffects(sl()));
   sl.registerLazySingleton(() => UpdateTransaction(sl()));
+  sl.registerLazySingleton(() => UpdateTransactionWithEffects(sl()));
   sl.registerLazySingleton(() => DeleteTransaction(sl()));
+  sl.registerLazySingleton(() => DeleteTransactionWithEffects(sl()));
 
   // Cubit (singleton so all screens share the same state)
   sl.registerLazySingleton(
@@ -179,11 +196,11 @@ void _initTransactionFeature() {
       getTransactions: sl(),
       getTransactionsByAccount: sl(),
       getTransactionsByCategory: sl(),
-      createTransaction: sl(),
-      updateTransaction: sl(),
-      deleteTransaction: sl(),
-      accountCubit: sl(),
+      createTransactionWithEffects: sl(),
+      updateTransactionWithEffects: sl(),
+      deleteTransactionWithEffects: sl(),
       getOrFetchExchangeRate: sl(),
+      recalculateAccountBalances: sl(),
       prefs: sl(),
     ),
   );
@@ -207,16 +224,17 @@ void _initBudgetFeature() {
   sl.registerLazySingleton(() => UpdateBudget(sl()));
   sl.registerLazySingleton(() => DeleteBudget(sl()));
   sl.registerLazySingleton(() => CalculateBudgetProgress());
+  sl.registerLazySingleton(() => BuildBudgetOverview(sl()));
 
-  // Cubit (singleton so all screens share the same state)
-  sl.registerLazySingleton(
+  // Cubit
+  sl.registerFactory(
     () => BudgetCubit(
       getBudgets: sl(),
+      getTransactions: sl(),
       createBudget: sl(),
       updateBudget: sl(),
       deleteBudget: sl(),
-      calculateProgress: sl(),
-      transactionCubit: sl(),
+      buildOverview: sl(),
     ),
   );
 }

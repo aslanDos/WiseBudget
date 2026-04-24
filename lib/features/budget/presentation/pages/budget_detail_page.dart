@@ -24,7 +24,7 @@ class BudgetDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: sl<BudgetCubit>()),
+        BlocProvider.value(value: context.read<BudgetCubit>()),
         BlocProvider.value(value: sl<TransactionCubit>()),
         BlocProvider.value(value: sl<CategoryCubit>()),
       ],
@@ -134,7 +134,9 @@ class _BudgetDetailContent extends StatelessWidget {
               Text(
                 isExceeded
                     ? context.l10n.overByAmount(progress.overByMoney.formatted)
-                    : context.l10n.amountRemaining(progress.remainingMoney.formatted),
+                    : context.l10n.amountRemaining(
+                        progress.remainingMoney.formatted,
+                      ),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: isExceeded ? colors.error : null,
                   fontWeight: FontWeight.w500,
@@ -146,7 +148,10 @@ class _BudgetDetailContent extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            context.l10n.daysLeftInPeriod(budget.daysRemaining, budget.periodLabel),
+            context.l10n.daysLeftInPeriod(
+              budget.daysRemaining,
+              budget.periodLabel,
+            ),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -215,7 +220,11 @@ class _BudgetDetailContent extends StatelessWidget {
                   Icon(Icons.trending_up, size: 18, color: colors.error),
                   const SizedBox(width: 8),
                   Text(
-                    context.l10n.spendingAbovePace(((dailyAverage / dailyBudget - 1) * 100).toStringAsFixed(0)),
+                    context.l10n.spendingAbovePace(
+                      ((dailyAverage / dailyBudget - 1) * 100).toStringAsFixed(
+                        0,
+                      ),
+                    ),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colors.error,
                       fontWeight: FontWeight.w500,
@@ -318,8 +327,8 @@ class _BudgetDetailContent extends StatelessWidget {
       context: context,
       budgetUuid: progress.budget.uuid,
     );
-    if (result == true) {
-      sl<BudgetCubit>().loadBudgets();
+    if (result == true && context.mounted) {
+      context.read<BudgetCubit>().loadBudgets();
     }
   }
 }
