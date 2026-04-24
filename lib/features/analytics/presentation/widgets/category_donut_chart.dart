@@ -52,8 +52,6 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
       builder: (context, constraints) {
         final isCompact =
             constraints.maxWidth < AppBreakpoints.chartHeaderStack;
-        final stackChartSection =
-            constraints.maxWidth < AppBreakpoints.chartLegendStack;
 
         return Container(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
@@ -74,15 +72,16 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
               if (widget.data.isEmpty)
                 _EmptyState(type: widget.selectedType)
               else ...[
-                _ChartSection(
-                  stackVertically: stackChartSection,
-                  data: widget.data,
-                  total: _total,
-                  currency: _currency,
-                  touchedIndex: _touchedIndex,
-                  onTouched: (i) => setState(() {
-                    _touchedIndex = _touchedIndex == i ? null : i;
-                  }),
+                Align(
+                  child: _DonutWithTotal(
+                    data: widget.data,
+                    total: _total,
+                    currency: _currency,
+                    touchedIndex: _touchedIndex,
+                    onTouched: (i) => setState(() {
+                      _touchedIndex = _touchedIndex == i ? null : i;
+                    }),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ...List.generate(widget.data.length, (i) {
@@ -169,55 +168,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ChartSection extends StatelessWidget {
-  final bool stackVertically;
-  final List<CategoryData> data;
-  final double total;
-  final String currency;
-  final int? touchedIndex;
-  final ValueChanged<int> onTouched;
-
-  const _ChartSection({
-    required this.stackVertically,
-    required this.data,
-    required this.total,
-    required this.currency,
-    required this.touchedIndex,
-    required this.onTouched,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final donut = _DonutWithTotal(
-      data: data,
-      total: total,
-      currency: currency,
-      touchedIndex: touchedIndex,
-      onTouched: onTouched,
-    );
-    final legend = _Legend(
-      data: data,
-      touchedIndex: touchedIndex,
-      currency: currency,
-    );
-
-    if (stackVertically) {
-      return Column(children: [donut, const SizedBox(height: 16), legend]);
-    }
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          donut,
-          const SizedBox(width: 16),
-          Expanded(child: legend),
-        ],
-      ),
-    );
-  }
-}
-
 // ── Donut with stacked center text ──────────────────────────────────────────
 
 class _DonutWithTotal extends StatelessWidget {
@@ -296,73 +246,6 @@ class _DonutWithTotal extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// ── Right-side legend ────────────────────────────────────────────────────────
-
-class _Legend extends StatelessWidget {
-  const _Legend({
-    required this.data,
-    required this.touchedIndex,
-    required this.currency,
-  });
-
-  final List<CategoryData> data;
-  final int? touchedIndex;
-  final String currency;
-
-  String _formatAmount(double amount) {
-    if (currency.isEmpty) return amount.toStringAsFixed(0);
-    return Money(amount, currency).formattedCompact;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(data.length, (i) {
-        final d = data[i];
-        final dimmed = touchedIndex != null && touchedIndex != i;
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 150),
-          opacity: dimmed ? 0.35 : 1.0,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Row(
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: d.color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    d.name,
-                    style: context.t.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  _formatAmount(d.amount),
-                  style: context.t.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }),
     );
   }
 }

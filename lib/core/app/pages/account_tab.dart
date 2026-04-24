@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/app/pages/account/account_tab_body.dart';
 import 'package:wisebuget/core/di/dependency_injection.dart';
+import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/icons/app_icons.dart';
 import 'package:wisebuget/core/shared/utils/list_utils.dart';
@@ -14,6 +15,8 @@ import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/account/presentation/pages/account_form.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/currency_rates_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 
 class AccountTab extends StatefulWidget {
   const AccountTab({super.key});
@@ -52,42 +55,51 @@ class _AccountTabState extends State<AccountTab>
       providers: [
         BlocProvider.value(value: sl<AccountCubit>()..loadAccounts()),
         BlocProvider.value(value: _ratesCubit),
+        BlocProvider.value(value: sl<TransactionCubit>()),
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          titleSpacing: 16,
-          centerTitle: false,
-          title: Text(context.l10n.accounts, style: context.t.headlineMedium),
-          actionsPadding: const EdgeInsets.only(right: 16),
-          actions: [
-            ActionButton(
-              icon: AppIcons.add,
-              onTap: () => _showAddAccountDialog(context),
-            ),
-            const SizedBox(width: 12),
-            BlocBuilder<AccountCubit, AccountState>(
-              builder: (context, state) {
-                if (state.accounts.isEmpty) return const SizedBox.shrink();
-                return ActionButton(
-                  icon: _reordering ? AppIcons.check : AppIcons.chevronUpDown,
-                  onTap: _toggleReorderMode,
-                );
-              },
-            ),
-          ],
-        ),
-        body: AccountTabBody(
-          reordering: _reordering,
-          searchController: _searchController,
-          searchQuery: _searchQuery,
-          onSearchChanged: () => setState(() {}),
-          onReorder: (oldIndex, newIndex) {
-            final accounts = context.read<AccountCubit>().state.accounts;
-            _handleReorder(context, accounts, oldIndex, newIndex);
-          },
-          onDeleteAccount: (account) => _handleDelete(context, account),
-          onAddAccount: () => _showAddAccountDialog(context),
-          onAccountTap: (account) => _navigateToEdit(context, account),
+      child: BlocListener<TransactionCubit, TransactionState>(
+        listenWhen: (previous, current) =>
+            previous.status == CubitStatus.loading &&
+            current.status == CubitStatus.success,
+        listener: (context, state) {
+          context.read<AccountCubit>().loadAccounts();
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            titleSpacing: 16,
+            centerTitle: false,
+            title: Text(context.l10n.accounts, style: context.t.headlineMedium),
+            actionsPadding: const EdgeInsets.only(right: 16),
+            actions: [
+              ActionButton(
+                icon: AppIcons.add,
+                onTap: () => _showAddAccountDialog(context),
+              ),
+              const SizedBox(width: 12),
+              BlocBuilder<AccountCubit, AccountState>(
+                builder: (context, state) {
+                  if (state.accounts.isEmpty) return const SizedBox.shrink();
+                  return ActionButton(
+                    icon: _reordering ? AppIcons.check : AppIcons.chevronUpDown,
+                    onTap: _toggleReorderMode,
+                  );
+                },
+              ),
+            ],
+          ),
+          body: AccountTabBody(
+            reordering: _reordering,
+            searchController: _searchController,
+            searchQuery: _searchQuery,
+            onSearchChanged: () => setState(() {}),
+            onReorder: (oldIndex, newIndex) {
+              final accounts = context.read<AccountCubit>().state.accounts;
+              _handleReorder(context, accounts, oldIndex, newIndex);
+            },
+            onDeleteAccount: (account) => _handleDelete(context, account),
+            onAddAccount: () => _showAddAccountDialog(context),
+            onAccountTap: (account) => _navigateToEdit(context, account),
+          ),
         ),
       ),
     );

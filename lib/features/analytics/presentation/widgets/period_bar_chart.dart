@@ -1,4 +1,4 @@
-import 'dart:math' show log, max, pow, ln10;
+import 'dart:math' show log, pow, ln10;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.
 
 class PeriodBarChart extends StatelessWidget {
   final List<BarBucket> data;
+  static const double _leftAxisReservedSize = 40;
 
   const PeriodBarChart({super.key, required this.data});
 
@@ -30,12 +31,13 @@ class PeriodBarChart extends StatelessWidget {
       return v > m ? v : m;
     });
 
-    final labelMax = _roundedMax(rawMax);
-    final chartMax = max(labelMax * 1.15, rawMax <= 0 ? 100.0 : rawMax * 1.05);
-    final interval = labelMax / 2;
+    final labelMax = _tightRoundedMax(rawMax);
+    final chartMax = labelMax <= 0 ? 100.0 : labelMax;
+    final interval = _axisInterval(labelMax);
 
     return BarChart(
       BarChartData(
+        alignment: BarChartAlignment.spaceBetween,
         maxY: chartMax,
         groupsSpace: 6,
         barTouchData: BarTouchData(
@@ -86,19 +88,21 @@ class PeriodBarChart extends StatelessWidget {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 28,
+              reservedSize: _leftAxisReservedSize,
               interval: interval,
               getTitlesWidget: (value, meta) {
-                if (value > labelMax + 0.5) return const SizedBox.shrink();
+                if (value < 0 || value > labelMax + 0.5) {
+                  return const SizedBox.shrink();
+                }
                 return SizedBox(
-                  width: 24,
+                  width: double.infinity,
                   child: Text(
                     _compact(value),
                     style: context.t.labelSmall?.copyWith(
                       color: context.c.onSurface.withAlpha(0x66),
                       fontSize: 10,
                     ),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.left,
                   ),
                 );
               },
@@ -113,12 +117,12 @@ class PeriodBarChart extends StatelessWidget {
                 if (index < 0 || index >= data.length) {
                   return const SizedBox.shrink();
                 }
-                // Skip labels to prevent overlap for dense charts.
                 if (index % _labelStep != 0) {
                   return const SizedBox.shrink();
                 }
-                return Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                return SideTitleWidget(
+                  meta: meta,
+                  space: 6,
                   child: Text(
                     data[index].label,
                     style: context.t.labelSmall?.copyWith(
@@ -140,6 +144,16 @@ class PeriodBarChart extends StatelessWidget {
             strokeWidth: 1,
             dashArray: [4, 4],
           ),
+        ),
+        extraLinesData: ExtraLinesData(
+          horizontalLines: [
+            HorizontalLine(
+              y: labelMax,
+              color: context.c.onSurface.withAlpha(0x20),
+              strokeWidth: 1,
+              dashArray: [4, 4],
+            ),
+          ],
         ),
         borderData: FlBorderData(show: false),
         barGroups: List.generate(data.length, (index) {
@@ -172,15 +186,54 @@ class PeriodBarChart extends StatelessWidget {
     );
   }
 
-  double _roundedMax(double maxValue) {
+  double _tightRoundedMax(double maxValue) {
     if (maxValue <= 0) return 100;
-    final magnitude = pow(10, (log(maxValue) / ln10).floor()).toDouble();
-    final normalized = maxValue / magnitude;
-    if (normalized >= 8) return 8 * magnitude;
-    if (normalized >= 6) return 6 * magnitude;
-    if (normalized >= 4) return 4 * magnitude;
-    if (normalized >= 2) return 2 * magnitude;
-    return magnitude;
+    final roughInterval = maxValue / 4;
+    final candidates = _stepCandidates(roughInterval);
+
+    for (final interval in candidates) {
+      final roundedMax = interval * (maxValue / interval).ceilToDouble();
+      final headroomRatio = roundedMax / maxValue;
+
+      if (headroomRatio <= 1.12) {
+        return roundedMax;
+      }
+    }
+
+    final fallback = _niceStepUp(roughInterval);
+    return fallback * (maxValue / fallback).ceilToDouble();
+  }
+
+  double _axisInterval(double labelMax) {
+    return labelMax / 4;
+  }
+
+  List<double> _stepCandidates(double value) {
+    final magnitude = pow(10, (log(value) / ln10).floor()).toDouble();
+    return [
+      magnitude,
+      2 * magnitude,
+      2.5 * magnitude,
+      4 * magnitude,
+      5 * magnitude,
+      8 * magnitude,
+      10 * magnitude,
+    ].where((step) => step >= value * 0.75).toList()..sort();
+  }
+
+  double _niceStepUp(double value) {
+    if (value <= 0) return 25;
+
+    final magnitude = pow(10, (log(value) / ln10).floor()).toDouble();
+    final normalized = value / magnitude;
+
+    if (normalized <= 1) return magnitude;
+    if (normalized <= 2) return 2 * magnitude;
+    if (normalized <= 2.5) return 2.5 * magnitude;
+    if (normalized <= 4) return 4 * magnitude;
+    if (normalized <= 5) return 5 * magnitude;
+    if (normalized <= 8) return 8 * magnitude;
+    return 10 * magnitude;
   }
 
   String _compact(double value) {

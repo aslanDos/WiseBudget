@@ -19,6 +19,8 @@ import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.
 import 'package:wisebuget/features/analytics/presentation/cubit/category_detail_state.dart';
 import 'package:wisebuget/features/analytics/presentation/widgets/category_donut_chart.dart';
 import 'package:wisebuget/features/analytics/presentation/widgets/period_bar_chart.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/transaction_state.dart';
 
 class AnalyticsTab extends StatefulWidget {
   const AnalyticsTab({super.key});
@@ -27,7 +29,8 @@ class AnalyticsTab extends StatefulWidget {
   State<AnalyticsTab> createState() => _AnalyticsTabState();
 }
 
-class _AnalyticsTabState extends State<AnalyticsTab> {
+class _AnalyticsTabState extends State<AnalyticsTab>
+    with AutomaticKeepAliveClientMixin {
   late final AnalyticsCubit _analyticsCubit;
 
   @override
@@ -40,47 +43,123 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: sl<AccountCubit>()),
+        BlocProvider.value(value: sl<TransactionCubit>()),
         BlocProvider.value(value: _analyticsCubit),
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          titleSpacing: 16,
-          centerTitle: false,
-          title: BlocBuilder<AccountCubit, AccountState>(
-            builder: (context, accountState) {
-              return BlocBuilder<AnalyticsCubit, AnalyticsState>(
-                builder: (context, analyticsState) {
-                  final selectedUuid = analyticsState.selectedAccountUuid;
-                  final selected = accountState.accounts
-                      .where((a) => a.uuid == selectedUuid)
-                      .firstOrNull;
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AccountChip(
-                          account: selected,
-                          accounts: accountState.accounts,
-                          allSelected: selectedUuid == null,
-                          onSelected: context
-                              .read<AnalyticsCubit>()
-                              .selectAccount,
-                          onAllSelected: () => context
-                              .read<AnalyticsCubit>()
-                              .selectAccount(null),
+      child: BlocListener<TransactionCubit, TransactionState>(
+        listenWhen: (previous, current) =>
+            previous.status == CubitStatus.loading &&
+            current.status == CubitStatus.success,
+        listener: (context, state) => _analyticsCubit.init(),
+        child: Scaffold(
+          appBar: AppBar(
+            titleSpacing: 16,
+            centerTitle: false,
+            title: BlocBuilder<AccountCubit, AccountState>(
+              builder: (context, accountState) {
+                return BlocBuilder<AnalyticsCubit, AnalyticsState>(
+                  builder: (context, analyticsState) {
+                    final selectedUuid = analyticsState.selectedAccountUuid;
+                    final selected = accountState.accounts
+                        .where((a) => a.uuid == selectedUuid)
+                        .firstOrNull;
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AccountChip(
+                            account: selected,
+                            accounts: accountState.accounts,
+                            allSelected: selectedUuid == null,
+                            onSelected: context
+                                .read<AnalyticsCubit>()
+                                .selectAccount,
+                            onAllSelected: () => context
+                                .read<AnalyticsCubit>()
+                                .selectAccount(null),
+                          ),
+                          const SizedBox(width: 8),
+                          PeriodChip(
+                            selectedPeriod: analyticsState.selectedPeriod,
+                            onChanged: context
+                                .read<AnalyticsCubit>()
+                                .selectPeriod,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          body: BlocBuilder<AnalyticsCubit, AnalyticsState>(
+            builder: (context, state) {
+              if (state.status == CubitStatus.loading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state.status == CubitStatus.failure) {
+                return Center(
+                  child: Text(
+                    state.errorMessage ?? context.l10n.failedToLoad,
+                    style: context.t.bodyMedium,
+                  ),
+                );
+              }
+
+              final hasAnyAnalyticsData =
+                  state.totalIncome > 0 ||
+                  state.totalExpense > 0 ||
+                  state.barBuckets.isNotEmpty ||
+                  state.categoryBreakdown.isNotEmpty;
+
+              if (!hasAnyAnalyticsData) {
+                return _EmptyState();
+              }
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide =
+                      constraints.maxWidth >= AppBreakpoints.analyticsWide;
+
+                  return Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1120),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
                         ),
-                        const SizedBox(width: 8),
-                        PeriodChip(
-                          selectedPeriod: analyticsState.selectedPeriod,
-                          onChanged: context
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        child: _AnalyticsContent(
+                          state: state,
+                          isWide: isWide,
+                          onTypeChanged: context
                               .read<AnalyticsCubit>()
-                              .selectPeriod,
+                              .selectCategoryType,
+                          onCategoryTapped: (categoryData) {
+                            context.push(
+                              AppRoutes.categoryDetail,
+                              extra: CategoryDetailArgs(
+                                categoryUuid: categoryData.categoryUuid,
+                                categoryName: categoryData.name,
+                                categoryColor: categoryData.color,
+                                categoryIcon: categoryData.icon,
+                                transactionType: state.categoryType,
+                                period: state.selectedPeriod,
+                                selectedAccountUuid: state.selectedAccountUuid,
+                              ),
+                            );
+                          },
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -88,66 +167,12 @@ class _AnalyticsTabState extends State<AnalyticsTab> {
             },
           ),
         ),
-        body: BlocBuilder<AnalyticsCubit, AnalyticsState>(
-          builder: (context, state) {
-            if (state.status == CubitStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (state.status == CubitStatus.failure) {
-              return Center(
-                child: Text(
-                  state.errorMessage ?? context.l10n.failedToLoad,
-                  style: context.t.bodyMedium,
-                ),
-              );
-            }
-
-            if (state.barBuckets.isEmpty && state.categoryBreakdown.isEmpty) {
-              return _EmptyState();
-            }
-
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide =
-                    constraints.maxWidth >= AppBreakpoints.analyticsWide;
-
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1120),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: _AnalyticsContent(
-                        state: state,
-                        isWide: isWide,
-                        onTypeChanged: context
-                            .read<AnalyticsCubit>()
-                            .selectCategoryType,
-                        onCategoryTapped: (categoryData) {
-                          context.push(
-                            AppRoutes.categoryDetail,
-                            extra: CategoryDetailArgs(
-                              categoryUuid: categoryData.categoryUuid,
-                              categoryName: categoryData.name,
-                              categoryColor: categoryData.color,
-                              categoryIcon: categoryData.icon,
-                              transactionType: state.categoryType,
-                              period: state.selectedPeriod,
-                              selectedAccountUuid: state.selectedAccountUuid,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class _AnalyticsContent extends StatelessWidget {
@@ -230,7 +255,7 @@ class _ChartCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(context.l10n.incomeAndExpenses, style: context.t.titleMedium),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           Expanded(child: PeriodBarChart(data: buckets)),
         ],
       ),

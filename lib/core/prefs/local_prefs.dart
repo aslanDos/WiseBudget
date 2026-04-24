@@ -51,4 +51,30 @@ class LocalPreferences {
       await _prefs.setString(PrefsConstants.lastChosenAccountKey, value);
     }
   }
+
+  /// analytics period
+  String? get analyticsPeriod =>
+      _prefs.getString(PrefsConstants.analyticsPeriodKey);
+
+  Future<void> setAnalyticsPeriod(String value) =>
+      _prefs.setString(PrefsConstants.analyticsPeriodKey, value);
+
+  /// analytics account
+  String? get analyticsAccount =>
+      _prefs.getString(PrefsConstants.analyticsAccountKey);
+
+  Future<void> setAnalyticsAccount(String? value) async {
+    if (value == null) {
+      await _prefs.remove(PrefsConstants.analyticsAccountKey);
+    } else {
+      await _prefs.setString(PrefsConstants.analyticsAccountKey, value);
+    }
+  }
+
+  /// analytics category type
+  String? get analyticsCategoryType =>
+      _prefs.getString(PrefsConstants.analyticsCategoryTypeKey);
+
+  Future<void> setAnalyticsCategoryType(String value) =>
+      _prefs.setString(PrefsConstants.analyticsCategoryTypeKey, value);
 }

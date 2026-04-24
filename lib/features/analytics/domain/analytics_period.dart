@@ -15,12 +15,27 @@ sealed class AnalyticsPeriod extends Equatable {
   /// Whether this period has enough data points to render a bar chart.
   /// Single-day periods (Today / Yesterday) skip the chart.
   bool get hasChart => true;
+
+  String get id;
+
+  static AnalyticsPeriod fromId(String? id) {
+    return switch (id) {
+      TodayPeriod.periodId => const TodayPeriod(),
+      YesterdayPeriod.periodId => const YesterdayPeriod(),
+      ThisWeekPeriod.periodId => const ThisWeekPeriod(),
+      PrevMonthPeriod.periodId => const PrevMonthPeriod(),
+      ThisYearPeriod.periodId => const ThisYearPeriod(),
+      _ => const ThisMonthPeriod(),
+    };
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 final class TodayPeriod extends AnalyticsPeriod {
   const TodayPeriod();
+
+  static const periodId = 'today';
 
   @override
   DateTimeRange get range {
@@ -31,15 +46,23 @@ final class TodayPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'Today';
-  @override String get chipLabel => 'Today';
-  @override bool get hasChart => false;
+  @override
+  String get label => 'Today';
+  @override
+  String get chipLabel => 'Today';
+  @override
+  bool get hasChart => false;
+  @override
+  String get id => periodId;
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class YesterdayPeriod extends AnalyticsPeriod {
   const YesterdayPeriod();
+
+  static const periodId = 'yesterday';
 
   @override
   DateTimeRange get range {
@@ -50,15 +73,23 @@ final class YesterdayPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'Yesterday';
-  @override String get chipLabel => 'Yesterday';
-  @override bool get hasChart => false;
+  @override
+  String get label => 'Yesterday';
+  @override
+  String get chipLabel => 'Yesterday';
+  @override
+  bool get hasChart => false;
+  @override
+  String get id => periodId;
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class ThisWeekPeriod extends AnalyticsPeriod {
   const ThisWeekPeriod();
+
+  static const periodId = 'this_week';
 
   @override
   DateTimeRange get range {
@@ -70,18 +101,35 @@ final class ThisWeekPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'This week';
-  @override String get chipLabel => 'This week';
+  @override
+  String get label => 'This week';
+  @override
+  String get chipLabel => 'This week';
+  @override
+  String get id => periodId;
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class ThisMonthPeriod extends AnalyticsPeriod {
   const ThisMonthPeriod();
 
+  static const periodId = 'this_month';
+
   static const _abbr = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   @override
@@ -93,22 +141,39 @@ final class ThisMonthPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'This month';
+  @override
+  String get label => 'This month';
+  @override
+  String get id => periodId;
 
-  @override String get chipLabel {
+  @override
+  String get chipLabel {
     final now = DateTime.now();
     return '${_abbr[now.month - 1]} ${now.year}';
   }
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class PrevMonthPeriod extends AnalyticsPeriod {
   const PrevMonthPeriod();
 
+  static const periodId = 'prev_month';
+
   static const _abbr = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   @override
@@ -123,20 +188,27 @@ final class PrevMonthPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'Previous month';
+  @override
+  String get label => 'Previous month';
+  @override
+  String get id => periodId;
 
-  @override String get chipLabel {
+  @override
+  String get chipLabel {
     final now = DateTime.now();
     final prevMonth = now.month == 1 ? 12 : now.month - 1;
     final prevYear = now.month == 1 ? now.year - 1 : now.year;
     return '${_abbr[prevMonth - 1]} $prevYear';
   }
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class ThisYearPeriod extends AnalyticsPeriod {
   const ThisYearPeriod();
+
+  static const periodId = 'this_year';
 
   @override
   DateTimeRange get range {
@@ -147,10 +219,15 @@ final class ThisYearPeriod extends AnalyticsPeriod {
     );
   }
 
-  @override String get label => 'This year';
-  @override String get chipLabel => '${DateTime.now().year}';
+  @override
+  String get label => 'This year';
+  @override
+  String get chipLabel => '${DateTime.now().year}';
+  @override
+  String get id => periodId;
 
-  @override List<Object?> get props => [];
+  @override
+  List<Object?> get props => [];
 }
 
 final class CustomPeriod extends AnalyticsPeriod {
@@ -160,16 +237,30 @@ final class CustomPeriod extends AnalyticsPeriod {
   const CustomPeriod({required this.start, required this.end});
 
   static const _abbr = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   @override
   DateTimeRange get range => DateTimeRange(start: start, end: end);
 
-  @override String get label => 'Custom range';
+  @override
+  String get label => 'Custom range';
+  @override
+  String get id => 'custom';
 
-  @override String get chipLabel {
+  @override
+  String get chipLabel {
     final sm = _abbr[start.month - 1];
     final em = _abbr[end.month - 1];
     if (start.year == end.year) {
@@ -178,5 +269,6 @@ final class CustomPeriod extends AnalyticsPeriod {
     return '${start.day} $sm ${start.year} – ${end.day} $em ${end.year}';
   }
 
-  @override List<Object?> get props => [start, end];
+  @override
+  List<Object?> get props => [start, end];
 }

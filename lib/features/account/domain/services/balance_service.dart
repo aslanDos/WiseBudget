@@ -25,8 +25,7 @@ class BalanceService {
         TransactionType.expense => -transaction.amount * multiplier,
         TransactionType.income => transaction.amount * multiplier,
         TransactionType.transfer => -transaction.amount * multiplier,
-        // Adjustment balance is set directly in account_form; no effect here.
-        TransactionType.adjustment => 0.0,
+        TransactionType.adjustment => transaction.amount * multiplier,
       };
     }
 
@@ -63,8 +62,7 @@ class BalanceService {
         }
 
       case TransactionType.adjustment:
-        // Balance is set directly in account_form; no effect here.
-        break;
+        changes[transaction.accountUuid] = transaction.amount * multiplier;
     }
 
     return changes;

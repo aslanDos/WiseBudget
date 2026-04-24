@@ -113,7 +113,9 @@ class _AccountFormState extends State<AccountForm> {
           } else if (state.status == CubitStatus.failure) {
             _isSaving = false;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? context.l10n.failedToSave)),
+              SnackBar(
+                content: Text(state.errorMessage ?? context.l10n.failedToSave),
+              ),
             );
           }
         },
@@ -181,8 +183,10 @@ class _AccountFormState extends State<AccountForm> {
                           selectedColorValue: _selectedColorValue,
                           selectedIconCode: _selectedIconCode,
                           iconOptions: iconOptions,
-                          onColorChanged: (value) => setState(() => _selectedColorValue = value),
-                          onIconChanged: (code) => setState(() => _selectedIconCode = code),
+                          onColorChanged: (value) =>
+                              setState(() => _selectedColorValue = value),
+                          onIconChanged: (code) =>
+                              setState(() => _selectedIconCode = code),
                         ),
                         const SizedBox(height: 12.0),
                       ],
@@ -277,14 +281,22 @@ class _AccountFormState extends State<AccountForm> {
     setState(() => _isSaving = true);
 
     if (widget.isEditing) {
+      final currentAccount = widget.account!;
+      final currencyChanged = _selectedCurrency != currentAccount.currency;
       final delta = balance - widget.account!.balance;
-      if (delta != 0) _pendingAdjustmentDelta = delta;
+      if (!currencyChanged && delta != 0) {
+        _pendingAdjustmentDelta = delta;
+      } else {
+        _pendingAdjustmentDelta = null;
+      }
 
       cubit.editAccount(
-        widget.account!.copyWith(
+        currentAccount.copyWith(
           name: name,
           currency: _selectedCurrency,
-          balance: balance,
+          // Keep the stored balance unchanged when we're creating an
+          // adjustment transaction to represent the delta.
+          balance: currencyChanged ? balance : currentAccount.balance,
           iconCode: _selectedIconCode,
           colorValue: _selectedColorValue,
         ),

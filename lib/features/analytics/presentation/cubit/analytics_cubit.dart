@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/prefs/local_prefs.dart';
 import 'package:wisebuget/core/shared/cubit/cubit_status.dart';
+import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/features/analytics/domain/analytics_period.dart';
 import 'package:wisebuget/features/analytics/domain/usecases/build_analytics_report.dart';
 import 'package:wisebuget/features/analytics/presentation/cubit/analytics_state.dart';
@@ -33,7 +34,17 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> init() async {
-    emit(state.copyWith(status: CubitStatus.loading));
+    emit(
+      state.copyWith(
+        status: CubitStatus.loading,
+        selectedPeriod: AnalyticsPeriod.fromId(_prefs.analyticsPeriod),
+        selectedAccountUuid: () => _prefs.analyticsAccount,
+        categoryType:
+            _prefs.analyticsCategoryType == TransactionType.income.label
+            ? TransactionType.income
+            : TransactionType.expense,
+      ),
+    );
 
     final transactionsResult = await _getTransactions(const NoParams());
     final categoriesResult = await _getCategories(const NoParams());
@@ -59,16 +70,19 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
   void selectPeriod(AnalyticsPeriod period) {
     emit(state.copyWith(selectedPeriod: period));
+    _prefs.setAnalyticsPeriod(period.id);
     _recompute();
   }
 
   void selectAccount(String? accountUuid) {
     emit(state.copyWith(selectedAccountUuid: () => accountUuid));
+    _prefs.setAnalyticsAccount(accountUuid);
     _recompute();
   }
 
   void selectCategoryType(TransactionType type) {
     emit(state.copyWith(categoryType: type));
+    _prefs.setAnalyticsCategoryType(type.label);
     _recompute();
   }
 
