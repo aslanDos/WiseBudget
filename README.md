@@ -20,41 +20,18 @@ WiseBudget helps you:
 
 WiseBudget covers the main personal finance workflow end to end: daily tracking, fast transaction entry, account management, and app customization. Below is a quick visual walkthrough of the current UI.
 
-### Home & Daily Tracking
-
-| Home Overview | Analytics Overview |
-|---|---|
-| ![](screenshots/home_overview.png) | ![](screenshots/analytics_overview.png) |
-| Daily tracking with account context, calendar navigation, and recent transactions | Period-based income and expense analytics with chart and category breakdown |
-
-### Transaction Flow
-
-| Transaction Form | Select Account |
-|---|---|
-| ![](screenshots/transaction_form_overview.png) | ![](screenshots/transaction_account_picker.png) |
-| Fast bottom-sheet flow for creating income, expense, and transfer entries | Pick the source account directly from a dedicated modal selector |
-
-| Select Category | Pick Date |
-|---|---|
-| ![](screenshots/transaction_category_picker.png) | ![](screenshots/transaction_date_picker.png) |
-| Choose a category with icon support for cleaner organization | Set the transaction date from a calendar picker without leaving the form |
-
-| Add Note |  |
-|---|---|
-| ![](screenshots/transaction_note_input.png) |  |
-| Add optional transaction details inline through a lightweight input sheet |  |
-
-### Accounts & Customization
-
-| Accounts Overview | Account Form |
-|---|---|
-| ![](screenshots/accounts_overview.png) | ![](screenshots/account_form.png) |
-| Manage balances, currencies, account identity, and ordering | Configure account name, balance, currency, color, and icon in one flow |
-
-| Settings |  |
-|---|---|
-| ![](screenshots/settings_overview.png) |  |
-| Customize language, currency, theme, launch page, and local device behavior |  |
+| Screen | Preview | What it shows |
+|---|---|---|
+| Home Overview | ![](screenshots/home_overview.png) | Daily tracking with account context, calendar navigation, and recent transactions |
+| Analytics Overview | ![](screenshots/analytics_overview.png) | Period-based income and expense analytics with charts and category breakdown |
+| Accounts Overview | ![](screenshots/accounts_overview.png) | Account balances, multiple wallets, and quick access to account management |
+| Account Form | ![](screenshots/account_form.png) | Configure account name, balance, currency, color, and icon in one flow |
+| Transaction Form | ![](screenshots/transaction_form_overview.png) | Bottom-sheet flow for creating income, expense, and transfer entries |
+| Select Account | ![](screenshots/transaction_account_picker.png) | Pick the source account directly from a dedicated modal selector |
+| Select Category | ![](screenshots/transaction_category_picker.png) | Choose a category with icon support for cleaner transaction organization |
+| Pick Date | ![](screenshots/transaction_date_picker.png) | Set the transaction date from a calendar picker without leaving the form |
+| Add Note | ![](screenshots/transaction_note_input.png) | Add optional transaction details inline through a lightweight input sheet |
+| Settings | ![](screenshots/settings_overview.png) | Customize language, currency, theme, launch page, and local device behavior |
 
 ## Features
 
