@@ -1,6 +1,7 @@
 import 'package:wisebuget/features/account/data/model/account_model.dart';
 import 'package:wisebuget/features/budget/data/model/budget_model.dart';
 import 'package:wisebuget/features/category/data/model/category_model.dart';
+import 'package:wisebuget/features/transaction/data/model/recurring_transaction_model.dart';
 import 'package:wisebuget/features/transaction/data/model/transaction_model.dart';
 import 'package:wisebuget/objectbox.g.dart';
 
@@ -14,5 +15,6 @@ class ClearAllData {
     _store.box<AccountModel>().removeAll();
     _store.box<BudgetModel>().removeAll();
     _store.box<CategoryModel>().removeAll();
+    _store.box<RecurringTransactionModel>().removeAll();
   }
 }

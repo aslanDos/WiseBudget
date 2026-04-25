@@ -21,6 +21,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get save => 'Сохранить';
 
   @override
+  String get saveAndSchedule => 'Сохранить и запланировать';
+
+  @override
+  String get saveRecurring => 'Сохранить повтор';
+
+  @override
   String get edit => 'Изменить';
 
   @override
@@ -67,6 +73,41 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unknown => 'Неизвестно';
+
+  @override
+  String get repeat => 'Повтор';
+
+  @override
+  String get never => 'Никогда';
+
+  @override
+  String get repeatingTransaction => 'Повторяющаяся транзакция';
+
+  @override
+  String get repeatingTransactionDeleteMessage =>
+      'Что сделать с правилом повтора?';
+
+  @override
+  String get stopRepeat => 'Остановить повтор';
+
+  @override
+  String get deleteSeries => 'Удалить серию';
+
+  @override
+  String get editRepeatingTransaction => 'Изменить повторяющуюся транзакцию';
+
+  @override
+  String get editRepeatingTransactionMessage =>
+      'Применить изменения только к этой транзакции, к будущим транзакциям или ко всей серии?';
+
+  @override
+  String get onlyThisTransaction => 'Только эта транзакция';
+
+  @override
+  String get futureTransactions => 'Будущие транзакции';
+
+  @override
+  String get entireSeries => 'Вся серия';
 
   @override
   String get somethingWentWrong => 'Что-то пошло не так';

@@ -23,6 +23,9 @@ class TransactionEntity extends Equatable {
   /// Snapshot of the app's base currency when this transaction was created.
   final String? baseCurrency;
 
+  /// UUID of the recurring template that created this transaction.
+  final String? recurringTemplateUuid;
+
   /// Validation constants
   static const int maxNoteLength = 256;
 
@@ -40,6 +43,7 @@ class TransactionEntity extends Equatable {
     this.exchangeRate,
     this.convertedAmount,
     this.baseCurrency,
+    this.recurringTemplateUuid,
   });
 
   /// Computed property - returns amount as Money value object
@@ -49,8 +53,7 @@ class TransactionEntity extends Equatable {
   double get amountInBase => convertedAmount ?? amount;
 
   /// True when transaction currency differs from the base currency at creation.
-  bool get isCrossCurrency =>
-      baseCurrency != null && currency != baseCurrency;
+  bool get isCrossCurrency => baseCurrency != null && currency != baseCurrency;
 
   /// Convenience getters
   bool get isExpense => type == TransactionType.expense;
@@ -89,6 +92,8 @@ class TransactionEntity extends Equatable {
     double? exchangeRate,
     double? convertedAmount,
     String? baseCurrency,
+    String? recurringTemplateUuid,
+    bool clearRecurringTemplateUuid = false,
   }) {
     return TransactionEntity(
       uuid: uuid ?? this.uuid,
@@ -104,6 +109,9 @@ class TransactionEntity extends Equatable {
       exchangeRate: exchangeRate ?? this.exchangeRate,
       convertedAmount: convertedAmount ?? this.convertedAmount,
       baseCurrency: baseCurrency ?? this.baseCurrency,
+      recurringTemplateUuid: clearRecurringTemplateUuid
+          ? null
+          : recurringTemplateUuid ?? this.recurringTemplateUuid,
     );
   }
 
@@ -122,5 +130,6 @@ class TransactionEntity extends Equatable {
     exchangeRate,
     convertedAmount,
     baseCurrency,
+    recurringTemplateUuid,
   ];
 }

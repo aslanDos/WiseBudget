@@ -2,6 +2,7 @@ import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/shared/utils/amount_formatter.dart';
 import 'package:wisebuget/features/account/domain/entity/account_entity.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
+import 'package:wisebuget/features/transaction/domain/recurrence_frequency.dart';
 import 'package:wisebuget/features/transaction/domain/entity/transaction_entity.dart';
 
 /// Form data class for transaction creation/editing.
@@ -15,6 +16,8 @@ class TransactionFormEntity {
   String? expenseCategoryUuid;
   DateTime date;
   String note;
+  bool isRecurring;
+  RecurrenceFrequency recurrenceFrequency;
 
   TransactionFormEntity({
     required this.type,
@@ -25,6 +28,8 @@ class TransactionFormEntity {
     this.expenseCategoryUuid,
     DateTime? date,
     this.note = '',
+    this.isRecurring = false,
+    this.recurrenceFrequency = RecurrenceFrequency.monthly,
   }) : date = date ?? DateTime.now();
 
   /// Creates form data from an existing transaction (for editing).
@@ -51,6 +56,7 @@ class TransactionFormEntity {
       expenseCategoryUuid: tx.isExpense ? tx.categoryUuid : null,
       date: tx.date,
       note: tx.note ?? '',
+      isRecurring: false,
     );
   }
 
@@ -62,8 +68,8 @@ class TransactionFormEntity {
   String? get categoryUuid => isAdjustment
       ? null
       : type == TransactionType.income
-          ? incomeCategoryUuid
-          : expenseCategoryUuid;
+      ? incomeCategoryUuid
+      : expenseCategoryUuid;
 
   set categoryUuid(String? uuid) {
     if (type == TransactionType.income) {

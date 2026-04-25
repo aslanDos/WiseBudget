@@ -14,6 +14,7 @@ const iconOptions = [
   'gamepad',
   'music',
   'heart',
+  'heartPulse',
   'star',
   'coffee',
   'gift',
@@ -25,4 +26,5 @@ const iconOptions = [
   'stethoscope',
   'zap',
   'globe',
+  'trendingUp',
 ];

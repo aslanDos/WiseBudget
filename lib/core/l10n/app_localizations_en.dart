@@ -21,6 +21,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get save => 'Save';
 
   @override
+  String get saveAndSchedule => 'Save & schedule';
+
+  @override
+  String get saveRecurring => 'Save recurring';
+
+  @override
   String get edit => 'Edit';
 
   @override
@@ -67,6 +73,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknown => 'Unknown';
+
+  @override
+  String get repeat => 'Repeat';
+
+  @override
+  String get never => 'Never';
+
+  @override
+  String get repeatingTransaction => 'Repeating transaction';
+
+  @override
+  String get repeatingTransactionDeleteMessage =>
+      'What do you want to do with this repeat rule?';
+
+  @override
+  String get stopRepeat => 'Stop repeat';
+
+  @override
+  String get deleteSeries => 'Delete series';
+
+  @override
+  String get editRepeatingTransaction => 'Edit repeating transaction';
+
+  @override
+  String get editRepeatingTransactionMessage =>
+      'Apply these changes to this transaction, future transactions, or the entire series?';
+
+  @override
+  String get onlyThisTransaction => 'Only this transaction';
+
+  @override
+  String get futureTransactions => 'Future transactions';
+
+  @override
+  String get entireSeries => 'Entire series';
 
   @override
   String get somethingWentWrong => 'Something went wrong';

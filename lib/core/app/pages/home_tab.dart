@@ -11,6 +11,7 @@ import 'package:wisebuget/core/shared/widgets/action_button.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_cubit.dart';
 import 'package:wisebuget/features/account/presentation/cubit/account_state.dart';
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/recurring_transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 
 class HomeTab extends StatefulWidget {
@@ -41,6 +42,7 @@ class _HomeTabState extends State<HomeTab> {
     super.initState();
     _prefs = sl<LocalPreferences>();
     sl<TransactionCubit>().loadTransactions();
+    sl<RecurringTransactionCubit>().loadRecurringTransactions();
     sl<CategoryCubit>().loadCategories();
     sl<AccountCubit>().loadAccounts();
   }
@@ -50,6 +52,7 @@ class _HomeTabState extends State<HomeTab> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: sl<TransactionCubit>()),
+        BlocProvider.value(value: sl<RecurringTransactionCubit>()),
         BlocProvider.value(value: sl<CategoryCubit>()),
         BlocProvider.value(value: sl<AccountCubit>()),
       ],

@@ -21,6 +21,12 @@ class AppLocalizationsKk extends AppLocalizations {
   String get save => 'Сақтау';
 
   @override
+  String get saveAndSchedule => 'Сақтап, жоспарлау';
+
+  @override
+  String get saveRecurring => 'Қайталауды сақтау';
+
+  @override
   String get edit => 'Өңдеу';
 
   @override
@@ -67,6 +73,41 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get unknown => 'Белгісіз';
+
+  @override
+  String get repeat => 'Қайталау';
+
+  @override
+  String get never => 'Ешқашан';
+
+  @override
+  String get repeatingTransaction => 'Қайталанатын транзакция';
+
+  @override
+  String get repeatingTransactionDeleteMessage =>
+      'Қайталау ережесімен не істегіңіз келеді?';
+
+  @override
+  String get stopRepeat => 'Қайталауды тоқтату';
+
+  @override
+  String get deleteSeries => 'Серияны өшіру';
+
+  @override
+  String get editRepeatingTransaction => 'Қайталанатын транзакцияны өңдеу';
+
+  @override
+  String get editRepeatingTransactionMessage =>
+      'Өзгерістерді тек осы транзакцияға, болашақ транзакцияларға немесе бүкіл серияға қолданасыз ба?';
+
+  @override
+  String get onlyThisTransaction => 'Тек осы транзакция';
+
+  @override
+  String get futureTransactions => 'Болашақ транзакциялар';
+
+  @override
+  String get entireSeries => 'Бүкіл серия';
 
   @override
   String get somethingWentWrong => 'Бірдеңе дұрыс болмады';

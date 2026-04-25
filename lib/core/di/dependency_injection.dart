@@ -31,13 +31,20 @@ import 'package:wisebuget/features/exchange_rate/domain/repository/exchange_rate
 import 'package:wisebuget/features/exchange_rate/domain/usecases/get_or_fetch_exchange_rate.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource.dart';
 import 'package:wisebuget/features/transaction/data/data_source/transaction_local_datasource_impl.dart';
+import 'package:wisebuget/features/transaction/data/data_source/recurring_transaction_local_datasource.dart';
+import 'package:wisebuget/features/transaction/data/data_source/recurring_transaction_local_datasource_impl.dart';
 import 'package:wisebuget/features/transaction/data/repository/objectbox_transaction_effects_gateway.dart';
+import 'package:wisebuget/features/transaction/data/repository/recurring_transaction_repository_impl.dart';
 import 'package:wisebuget/features/transaction/data/repository/transaction_repository_impl.dart';
+import 'package:wisebuget/features/transaction/domain/repository/recurring_transaction_repository.dart';
 import 'package:wisebuget/features/transaction/domain/repository/transaction_effects_gateway.dart';
 import 'package:wisebuget/features/transaction/domain/repository/transaction_repository.dart';
+import 'package:wisebuget/features/transaction/domain/services/recurring_transaction_scheduler.dart';
+import 'package:wisebuget/features/transaction/domain/usecases/recurring_transaction_usecases.dart';
 import 'package:wisebuget/features/transaction/domain/usecases/transaction_usecases.dart';
 import 'package:wisebuget/core/usecases/clear_all_data.dart';
 import 'package:wisebuget/features/settings/presentation/cubit/settings_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/cubit/recurring_transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
 import 'package:wisebuget/features/budget/domain/usecases/build_budget_overview.dart';
 
@@ -169,10 +176,16 @@ void _initTransactionFeature() {
   sl.registerLazySingleton<TransactionLocalDataSource>(
     () => TransactionLocalDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<RecurringTransactionLocalDataSource>(
+    () => RecurringTransactionLocalDataSourceImpl(sl()),
+  );
 
   // Repository
   sl.registerLazySingleton<TransactionRepository>(
     () => TransactionRepositoryImpl(localDataSource: sl()),
+  );
+  sl.registerLazySingleton<RecurringTransactionRepository>(
+    () => RecurringTransactionRepositoryImpl(localDataSource: sl()),
   );
   sl.registerLazySingleton<TransactionEffectsGateway>(
     () => ObjectBoxTransactionEffectsGateway(sl()),
@@ -185,10 +198,15 @@ void _initTransactionFeature() {
   sl.registerLazySingleton(() => GetTransactionsByCategory(sl()));
   sl.registerLazySingleton(() => CreateTransaction(sl()));
   sl.registerLazySingleton(() => CreateTransactionWithEffects(sl()));
+  sl.registerLazySingleton(() => GetRecurringTransactions(sl()));
+  sl.registerLazySingleton(() => CreateRecurringTransaction(sl()));
+  sl.registerLazySingleton(() => UpdateRecurringTransaction(sl()));
+  sl.registerLazySingleton(() => DeleteRecurringTransaction(sl()));
   sl.registerLazySingleton(() => UpdateTransaction(sl()));
   sl.registerLazySingleton(() => UpdateTransactionWithEffects(sl()));
   sl.registerLazySingleton(() => DeleteTransaction(sl()));
   sl.registerLazySingleton(() => DeleteTransactionWithEffects(sl()));
+  sl.registerLazySingleton(() => const RecurringTransactionScheduler());
 
   // Cubit (singleton so all screens share the same state)
   sl.registerLazySingleton(
@@ -202,6 +220,14 @@ void _initTransactionFeature() {
       getOrFetchExchangeRate: sl(),
       recalculateAccountBalances: sl(),
       prefs: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => RecurringTransactionCubit(
+      getRecurringTransactions: sl(),
+      createRecurringTransaction: sl(),
+      updateRecurringTransaction: sl(),
+      deleteRecurringTransaction: sl(),
     ),
   );
 }

@@ -36,6 +36,7 @@ class AppIcons {
     'gift': gift,
     'home': home,
     'heart': heart,
+    'heartPulse': heartPulse,
     'music': music,
     'coffee': coffee,
     'book': book,
@@ -128,6 +129,8 @@ class AppIcons {
   static const IconData chevronUpDown = LucideIcons.chevronsUpDown;
   static const IconData feather = LucideIcons.feather;
   static const IconData ban = LucideIcons.ban;
+  static const IconData repeat = LucideIcons.repeat;
+  static const IconData elipsesVertical = LucideIcons.ellipsisVertical;
 
   // Category icons
   static const IconData utensils = LucideIcons.utensils;
@@ -138,6 +141,7 @@ class AppIcons {
   static const IconData gift = LucideIcons.gift;
   static const IconData home = LucideIcons.house;
   static const IconData heart = LucideIcons.heart;
+  static const IconData heartPulse = LucideIcons.heartPulse;
   static const IconData music = LucideIcons.music;
   static const IconData coffee = LucideIcons.coffee;
   static const IconData book = LucideIcons.bookOpen;

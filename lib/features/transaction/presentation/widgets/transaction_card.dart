@@ -24,6 +24,7 @@ class TransactionCard extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final bool isRecurring;
 
   const TransactionCard({
     super.key,
@@ -34,6 +35,7 @@ class TransactionCard extends StatefulWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.isRecurring = false,
   });
 
   @override
@@ -63,14 +65,14 @@ class _TransactionCardState extends State<TransactionCard> {
         ),
         child: Row(
           children: [
-            ColoredIconBox(
-              size: 24,
+            _TransactionIcon(
               icon: isTransfer
                   ? AppIcons.arrowUpDown
                   : isAdjustment
                   ? AppIcons.pen
                   : (widget.category?.icon ?? AppIcons.empty),
               color: categoryColor,
+              isRecurring: widget.isRecurring,
             ),
             const SizedBox(width: 12.0),
             Expanded(
@@ -127,6 +129,49 @@ class _TransactionCardState extends State<TransactionCard> {
             return SizedBox(width: resolvedWidth, child: cardContent);
           },
         ),
+      ),
+    );
+  }
+}
+
+class _TransactionIcon extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final bool isRecurring;
+
+  const _TransactionIcon({
+    required this.icon,
+    required this.color,
+    required this.isRecurring,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 36,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ColoredIconBox(size: 24, icon: icon, color: color),
+          if (isRecurring)
+            Positioned(
+              top: -3,
+              right: -3,
+              child: Container(
+                width: 15,
+                height: 15,
+                decoration: BoxDecoration(
+                  color: context.c.primary,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Icon(
+                  AppIcons.repeat,
+                  size: 9.5,
+                  color: context.c.onPrimary,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -124,6 +124,18 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
+  /// No description provided for @saveAndSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & schedule'**
+  String get saveAndSchedule;
+
+  /// No description provided for @saveRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Save recurring'**
+  String get saveRecurring;
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
@@ -219,6 +231,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get unknown;
+
+  /// No description provided for @repeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get repeat;
+
+  /// No description provided for @never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get never;
+
+  /// No description provided for @repeatingTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeating transaction'**
+  String get repeatingTransaction;
+
+  /// No description provided for @repeatingTransactionDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to do with this repeat rule?'**
+  String get repeatingTransactionDeleteMessage;
+
+  /// No description provided for @stopRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop repeat'**
+  String get stopRepeat;
+
+  /// No description provided for @deleteSeries.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete series'**
+  String get deleteSeries;
+
+  /// No description provided for @editRepeatingTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit repeating transaction'**
+  String get editRepeatingTransaction;
+
+  /// No description provided for @editRepeatingTransactionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply these changes to this transaction, future transactions, or the entire series?'**
+  String get editRepeatingTransactionMessage;
+
+  /// No description provided for @onlyThisTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this transaction'**
+  String get onlyThisTransaction;
+
+  /// No description provided for @futureTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Future transactions'**
+  String get futureTransactions;
+
+  /// No description provided for @entireSeries.
+  ///
+  /// In en, this message translates to:
+  /// **'Entire series'**
+  String get entireSeries;
 
   /// No description provided for @somethingWentWrong.
   ///

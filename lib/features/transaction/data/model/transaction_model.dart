@@ -36,6 +36,7 @@ class TransactionModel {
   double? exchangeRate;
   double? convertedAmount;
   String? baseCurrency;
+  String? recurringTemplateUuid;
 
   TransactionModel({
     this.id = 0,
@@ -52,6 +53,7 @@ class TransactionModel {
     this.exchangeRate,
     this.convertedAmount,
     this.baseCurrency,
+    this.recurringTemplateUuid,
   }) : createdDate = createdDate ?? DateTime.now();
 
   @Transient()
@@ -85,6 +87,7 @@ class TransactionModel {
       exchangeRate: exchangeRate,
       convertedAmount: convertedAmount,
       baseCurrency: baseCurrency,
+      recurringTemplateUuid: recurringTemplateUuid,
     );
   }
 
@@ -105,6 +108,7 @@ class TransactionModel {
       exchangeRate: entity.exchangeRate,
       convertedAmount: entity.convertedAmount,
       baseCurrency: entity.baseCurrency,
+      recurringTemplateUuid: entity.recurringTemplateUuid,
     );
   }
 }

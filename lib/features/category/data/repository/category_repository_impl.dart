@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
-import 'package:wisebuget/core/constants/app_enums.dart';
 import 'package:wisebuget/core/errors/failures.dart';
 import 'package:wisebuget/core/shared/extensions/transaction_type_x.dart';
 import 'package:wisebuget/features/category/data/data_source/category_local_datasource.dart';
+import 'package:wisebuget/features/category/data/default_categories.dart';
 import 'package:wisebuget/features/category/data/model/category_model.dart';
 import 'package:wisebuget/features/category/domain/entity/category_entity.dart';
 import 'package:wisebuget/features/category/domain/repository/category_repository.dart';
@@ -87,68 +87,15 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
       _log.info('No categories found, creating default categories');
 
-      final defaultCategories = [
-        // Expense categories
-        CategoryModel(
+      for (final definition in defaultCategoryDefinitions) {
+        final category = CategoryModel(
           uuid: const Uuid().v4(),
-          name: 'Food & Drinks',
-          sortOrder: 0,
-          iconCode: 'utensils',
-          type: TransactionType.expense.label,
-          colorValue: 0xFFEF5350,
-        ),
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Transport',
-          sortOrder: 1,
-          iconCode: 'car',
-          type: TransactionType.expense.label,
-          colorValue: 0xFFEC407A,
-        ),
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Shopping',
-          sortOrder: 2,
-          iconCode: 'shoppingBag',
-          type: TransactionType.expense.label,
-          colorValue: 0xFFAB47BC,
-        ),
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Entertainment',
-          sortOrder: 3,
-          iconCode: 'gamepad',
-          type: TransactionType.expense.label,
-          colorValue: 0xFF7E57C2,
-        ),
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Bills',
-          sortOrder: 4,
-          iconCode: 'receipt',
-          type: TransactionType.expense.label,
-          colorValue: 0xFF5C6BC0,
-        ),
-        // Income categories
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Salary',
-          sortOrder: 0,
-          iconCode: 'briefCase',
-          type: TransactionType.income.label,
-          colorValue: 0xFF42A5F5,
-        ),
-        CategoryModel(
-          uuid: const Uuid().v4(),
-          name: 'Gift',
-          sortOrder: 1,
-          iconCode: 'gift',
-          type: TransactionType.income.label,
-          colorValue: 0xFF29B6F6,
-        ),
-      ];
-
-      for (final category in defaultCategories) {
+          name: definition.name,
+          sortOrder: definition.sortOrder,
+          iconCode: definition.iconCode,
+          type: definition.type.label,
+          colorValue: definition.colorValue,
+        );
         await localDataSource.createCategory(category);
       }
 
