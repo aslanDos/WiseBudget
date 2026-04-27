@@ -13,6 +13,7 @@ import 'package:wisebuget/features/account/presentation/cubit/account_state.dart
 import 'package:wisebuget/features/category/presentation/cubit/category_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/recurring_transaction_cubit.dart';
 import 'package:wisebuget/features/transaction/presentation/cubit/transaction_cubit.dart';
+import 'package:wisebuget/features/transaction/presentation/pages/transaction_search_sheet.dart';
 
 class HomeTab extends StatefulWidget {
   final ScrollController? scrollController;
@@ -79,6 +80,11 @@ class _HomeTabState extends State<HomeTab> {
           ),
           actionsPadding: const EdgeInsets.only(right: 16),
           actions: [
+            ActionButton(
+              icon: AppIcons.search,
+              onTap: () => showTransactionSearchModal(context: context),
+            ),
+            const SizedBox(width: 8),
             ActionButton(
               icon: AppIcons.settings,
               onTap: () => context.push(AppRoutes.settings),

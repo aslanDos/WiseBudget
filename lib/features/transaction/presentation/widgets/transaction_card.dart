@@ -101,14 +101,14 @@ class _TransactionCardState extends State<TransactionCard> {
       actions: [
         if (widget.onEdit != null)
           CupertinoContextMenuAction(
-            onPressed: widget.onEdit,
+            onPressed: () => _runContextMenuAction(context, widget.onEdit),
             trailingIcon: CupertinoIcons.pencil,
             child: const Text('Edit'),
           ),
         if (widget.onDelete != null)
           CupertinoContextMenuAction(
             isDestructiveAction: true,
-            onPressed: widget.onDelete,
+            onPressed: () => _runContextMenuAction(context, widget.onDelete),
             trailingIcon: CupertinoIcons.delete,
             child: const Text('Delete'),
           ),
@@ -131,6 +131,11 @@ class _TransactionCardState extends State<TransactionCard> {
         ),
       ),
     );
+  }
+
+  void _runContextMenuAction(BuildContext context, VoidCallback? action) {
+    Navigator.of(context).pop();
+    WidgetsBinding.instance.addPostFrameCallback((_) => action?.call());
   }
 }
 

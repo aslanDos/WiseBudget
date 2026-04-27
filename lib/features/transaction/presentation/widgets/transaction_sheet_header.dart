@@ -85,11 +85,15 @@ class _TransactionSheetHeaderState extends State<TransactionSheetHeader> {
         bottom: false,
         child: Row(
           children: [
-            ActionButton(
-              backgroundColor: Colors.transparent,
-              icon: AppIcons.close,
+            GestureDetector(
               onTap: () => Navigator.pop(context),
+              child: Icon(AppIcons.close, size: 20),
             ),
+            // ActionButton(
+            //   backgroundColor: Colors.transparent,
+            //   icon: AppIcons.close,
+            //   onTap: () => Navigator.pop(context),
+            // ),
             Expanded(
               child: Center(
                 child: BlocBuilder<AccountCubit, AccountState>(
@@ -125,10 +129,9 @@ class _TransactionSheetHeaderState extends State<TransactionSheetHeader> {
               ],
               buttonBuilder: (context, showMenu) => SizedBox(
                 key: _menuButtonKey,
-                child: ActionButton(
-                  backgroundColor: Colors.transparent,
-                  icon: AppIcons.elipsesVertical,
+                child: GestureDetector(
                   onTap: showMenu,
+                  child: Icon(AppIcons.elipsesVertical, size: 20),
                 ),
               ),
             ),

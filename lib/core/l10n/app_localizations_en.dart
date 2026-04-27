@@ -57,6 +57,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get select => 'Select';
 
   @override
+  String get search => 'Search';
+
+  @override
   String get skip => 'Skip';
 
   @override

@@ -57,6 +57,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get select => 'Таңдау';
 
   @override
+  String get search => 'Іздеу';
+
+  @override
   String get skip => 'Өткізу';
 
   @override

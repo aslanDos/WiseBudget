@@ -374,7 +374,17 @@ class _TransactionsList extends StatelessWidget {
     final recurringCubit = context.read<RecurringTransactionCubit>();
 
     if (template == null) {
-      transactionCubit.removeTransaction(item.transaction.uuid);
+      final confirmed = await showAppConfirmDialog(
+        context: context,
+        title: context.l10n.deleteTransaction,
+        message: context.l10n.areYouSureDeleteTransaction,
+        confirmText: context.l10n.delete,
+        cancelText: context.l10n.cancel,
+        isDestructive: true,
+      );
+      if (confirmed == true) {
+        transactionCubit.removeTransaction(item.transaction.uuid);
+      }
       return;
     }
 

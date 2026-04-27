@@ -18,6 +18,7 @@ class AppIcons {
     'briefCase': briefCase,
     'wallet': wallet,
     'settings': settings,
+    'search': search,
     'pencil': pencil,
     'gripVertical': gripVertical,
     'trash': trash,
@@ -117,6 +118,7 @@ class AppIcons {
   static const IconData wallet = LucideIcons.wallet;
   static const IconData wallet400 = LucideIcons.wallet400;
   static const IconData settings = LucideIcons.settings;
+  static const IconData search = LucideIcons.search;
   static const IconData pencil = LucideIcons.pencil;
   static const IconData gripVertical = LucideIcons.gripVertical;
   static const IconData trash = LucideIcons.trash2;
